@@ -1,0 +1,10 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Work from '../../components/Work.astro';
+export async function getStaticPaths() {
+  return (await getCollection('projects')).map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+---
+<Base locale="ko" title={entry.data.title} description={entry.data.summary}><Work locale="ko" entry={entry} /></Base>

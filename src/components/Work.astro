@@ -1,0 +1,63 @@
+---
+// Project detail body, shared by /work/[id]/ and /en/work/[id]/.
+// EN pages show the English summary; the full write-up is Korean for now (assumption, see README).
+import { render, getCollection, type CollectionEntry } from 'astro:content';
+import { t, STATUS_LABEL, type Locale } from '../i18n';
+
+interface Props { locale: Locale; entry: CollectionEntry<'projects'>; }
+const { locale, entry } = Astro.props;
+const s = t[locale].detail;
+const en = locale === 'en';
+const prefix = en ? '/en/' : '/';
+const d = entry.data;
+const { Content } = await render(entry);
+const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const next = all[all.findIndex((p) => p.id === entry.id) + 1] ?? all[0];
+const title = en ? d.titleEn : d.title;
+---
+<article class="wrap work">
+  <a class="back mono" href={`${prefix}#modules`}>{s.back}</a>
+  <header class="work-head">
+    <div class="work-top">
+      <span class="mono work-id">MOD-{String(d.order).padStart(2, '0')}</span>
+      <span class="label">{d.module}</span>
+      <span class="status" data-status={d.status}>{STATUS_LABEL[locale][d.status]}</span>
+    </div>
+    <h1 class="work-title">{title}</h1>
+    <p class="work-summary">{en ? d.summaryEn : d.summary}</p>
+    <dl class="record work-meta">
+      <dt>{s.period}</dt><dd>{en ? d.periodEn : d.period}</dd>
+      <dt>{s.stack}</dt><dd class="mono">{d.stack.join(' · ')}</dd>
+      <dt>{s.replaced}</dt><dd>{en ? d.replacedEn : d.replaced}</dd>
+    </dl>
+  </header>
+
+  {en && (
+    <p class="notice">
+      The full write-up below is in Korean. <a href={`/work/${entry.id}/`} lang="ko">Read the Korean page</a> for the same content without the English header, or email me for an English walkthrough.
+    </p>
+  )}
+
+  <div class="prose" lang="ko"><Content /></div>
+
+  <nav class="work-next" aria-label={s.next}>
+    <span class="label">{s.next}</span>
+    <a href={`${prefix}work/${next.id}/`}>MOD-{String(next.data.order).padStart(2, '0')} · {en ? next.data.titleEn : next.data.title} →</a>
+  </nav>
+</article>
+
+<style>
+  .work { padding-block: var(--space-xl) var(--space-2xl); }
+  .back { display: inline-block; font-size: var(--text-xs); letter-spacing: 0.04em; color: var(--color-ink-3); text-decoration: none; margin-bottom: var(--space-lg); }
+  .back:hover { color: var(--color-ink); }
+  .work-head { display: grid; gap: var(--space-md); max-width: 44rem; padding-bottom: var(--space-xl); border-bottom: var(--rule); margin-bottom: var(--space-xl); }
+  .work-top { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
+  .work-id { font-size: var(--text-xs); letter-spacing: 0.06em; }
+  .work-title { font-size: var(--text-3xl); letter-spacing: -0.025em; }
+  .work-summary { font-size: var(--text-lg); color: var(--color-ink-2); line-height: 1.5; }
+  .work-meta { margin-top: var(--space-sm); }
+  .notice { max-width: var(--measure); font-size: var(--text-sm); color: var(--color-ink-2); background: var(--color-paper-2); border: var(--rule); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); margin-bottom: var(--space-xl); }
+  .work-next { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: var(--rule); display: grid; gap: var(--space-2xs); }
+  .work-next a { text-decoration: none; font-weight: 600; }
+  .work-next a:hover { text-decoration: underline; }
+</style>

@@ -1,0 +1,222 @@
+---
+// Home page body, shared by / (ko) and /en/. All copy comes from i18n.ts; modules from the content collection.
+import { getCollection } from 'astro:content';
+import { t, EMAIL, LINKEDIN, STATUS_LABEL, type Locale } from '../i18n';
+import Palette from './Palette.astro';
+
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const s = t[locale];
+const en = locale === 'en';
+const prefix = en ? '/en/' : '/';
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const pick = <K extends string>(d: Record<string, unknown>, k: K) => String(en ? d[`${k}En`] : d[k]);
+
+const paletteItems = [
+  ...projects.map((p) => ({ label: pick(p.data, 'title'), hint: `MOD-${String(p.data.order).padStart(2, '0')} · ${p.data.module}`, href: `${prefix}work/${p.id}/` })),
+  ...Object.entries(s.nav).map(([id, label]) => ({ label, hint: 'SECTION', href: `#${id}` })),
+];
+---
+<!-- ── RECORD (hero) ─────────────────────────────────────── -->
+<section id="record" class="wrap hero">
+  <div class="hero-main">
+    <p class="label">{s.hero.eyebrow}</p>
+    <h1 class="hero-name">{s.hero.name}<span class="hero-role"> · {s.hero.role}</span></h1>
+    <p class="hero-statement">{s.hero.statement}</p>
+    <p class="hero-sub">{s.hero.sub}</p>
+    <div class="hero-cta">
+      <a class="btn" href={`mailto:${EMAIL}`}>{s.hero.ctaPrimary}</a>
+      <a class="btn ghost" href={LINKEDIN} target="_blank" rel="noopener">{s.hero.ctaSecondary} ↗</a>
+    </div>
+  </div>
+  <aside class="hero-card">
+    <img class="hero-photo" src="/juyoung.jpg" width="800" height="800" alt={en ? 'Portrait of Juyoung You' : '유주영 프로필 사진'} loading="eager" />
+    <dl class="record">
+      {s.hero.fields.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}
+      <dt>ID</dt><dd class="mono">REC-2024-1205</dd>
+    </dl>
+  </aside>
+</section>
+
+<!-- ── MODULES ───────────────────────────────────────────── -->
+<section id="modules" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="label">MODULES · {String(projects.length).padStart(2, '0')}</p>
+      <h2>{s.modules.title}</h2>
+      <p class="lede">{s.modules.lede}</p>
+    </div>
+    <ol class="modules">
+      {projects.map((p) => (
+        <li class="module">
+          <a class="module-link" href={`${prefix}work/${p.id}/`}>
+            <div class="module-top">
+              <span class="mono module-id">MOD-{String(p.data.order).padStart(2, '0')}</span>
+              <span class="label">{p.data.module}</span>
+              <span class="status" data-status={p.data.status}>{STATUS_LABEL[locale][p.data.status]}</span>
+            </div>
+            <h3 class="module-title">{pick(p.data, 'title')}</h3>
+            <p class="module-summary">{pick(p.data, 'summary')}</p>
+            <dl class="module-meta">
+              <dt>{en ? 'Period' : '기간'}</dt><dd>{pick(p.data, 'period')}</dd>
+              <dt>{s.modules.replaced}</dt><dd>{pick(p.data, 'replaced')}</dd>
+            </dl>
+            <div class="module-foot">
+              <span class="mono module-stack">{p.data.stack.join(' · ')}</span>
+              <span class="module-open">{s.modules.open} →</span>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<!-- ── POLICY ────────────────────────────────────────────── -->
+<section id="policy" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="label">POLICY · {en ? 'Rev. 2026-09' : '2026-09 개정'}</p>
+      <h2>{s.policy.title}</h2>
+      <p class="lede">{s.policy.lede}</p>
+    </div>
+    <ol class="articles">
+      {s.policy.articles.map(([no, head, body]) => (
+        <li class="article">
+          <span class="mono article-no">{no}</span>
+          <div>
+            <h3 class="article-head">{head}</h3>
+            <p class="article-body">{body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <div class="silent">
+      <p class="label">{s.policy.silentTitle}</p>
+      <div class="silent-scroll">
+        <table class="silent-table">
+          <thead><tr>{s.policy.silentHead.map((h) => <th>{h}</th>)}</tr></thead>
+          <tbody>
+            {s.policy.silent.map(([a, b, c]) => (
+              <tr><td>{a}</td><td class="silent-hide">{b}</td><td class="silent-fix">{c}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LOG ───────────────────────────────────────────────── -->
+<section id="log" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="label">LOG · {en ? 'since 2024-12-05' : '2024-12-05 이후'}</p>
+      <h2>{s.log.title}</h2>
+      <p class="lede">{s.log.lede}</p>
+    </div>
+    <ol class="log">
+      {s.log.entries.map(([when, head, body]) => (
+        <li class="log-row">
+          <span class="mono log-when">{when}</span>
+          <span class="log-head">{head}</span>
+          <span class="log-body">{body}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<!-- ── CONTACT ───────────────────────────────────────────── -->
+<section id="contact" class="section contact">
+  <div class="wrap contact-in">
+    <div>
+      <p class="label">CONTACT</p>
+      <h2>{s.contact.title}</h2>
+      <p class="lede">{s.contact.lede}</p>
+    </div>
+    <div class="contact-actions">
+      <a class="btn" href={`mailto:${EMAIL}`}>{EMAIL}</a>
+      <a class="btn ghost" href={LINKEDIN} target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</section>
+
+<Palette locale={locale} items={paletteItems} />
+
+<style>
+  /* hero */
+  .hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--space-2xl); padding-block: var(--space-2xl) var(--space-2xl); align-items: start; }
+  .hero-main { display: flex; flex-direction: column; gap: var(--space-md); }
+  .hero-name { font-size: var(--text-display); letter-spacing: -0.03em; line-height: 1.05; }
+  .hero-role { display: block; font-size: var(--text-lg); font-weight: 460; color: var(--color-ink-2); letter-spacing: -0.01em; margin-top: 0.35em; }
+  .hero-statement { font-size: var(--text-xl); font-weight: 560; line-height: 1.35; letter-spacing: -0.015em; max-width: 30ch; margin-top: var(--space-sm); }
+  .hero-sub { color: var(--color-ink-2); max-width: var(--measure); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-sm); }
+  .hero-card { border: var(--rule); border-radius: var(--radius-md); padding: var(--space-md); background: var(--color-paper-2); display: grid; grid-template-columns: minmax(0, 150px) 1fr; gap: var(--space-lg); align-items: start; align-self: center; }
+  .hero-photo { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; object-position: top; border-radius: var(--radius-sm); filter: grayscale(0.15); }
+  .hero-card .record { row-gap: 0.7rem; }
+
+  /* modules */
+  .modules { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); }
+  .module { min-width: 0; }
+  .module-link {
+    display: flex; flex-direction: column; gap: var(--space-sm); height: 100%;
+    padding: var(--space-lg); border: var(--rule); border-radius: var(--radius-md); background: var(--color-paper);
+    text-decoration: none; transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  }
+  .module-link:hover { border-color: var(--color-ink-3); transform: translateY(-2px); }
+  .module-top { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
+  .module-id { font-size: var(--text-xs); color: var(--color-ink); letter-spacing: 0.06em; }
+  .module-top .status { margin-left: auto; }
+  .module-title { font-size: var(--text-xl); }
+  .module-summary { color: var(--color-ink-2); font-size: var(--text-sm); flex: 1; }
+  .module-meta { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem var(--space-md); margin: 0; font-size: var(--text-sm); border-top: var(--rule); padding-top: var(--space-sm); }
+  .module-meta dt { font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-3); padding-top: 0.2em; }
+  .module-meta dd { margin: 0; }
+  .module-foot { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-md); font-size: var(--text-xs); }
+  .module-stack { color: var(--color-ink-3); }
+  .module-open { color: var(--color-ink); font-weight: 560; white-space: nowrap; }
+
+  /* policy */
+  .articles { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: var(--rule); }
+  .article { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: var(--space-lg); padding-block: var(--space-lg); border-bottom: var(--rule); }
+  .article-no { font-size: var(--text-sm); color: var(--color-accent-ink); padding-top: 0.25em; }
+  .article-head { font-size: var(--text-lg); margin-bottom: 0.35em; }
+  .article-body { color: var(--color-ink-2); max-width: var(--measure); }
+  .silent { margin-top: var(--space-xl); display: grid; gap: var(--space-sm); }
+  .silent-scroll { overflow-x: auto; }
+  .silent-table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: var(--text-sm); }
+  .silent-table th { text-align: left; font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-3); font-weight: 500; padding: 0.5rem 0.75rem 0.5rem 0; border-bottom: 1px solid var(--color-rule-strong); }
+  .silent-table td { vertical-align: top; padding: 0.6rem 0.75rem 0.6rem 0; border-bottom: var(--rule); }
+  .silent-hide { color: var(--color-ink-2); }
+  .silent-fix { color: var(--color-accent-ink); }
+
+  /* log */
+  .log { list-style: none; margin: 0; padding: 0; border-top: var(--rule); }
+  .log-row { display: grid; grid-template-columns: 6rem 12rem minmax(0, 1fr); gap: var(--space-md); padding-block: var(--space-md); border-bottom: var(--rule); font-size: var(--text-sm); }
+  .log-when { color: var(--color-ink-3); font-size: var(--text-xs); padding-top: 0.25em; }
+  .log-head { font-weight: 600; }
+  .log-body { color: var(--color-ink-2); }
+
+  /* contact */
+  .contact-in { display: flex; justify-content: space-between; align-items: end; gap: var(--space-xl); flex-wrap: wrap; }
+  .contact-in h2 { font-size: var(--text-2xl); margin-block: var(--space-xs) var(--space-sm); }
+  .contact-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: var(--space-xl); }
+    .hero-card { grid-template-columns: minmax(0, 140px) 1fr; align-self: start; }
+    .modules { grid-template-columns: 1fr; }
+    .log-row { grid-template-columns: 6rem minmax(0, 1fr); }
+    .log-body { grid-column: 2; }
+  }
+  @media (max-width: 560px) {
+    .hero-card { grid-template-columns: minmax(0, 104px) 1fr; gap: var(--space-md); }
+    .hero-card .record { grid-template-columns: 1fr; row-gap: 0.25rem; }
+    .hero-card .record dd + dt { margin-top: 0.5rem; }
+    .article { grid-template-columns: 1fr; gap: var(--space-xs); }
+    .log-row { grid-template-columns: 1fr; gap: var(--space-2xs); }
+    .log-body { grid-column: auto; }
+  }
+</style>
