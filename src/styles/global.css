@@ -25,7 +25,7 @@ img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration-color: var(--color-rule-strong); text-underline-offset: 0.18em; }
 a:hover { text-decoration-color: var(--color-ink); }
 :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
-h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.2; letter-spacing: -0.02em; margin: 0; font-weight: 640; }
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.15; letter-spacing: -0.05em; margin: 0; font-weight: 700; }
 p { margin: 0; }
 code, kbd, .mono { font-family: var(--font-mono); font-size: 0.86em; }
 kbd {
@@ -48,14 +48,16 @@ kbd {
 .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--color-ink-3); }
 .status[data-status="live"] { color: var(--color-accent-ink); }
 .status[data-status="live"]::before { background: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-soft); }
+/* unread-style blue dot used next to fresh items */
+.dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); vertical-align: super; margin-left: 0.35em; }
 .status[data-status="pending"]::before, .status[data-status="poc"]::before { background: var(--color-warn); }
 .status[data-status="approved"]::before, .status[data-status="done"]::before { background: var(--color-ink-2); }
 
 /* ── buttons ───────────────────────────────────────────── */
 .btn {
   display: inline-flex; align-items: center; gap: 0.5em; white-space: nowrap;
-  padding: 0.6rem 1.05rem; border-radius: 999px; border: 1px solid var(--color-ink);
-  background: var(--color-ink); color: var(--color-paper); font: inherit; font-weight: 560; font-size: var(--text-sm);
+  padding: 0.65rem 1.15rem; border-radius: 999px; border: 1px solid var(--color-ink);
+  background: var(--color-ink); color: var(--color-paper); font: inherit; font-weight: 600; font-size: var(--text-sm);
   text-decoration: none; cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
@@ -67,7 +69,7 @@ kbd {
 /* ── section ───────────────────────────────────────────── */
 .section { padding-block: var(--space-2xl); border-top: var(--rule); }
 .section-head { display: flex; flex-direction: column; gap: var(--space-xs); margin-bottom: var(--space-xl); }
-.section-head h2 { font-size: var(--text-2xl); }
+.section-head h2 { font-size: var(--text-3xl); }
 .section-head .lede { color: var(--color-ink-2); max-width: var(--measure); }
 
 /* ── record table ──────────────────────────────────────── */
