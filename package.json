@@ -10,9 +10,11 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "pdf": "node scripts/make-pdf.mjs"
+    "pdf": "node scripts/make-pdf.mjs",
+    "og": "node scripts/make-og.mjs"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
     "astro": "^7.3.2",
     "pretendard": "^1.3.9"
   },

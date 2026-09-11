@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /print/
+
+Sitemap: https://im-ju.github.io/sitemap-index.xml
