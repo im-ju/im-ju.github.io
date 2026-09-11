@@ -1,6 +1,6 @@
 # Juyoung You — HR × AX 포트폴리오
 
-HR 콘솔 콘셉트의 정적 포트폴리오 사이트. Astro 7 · Cloudflare Pages.
+HR 콘솔 콘셉트의 정적 포트폴리오 사이트. Astro 7 · GitHub Pages.
 
 ## 구조
 
@@ -25,10 +25,8 @@ npm run build                     # dist/ 생성 (배포 전 반드시 성공해
 
 ## 배포
 
-GitHub `main`에 push → Cloudflare Pages가 자동 빌드. 빌드 명령 `npm run build`, 출력 디렉터리 `dist`.
+`master`에 push → GitHub Actions(`.github/workflows/deploy.yml`)가 빌드해서 GitHub Pages에 올린다. 주소: https://im-ju.github.io/
 
 ## 전제(assumption)
 
 - 영문 상세 페이지(`/en/work/…`)는 영문 요약 + 국문 본문. 본문 영역 번역은 미착수.
-- 사내 수치 중 로스터 인원(88명)은 "약 90명"으로 완화했다. 그 외 수치(제휴식당 337곳, 테스트 978개 등)는 원본 그대로다 — 공개 전 회사 확인 권장.
-- 2026-09-10 삭제 결정된 「근로시간 컴플라이언스 리스크 제기」 서술은 어디에도 넣지 않았다.

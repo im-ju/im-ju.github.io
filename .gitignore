@@ -29,3 +29,8 @@ pnpm-debug.log*
 .hallmark/
 output/
 .venv/
+
+# internal working notes and job-application tooling — kept locally, never published
+HANDOFF.md
+.claude/
+scripts/merge-application-pdf.py
