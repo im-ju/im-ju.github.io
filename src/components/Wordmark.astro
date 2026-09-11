@@ -1,5 +1,6 @@
 ---
-// Logo: lowercase chunky wordmark with an accent-coloured pair of letters, plus a small uppercase tag.
+// Logo: lowercase editorial-serif wordmark (Fraunces 600) with an accent-coloured pair of letters, plus a small uppercase tag.
+// Chosen 2026-09-11 from the UI Lab comparison: serif vs the system-sans body gives the mark weight without italics or extra colour.
 interface Props { tag?: string; size?: 'sm' | 'md'; }
 const { tag = 'HR × AX', size = 'md' } = Astro.props;
 ---
@@ -9,8 +10,8 @@ const { tag = 'HR × AX', size = 'md' } = Astro.props;
 </span>
 
 <style>
-  .wordmark { display: inline-flex; align-items: center; font-family: var(--font-wordmark); font-weight: 400; font-size: 1.35rem; line-height: 1; letter-spacing: -0.02em; color: var(--color-ink); text-transform: lowercase; }
-  .wordmark.sm { font-size: 1.1rem; }
+  .wordmark { display: inline-flex; align-items: center; font-family: var(--font-wordmark); font-weight: 600; font-size: 1.45rem; line-height: 1; letter-spacing: -0.03em; font-optical-sizing: auto; color: var(--color-ink); text-transform: lowercase; }
+  .wordmark.sm { font-size: 1.2rem; }
   .wm-accent { color: var(--color-accent); }
   .wm-tag { margin-left: 0.6rem; font-family: var(--font-body); font-size: 0.5em; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--color-ink-3); }
   @media (max-width: 512px) { .wm-tag { display: none; } }

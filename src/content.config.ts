@@ -16,6 +16,7 @@ const projects = defineCollection({
     replacedEn: z.string(),
     summary: z.string(),
     summaryEn: z.string(),
+    added: z.string().optional(), // YYYY-MM-DD the module was published on the site; drives the 14-day NEW tag
   }),
 });
 

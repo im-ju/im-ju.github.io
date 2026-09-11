@@ -23,7 +23,7 @@
   --font-body: -apple-system, BlinkMacSystemFont, system-ui, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard Variable", Pretendard, "Noto Sans KR", sans-serif;
   --font-display: var(--font-body);
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --font-wordmark: "Bagel Fat One", var(--font-body); /* logo only */
+  --font-wordmark: "Fraunces", Georgia, "Times New Roman", serif; /* logo only — editorial serif, weight 600 */
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;

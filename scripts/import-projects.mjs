@@ -8,6 +8,9 @@ const SRC = '/Users/juyoung/Projects/career-ops/dsrv-projects'; // ← source fo
 const OUT = new URL('../src/content/projects/', import.meta.url).pathname;
 
 // order / metadata live here (edit here, not in the md files)
+// ← EDIT when publishing a NEW module: add  added: 'YYYY-MM-DD'  to its entry. The home page shows a
+//   mono "NEW" tag on that module for 14 days after that date (client-side, so no rebuild needed to expire).
+//   The original 8 modules deliberately have no `added` — they launched with the site.
 const projects = [
   { slug: 'hrga-hub', file: 'dsrv-hrga-hub/project-brief.md', order: 1, module: 'SYSTEMS',
     title: 'DSRV HR/GA Hub', titleEn: 'DSRV HR/GA Hub',
@@ -92,7 +95,7 @@ stack: ${yamlList(p.stack)}
 replaced: ${JSON.stringify(p.replaced)}
 replacedEn: ${JSON.stringify(p.replacedEn)}
 summary: ${JSON.stringify(p.summary)}
-summaryEn: ${JSON.stringify(p.summaryEn)}
+summaryEn: ${JSON.stringify(p.summaryEn)}${p.added ? `\nadded: ${JSON.stringify(p.added)}` : ''}
 ---
 `;
   writeFileSync(`${OUT}${p.slug}.md`, fm + md.trimStart());

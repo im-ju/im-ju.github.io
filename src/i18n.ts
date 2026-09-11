@@ -44,6 +44,8 @@ export const t = {
       lede: '인사총무 담당자가 자기 팀의 반복 업무를 직접 도구로 만들어 운영한 기록. 구현은 AI 페어프로그래밍, 무엇을 만들고 무엇을 만들지 않을지와 그것을 어떻게 검증할지는 직접 판단했습니다.',
       replaced: '대체한 것',
       open: '상세 보기',
+      view: { grid: '카드형', list: '리스트형' },
+      isNew: 'NEW',
     },
     policy: {
       title: '이 사이트의 운영 규정',
@@ -124,6 +126,8 @@ export const t = {
       lede: 'Tools I built and operate for my own team\'s recurring work. Implementation was AI pair-programming; what to build, what not to build, and how to verify it were my calls.',
       replaced: 'Replaced',
       open: 'Open',
+      view: { grid: 'Cards', list: 'List' },
+      isNew: 'NEW',
     },
     policy: {
       title: 'Operating rules of this site',

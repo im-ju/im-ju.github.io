@@ -3,6 +3,7 @@
 import { getCollection } from 'astro:content';
 import { t, EMAIL, LINKEDIN, STATUS_LABEL, type Locale } from '../i18n';
 import Palette from './Palette.astro';
+import Icon from './Icon.astro';
 
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
@@ -43,10 +44,17 @@ const paletteItems = [
   <div class="wrap">
     <div class="section-head">
       <p class="label">MODULES · {String(projects.length).padStart(2, '0')}</p>
-      <h2>{s.modules.title}</h2>
+      <div class="modules-head">
+        <h2>{s.modules.title}</h2>
+        <!-- card/list switch; choice persists in localStorage (ui-modules-view), wired in src/scripts/view.ts -->
+        <div class="viewswitch" role="group" aria-label={`${s.modules.view.grid} / ${s.modules.view.list}`}>
+          <button class="viewbtn" type="button" data-view-btn="grid" aria-pressed="true" aria-label={s.modules.view.grid} title={s.modules.view.grid}><Icon name="grid" /></button>
+          <button class="viewbtn" type="button" data-view-btn="list" aria-pressed="false" aria-label={s.modules.view.list} title={s.modules.view.list}><Icon name="list" /></button>
+        </div>
+      </div>
       <p class="lede">{s.modules.lede}</p>
     </div>
-    <ol class="modules">
+    <ol class="modules" data-view="grid">
       {projects.map((p) => (
         <li class="module">
           <a class="module-link" href={`${prefix}work/${p.id}/`}>
@@ -54,8 +62,9 @@ const paletteItems = [
               <span class="mono module-id">MOD-{String(p.data.order).padStart(2, '0')}</span>
               <span class="label">{p.data.module}</span>
               <span class="status" data-status={p.data.status}>{STATUS_LABEL[locale][p.data.status]}</span>
+              <span class="mono module-period">{pick(p.data, 'period')}</span>
             </div>
-            <h3 class="module-title">{pick(p.data, 'title')}</h3>
+            <h3 class="module-title">{pick(p.data, 'title')}{p.data.added && <span class="module-new mono" data-added={p.data.added} hidden>{s.modules.isNew}</span>}</h3>
             <p class="module-summary">{pick(p.data, 'summary')}</p>
             <dl class="module-meta">
               <dt>{en ? 'Period' : '기간'}</dt><dd>{pick(p.data, 'period')}</dd>
@@ -177,6 +186,32 @@ const paletteItems = [
   .module-foot { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-md); font-size: var(--text-xs); }
   .module-stack { color: var(--color-ink-3); }
   .module-open { color: var(--color-ink); font-weight: 560; white-space: nowrap; }
+  .module-period { display: none; } /* list view only */
+  .module-new { display: inline-block; vertical-align: 0.15em; margin-left: 0.5rem; font-size: 0.6rem; letter-spacing: 0.08em; color: var(--color-accent-ink); background: var(--color-accent-soft); border-radius: 4px; padding: 0.1rem 0.34rem; }
+
+  /* modules — view switch */
+  .modules-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); }
+  .viewswitch { display: inline-flex; gap: 2px; padding: 2px; border: var(--rule); border-radius: 999px; background: var(--color-paper-2); }
+  .viewbtn { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 999px; border: 0; background: transparent; color: var(--color-ink-3); cursor: pointer; padding: 0; font: inherit; transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out); }
+  .viewbtn:hover { color: var(--color-ink); }
+  .viewbtn[aria-pressed="true"] { background: var(--color-paper); color: var(--color-ink); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+  .viewbtn :global(svg) { width: 16px; height: 16px; }
+
+  /* modules — list view: same markup, re-laid as console rows */
+  .modules[data-view="list"] { display: block; border-top: var(--rule); }
+  .modules[data-view="list"] .module-link {
+    display: grid; grid-template-columns: 4.6rem 6.5rem minmax(10rem, 1fr) auto 8.6rem; grid-template-areas: "id mod title status period" "id mod sum status period";
+    gap: 0.15rem var(--space-md); align-items: baseline; padding: 0.7rem 0.3rem; border: 0; border-bottom: var(--rule); border-radius: 0; background: transparent; height: auto;
+  }
+  .modules[data-view="list"] .module-link:hover { transform: none; box-shadow: none; background: var(--color-paper-2); }
+  .modules[data-view="list"] .module-top { display: contents; }
+  .modules[data-view="list"] .module-id { grid-area: id; }
+  .modules[data-view="list"] .module-top .label { grid-area: mod; }
+  .modules[data-view="list"] .status { grid-area: status; margin-left: 0; white-space: nowrap; }
+  .modules[data-view="list"] .module-period { grid-area: period; display: block; color: var(--color-ink-3); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+  .modules[data-view="list"] .module-title { grid-area: title; font-size: var(--text-base); letter-spacing: -0.02em; }
+  .modules[data-view="list"] .module-summary { grid-area: sum; font-size: var(--text-xs); color: var(--color-ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .modules[data-view="list"] .module-meta, .modules[data-view="list"] .module-foot { display: none; }
 
   /* policy */
   .articles { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: var(--rule); }
@@ -208,6 +243,8 @@ const paletteItems = [
     .hero { grid-template-columns: 1fr; gap: var(--space-xl); }
     .hero-card { grid-template-columns: minmax(0, 140px) 1fr; align-self: start; }
     .modules { grid-template-columns: 1fr; }
+    .modules[data-view="list"] .module-link { grid-template-columns: 3.6rem minmax(0, 1fr) auto; grid-template-areas: "id title status"; }
+    .modules[data-view="list"] .module-top .label, .modules[data-view="list"] .module-period, .modules[data-view="list"] .module-summary { display: none; }
     .log-row { grid-template-columns: 6rem minmax(0, 1fr); }
     .log-body { grid-column: 2; }
   }
