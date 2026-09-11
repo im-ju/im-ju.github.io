@@ -99,7 +99,7 @@ const navItems: [string, 'home' | 'grid' | 'scale' | 'list' | 'mail', string][] 
     backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
   }
   .topbar-in { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content; align-items: center; gap: var(--space-xs); min-height: 56px; }
-  .brand { display: inline-flex; align-items: center; text-decoration: none; padding: 0.4rem 0.5rem; margin-left: -0.5rem; border-radius: 999px; }
+  .brand { display: inline-flex; align-items: center; min-height: 44px; /* tap target ≥ 44px (Apple HIG); visual size unchanged */ text-decoration: none; padding: 0.4rem 0.5rem; margin-left: -0.5rem; border-radius: 999px; }
   .brand:hover { background: var(--color-paper-3); }
   .topnav { display: flex; justify-content: flex-end; gap: 0.15rem; }
   .topbar-right { display: flex; align-items: center; gap: 0.35rem; }
