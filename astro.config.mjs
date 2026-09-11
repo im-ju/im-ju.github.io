@@ -9,5 +9,5 @@ export default defineConfig({
 
   trailingSlash: 'always',
   build: { format: 'directory' },
-  integrations: [sitemap({ filter: (url) => !url.includes('/print/')   integrations: [sitemap()],  integrations: [sitemap()], !url.includes('/404/') })], // print edition and 404 stay out of search
+  integrations: [sitemap({ filter: (url) => !url.includes('/print/') && !url.includes('/404/') })], // print edition and 404 stay out of search
 });
