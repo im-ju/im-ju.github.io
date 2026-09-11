@@ -6,6 +6,7 @@ export type Locale = 'ko' | 'en';
 export const HIRE_DATE = '2024-12-05'; // DSRV start date (drives the live tenure counter)
 export const EMAIL = 'yjyijc97@gmail.com';
 export const LINKEDIN = 'https://linkedin.com/in/juyoung-you-54aa921bb';
+export const SITE_URL = 'https://im-ju.github.io'; // ← EDIT: keep in sync with `site` in astro.config.mjs
 
 export const STATUS_LABEL: Record<Locale, Record<string, string>> = {
   ko: { live: '운영 중', poc: 'PoC 완료', approved: '승인 완료', pending: '적용 승인 대기', done: '완료' },
@@ -88,7 +89,7 @@ export const t = {
     footer: {
       line: 'Juyoung You · HR × AX',
       note: '이 사이트의 모든 수치는 저장소 소스·커밋 이력·산출 리포트 실측 기준입니다. 임직원 실명과 사내 식별자는 제외했습니다.',
-      built: '직접 만들었습니다 · Astro · Cloudflare Pages',
+      built: '직접 만들었습니다 · Astro · GitHub Pages',
     },
     detail: { back: '← 모듈 목록', period: '기간', status: '상태', stack: '스택', replaced: '대체한 것', next: '다음 모듈' },
     palette: { placeholder: '모듈·섹션 검색…', empty: '결과 없음', hint: '↑↓ 이동 · ↵ 열기 · esc 닫기' },
@@ -168,7 +169,7 @@ export const t = {
     footer: {
       line: 'Juyoung You · HR × AX',
       note: 'Every figure on this site is measured from repository sources, commit history and produced reports. Employee names and internal identifiers are excluded.',
-      built: 'Built by hand · Astro · Cloudflare Pages',
+      built: 'Built by hand · Astro · GitHub Pages',
     },
     detail: { back: '← All modules', period: 'Period', status: 'Status', stack: 'Stack', replaced: 'Replaced', next: 'Next module' },
     palette: { placeholder: 'Search modules and sections…', empty: 'No results', hint: '↑↓ move · ↵ open · esc close' },

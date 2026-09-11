@@ -1,0 +1,37 @@
+# Builds the Astro site and publishes it to GitHub Pages on every push to master.
+# Settings › Pages › Source must be set to "GitHub Actions" for this to have anywhere to deploy to.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master] # ← EDIT: branch name, if the default branch is ever renamed
+  workflow_dispatch: # lets you re-run a deploy from the Actions tab without a new commit
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it midway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: withastro/action@v4
+        with:
+          node-version: 22
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -4,7 +4,7 @@
 // Generate: npm run pdf  (see scripts/make-pdf.mjs)
 import '../styles/global.css';
 import { getCollection } from 'astro:content';
-import { t, EMAIL, LINKEDIN, STATUS_LABEL } from '../i18n';
+import { t, EMAIL, LINKEDIN, STATUS_LABEL, SITE_URL } from '../i18n';
 import Wordmark from '../components/Wordmark.astro';
 
 const s = t.ko;
@@ -110,6 +110,7 @@ const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); // K
         ))}
       </ol>
       <footer class="end">
+        <p>웹 버전: <span class="mono">{SITE_URL.replace("https://", "")}</span></p>
         <p class="muted small">{s.footer.note}</p>
       </footer>
     </section>
