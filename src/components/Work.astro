@@ -1,7 +1,7 @@
 ---
 // Project detail body, shared by /work/[id]/ and /en/work/[id]/.
-// EN pages show the English summary; the full write-up is Korean for now (assumption, see README).
-import { render, getCollection, type CollectionEntry } from 'astro:content';
+// EN pages render src/content/projects-en/<id>.md when it exists, else fall back to the Korean body.
+import { render, getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { t, STATUS_LABEL, type Locale } from '../i18n';
 
 interface Props { locale: Locale; entry: CollectionEntry<'projects'>; }
@@ -10,7 +10,9 @@ const s = t[locale].detail;
 const en = locale === 'en';
 const prefix = en ? '/en/' : '/';
 const d = entry.data;
-const { Content } = await render(entry);
+const enEntry = en ? await getEntry('projectsEn', entry.id) : undefined;
+const { Content } = await render(enEntry ?? entry);
+const bodyLang = enEntry ? 'en' : 'ko';
 const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const next = all[all.findIndex((p) => p.id === entry.id) + 1] ?? all[0];
 const title = en ? d.titleEn : d.title;
@@ -32,13 +34,13 @@ const title = en ? d.titleEn : d.title;
     </dl>
   </header>
 
-  {en && (
+  {en && !enEntry && (
     <p class="notice">
       The full write-up below is in Korean. <a href={`/work/${entry.id}/`} lang="ko">Read the Korean page</a> for the same content without the English header, or email me for an English walkthrough.
     </p>
   )}
 
-  <div class="prose" lang="ko"><Content /></div>
+  <div class="prose" lang={bodyLang}><Content /></div>
 
   <nav class="work-next" aria-label={s.next}>
     <span class="label">{s.next}</span>

@@ -1,6 +1,7 @@
 // Imports project write-ups from career-ops into the content collection.
 // Strips: H1 title, the "이력서에 그대로 붙일 짧은 버전" section, trailing italic source notes.
 // Re-run: node scripts/import-projects.mjs   (overwrites src/content/projects/*.md)
+// English bodies live in src/content/projects-en/ and are NOT touched by this script — update them by hand when the Korean source changes.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const SRC = '/Users/juyoung/Projects/career-ops/dsrv-projects'; // ← source folder

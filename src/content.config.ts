@@ -19,4 +19,12 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { projects };
+// English bodies. Same filename as the Korean entry, body only (no frontmatter): metadata
+// always comes from `projects`. Lives outside src/content/projects so import-projects.mjs
+// never overwrites a translation. A missing file just means the EN page falls back to Korean.
+const projectsEn = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/projects-en' }),
+  schema: z.object({}),
+});
+
+export const collections = { projects, projectsEn };
