@@ -1,0 +1,71 @@
+/* Clay world (2026-10 redesign): cream ground, near-black ink, saturated "clay" folders, big radii, Pretendard only.
+ * Loaded by Base.astro AFTER global.css. /print/ imports global.css on its own and never loads this file,
+ * so the application PDF keeps its look. Single light theme by decision (dark-mode toggle removed). */
+:root {
+  --color-paper: #fffaf0;          /* page ground (cream) */
+  --color-paper-2: #ffffff;        /* sheets */
+  --color-paper-3: #f5f0e0;        /* memo / inset panels */
+  --color-panel: #faf5e8;          /* problem · solution · result boxes */
+  --color-ink: #0a0a0a;
+  --color-ink-2: #2b2925;
+  --color-ink-3: #5f5b52;          /* muted text, 6.5:1 on cream */
+  --color-rule: #e5e0d2;
+  --color-rule-strong: #cfc8b4;
+  --color-bar: #fffaf0;            /* opaque: text scrolling under a see-through bar read as clutter */
+  --color-accent: #0a0a0a;
+  --color-accent-ink: #0a0a0a;
+  --color-accent-soft: #f5f0e0;
+  --color-stamp: #d23a22;          /* rubber stamp, "live" status */
+  --color-focus: #d23a22;
+
+  /* folder colours, cycled in this order so neighbours never match (see [data-clay] below) */
+  --clay-pink: #ff4d8b;
+  --clay-teal: #1a3a3a;
+  --clay-lavender: #b8a4ed;
+  --clay-peach: #ffb084;
+  --clay-ochre: #e8b94a;
+
+  --font-body: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-display: var(--font-body);
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace; /* code blocks only */
+
+  --text-base: 1rem;
+  --radius-sm: 12px;   /* buttons, controls */
+  --radius-md: 16px;   /* panels, list rows */
+  --radius-lg: 24px;   /* sheets, folders */
+  --track-display: -0.045em;
+  --shadow-sheet: 0 1px 0 #ebe6d6, 0 24px 48px -28px rgba(10, 10, 10, 0.35);
+}
+
+[data-clay="0"] { --clay: var(--clay-pink); --clay-on: #0a0a0a; }
+[data-clay="1"] { --clay: var(--clay-teal); --clay-on: #ffffff; }
+[data-clay="2"] { --clay: var(--clay-lavender); --clay-on: #0a0a0a; }
+[data-clay="3"] { --clay: var(--clay-peach); --clay-on: #0a0a0a; }
+[data-clay="4"] { --clay: var(--clay-ochre); --clay-on: #0a0a0a; }
+
+html { color-scheme: light; scrollbar-color: #cfc8b4 var(--color-paper); }
+body { font-size: var(--text-base); line-height: 1.7; }
+::selection { background: var(--clay-pink); color: #0a0a0a; }
+h1, h2, h3, h4 { font-weight: 800; letter-spacing: var(--track-display); text-wrap: balance; }
+h3, h4 { letter-spacing: -0.03em; }
+a { text-decoration-color: currentColor; text-decoration-thickness: 1.5px; text-underline-offset: 0.22em; }
+:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; border-radius: var(--radius-sm); }
+
+/* the console-era mono labels become plain bold labels */
+.label, .record dt, .prose th { font-family: var(--font-body); text-transform: none; letter-spacing: 0; font-weight: 700; font-size: var(--text-sm); color: var(--color-ink-3); }
+.status { font-family: var(--font-body); font-weight: 700; font-size: var(--text-xs); letter-spacing: 0; color: var(--color-ink); border: 1.5px solid currentColor; border-radius: 999px; padding: 0.15rem 0.6rem; }
+.status::before { display: none; }
+.status[data-status="live"] { color: var(--color-stamp); }
+
+.btn {
+  min-height: 48px; padding: 0 1.25rem; border-radius: var(--radius-sm); border-width: 1.5px;
+  font-weight: 700; font-size: var(--text-base); justify-content: center;
+  transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+}
+.btn:hover, .btn.ghost:hover { background: var(--color-stamp); border-color: var(--color-stamp); color: #fff; }
+.btn.ghost { border-color: var(--color-ink); }
+
+/* long-form detail pages */
+.prose blockquote { border: 0; background: var(--color-paper-3); border-radius: var(--radius-md); padding: 1rem 1.25rem; color: var(--color-ink-2); }
+.prose pre { background: var(--color-paper-3); border: 0; border-radius: var(--radius-md); }
+.prose img { border-radius: var(--radius-md); }

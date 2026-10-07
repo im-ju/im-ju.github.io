@@ -34,3 +34,7 @@ output/
 HANDOFF.md
 .claude/
 scripts/merge-application-pdf.py
+# impeccable design-skill context files (may describe the job search)
+PRODUCT.md
+DESIGN.md
+.impeccable/

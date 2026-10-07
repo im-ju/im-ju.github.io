@@ -3,7 +3,6 @@
 
 export type Locale = 'ko' | 'en';
 
-export const HIRE_DATE = '2024-12-05'; // DSRV start date (drives the live tenure counter)
 export const EMAIL = 'yjyijc97@gmail.com';
 export const LINKEDIN = 'https://linkedin.com/in/juyoung-you-54aa921bb';
 export const SITE_URL = 'https://im-ju.github.io'; // ← EDIT: keep in sync with `site` in astro.config.mjs
@@ -18,11 +17,9 @@ export const t = {
     htmlLang: 'ko',
     siteTitle: 'Juyoung You — HR × AX',
     description: 'HR 담당자 유주영의 포트폴리오. 제도를 만들고, 그 제도가 지켜지는지 코드로 확인합니다.',
-    nav: { record: '기록', modules: '모듈', policy: '원칙', log: '이력', contact: '연락' },
-    search: '검색',
+    nav: { files: '작업 파일', record: '인사기록', contact: '연락' },
     langSwitch: 'EN',
     langSwitchHref: '/en/',
-    tenure: (d: number) => `재직 D+${d.toLocaleString('ko-KR')}`,
     hero: {
       eyebrow: '인사기록 카드 · HR × AX',
       name: '유주영',
@@ -84,27 +81,52 @@ export const t = {
         ['2026', '외부 제출 무반려', '법인 변경등기 12건, 해외 파트너 KYB 실사 10건 영문 서류 최종 검토. 반려 0건.'],
       ],
     },
+    // Home page (2026-10 redesign: case-file drawer). hero/modules/policy/log above stay because /print/ still uses them.
+    home: {
+      h1: ['사람은 사람의 일에', '집중하도록.'],
+      en: 'Systems for people.',
+      desc: '조직이 90명으로 크는 동안 제도와 HR 시스템을 만들고, 손으로 하던 확인 업무를 직접 만든 도구로 바꿉니다.',
+      ctaFiles: '파일 열어보기',
+      ctaContact: '연락하기',
+      filesTitle: (n: number) => `작업 파일 ${n}건`,
+      filesLede: '파일을 누르면 내용이 펼쳐집니다.',
+      amount: '설명 분량', simple: '간단히', detail: '자세히',
+      view: '보기 방식', slider: '슬라이더', list: '목록',
+      prev: '이전 파일', next: '다음 파일', close: '파일 닫기',
+      flow: '흐름',
+      more: '문제 · 해결 · 결과 보기', less: '간단히 보기',
+      psr: ['문제', '해결', '결과'],
+      full: '전체 기록 보기',
+      principlesTitle: '업무 원칙',
+      principles: [
+        ['규정은 기억 대신 규칙으로 옮깁니다.', '사람마다 해석이 달라지던 지원 요건과 한도를 규칙으로 고정하면 판정이 일관되고, 규정이 바뀔 때 고칠 곳이 한 곳이 됩니다.'],
+        ['틀렸는데 정상처럼 보이는 것을 먼저 찾습니다.', '근태 기록이 빠지면 차감 0원으로, 읽기 실패는 성공 메시지로 위장합니다. 이런 건을 따로 모아 눈에 띄게 만듭니다.'],
+        ['무엇을 자동화하지 않을지 먼저 정합니다.', '안내메일은 작성까지만, 감사 도구는 진단까지만. 되돌릴 수 없는 일은 사람이 마지막에 결정합니다.'],
+      ],
+      recordTitle: '인사기록 카드',
+      photoAlt: '유주영 프로필 사진',
+      logTitle: '이력 로그',
+      contactTitle: '연락은 이메일이 가장 빠릅니다.',
+      copy: '이메일 복사', copied: '복사했습니다', copyFailed: '복사가 안 됐습니다. 주소를 직접 선택해 주세요.',
+    },
     contact: {
       title: '연락',
-      lede: 'HR Ops · People Systems · 외국계 한국법인 HR 포지션에 관심이 있습니다. 이메일이 가장 빠릅니다.',
+      lede: 'HR Ops · People Systems · 외국계 한국법인 HR 포지션에 관심이 있습니다.',
     },
     footer: {
       line: 'Juyoung You · HR × AX',
       note: '이 사이트의 모든 수치는 저장소 소스·커밋 이력·산출 리포트 실측 기준입니다. 임직원 실명과 사내 식별자는 제외했습니다.',
       built: '직접 만들었습니다 · Astro · GitHub Pages',
     },
-    detail: { back: '← 모듈 목록', period: '기간', status: '상태', stack: '스택', replaced: '대체한 것', next: '다음 모듈' },
-    palette: { placeholder: '모듈·섹션 검색…', empty: '결과 없음', hint: '↑↓ 이동 · ↵ 열기 · esc 닫기' },
+    detail: { back: '← 작업 파일', period: '기간', status: '상태', stack: '스택', replaced: '대체한 것', next: '다음 파일' },
   },
   en: {
     htmlLang: 'en',
     siteTitle: 'Juyoung You — HR × AX',
     description: 'Portfolio of Juyoung You, HR generalist who writes the policy when none exists, then builds the systems that make it hold.',
-    nav: { record: 'Record', modules: 'Modules', policy: 'Policy', log: 'Log', contact: 'Contact' },
-    search: 'Search',
+    nav: { files: 'Files', record: 'Record', contact: 'Contact' },
     langSwitch: 'KO',
     langSwitchHref: '/',
-    tenure: (d: number) => `Day ${d.toLocaleString('en-US')} at DSRV`,
     hero: {
       eyebrow: 'Employee record · HR × AX',
       name: 'Juyoung You',
@@ -166,16 +188,43 @@ export const t = {
         ['2026', 'Zero-defect filings', '12 corporate registry filings and 10 partner KYB reviews as final reviewer of English submissions. No rejections.'],
       ],
     },
+    home: {
+      h1: ['Systems for people.'],
+      en: '',
+      desc: 'An HR generalist who writes the policy when none exists, then builds the systems that make it hold.',
+      ctaFiles: 'Open the files',
+      ctaContact: 'Contact',
+      filesTitle: (n: number) => `${n} case files`,
+      filesLede: 'Open a file to read it.',
+      amount: 'Detail', simple: 'Brief', detail: 'Full',
+      view: 'View', slider: 'Slider', list: 'List',
+      prev: 'Previous file', next: 'Next file', close: 'Close file',
+      flow: 'Flow',
+      more: 'Problem · solution · result', less: 'Show less',
+      psr: ['Problem', 'Solution', 'Result'],
+      full: 'Read the full write-up',
+      principlesTitle: 'Working principles',
+      // EN principles reuse the existing site copy (policy.articles 1–3 below) until plain English copy is written
+      principles: [
+        ['Move rules out of memory and into code', 'Meal-allowance eligibility, training budgets and asset lifetimes were all written down, yet interpreted by a person every time. Fix the interpretation in code and judgements become consistent, with one place to change when the rule changes.'],
+        ['Find silent failures and make them loud', 'The real risk was never an error. It was being wrong while looking normal. A missing attendance record shows up as a zero deduction; a parse failure hides behind a "3 drafts created" success message. Each was promoted to an explicit review item or an alert.'],
+        ['Decide the boundary of automation first', 'Interview emails: drafting is automated, sending is human. The audit tool diagnoses and never edits. Access-log analysis narrows what to check and does not judge. Every project started by deciding what not to automate.'],
+      ],
+      recordTitle: 'Employee record',
+      photoAlt: 'Portrait of Juyoung You',
+      logTitle: 'Log',
+      contactTitle: 'Email is the fastest way to reach me.',
+      copy: 'Copy email', copied: 'Copied', copyFailed: 'Could not copy. Please select the address.',
+    },
     contact: {
       title: 'Contact',
-      lede: 'Open to HR Operations, People Systems and HR Generalist roles at foreign-owned companies in Korea. Email is fastest.',
+      lede: 'Open to HR Operations, People Systems and HR Generalist roles at foreign-owned companies in Korea.',
     },
     footer: {
       line: 'Juyoung You · HR × AX',
       note: 'Every figure on this site is measured from repository sources, commit history and produced reports. Employee names and internal identifiers are excluded.',
       built: 'Built by hand · Astro · GitHub Pages',
     },
-    detail: { back: '← All modules', period: 'Period', status: 'Status', stack: 'Stack', replaced: 'Replaced', next: 'Next module' },
-    palette: { placeholder: 'Search modules and sections…', empty: 'No results', hint: '↑↓ move · ↵ open · esc close' },
+    detail: { back: '← All files', period: 'Period', status: 'Status', stack: 'Stack', replaced: 'Replaced', next: 'Next file' },
   },
 } as const;
