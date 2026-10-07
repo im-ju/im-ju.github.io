@@ -6,7 +6,7 @@ import { getCollection } from 'astro:content';
 import { t, EMAIL, LINKEDIN, STATUS_LABEL, type Locale } from '../i18n';
 import { CASES, fileNo } from '../data/cases';
 import Icon from './Icon.astro';
-import HubDiagram from './HubDiagram.astro';
+import HubScreen from './HubScreen.astro';
 
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
@@ -27,15 +27,13 @@ const files = CASES.map((c, i) => {
     ...c,
     no: fileNo(c.id),
     clay: i % 5, // folder colour slot; 5 colours cycle so neighbours never match
-    title: en ? d.titleEn : c.title,
+    ...(en ? c.en : {}), // English plain copy: title, line, flow, problem, solution, result
     cat: en ? c.catEn : c.cat,
-    head: en ? c.catEn : c.name,
-    line: en ? d.summaryEn : c.line,
+    head: en ? d.titleEn : c.name,
     period: (en ? d.periodEn : d.period).replace(/\s*(운영 중|live)$/, ''), // the status stamp already says "live"
     status: STATUS_LABEL[locale][d.status],
     live: d.status === 'live',
     href: `${prefix}work/${c.id}/`,
-    plain: !en, // Korean has flow + problem/solution/result; English plain copy is not written yet
   };
 });
 const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Location'); // decided set: 소속·기간·언어·학위
@@ -58,12 +56,10 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
         <p>{h.filesLede}</p>
       </div>
       <div class="ctrl">
-        {!en && (
-          <div class="seg" role="group" aria-label={h.amount}>
-            <button type="button" data-set-mode="simple" aria-pressed="true">{h.simple}</button>
-            <button type="button" data-set-mode="detail" aria-pressed="false">{h.detail}</button>
-          </div>
-        )}
+        <div class="seg" role="group" aria-label={h.amount}>
+          <button type="button" data-set-mode="simple" aria-pressed="true">{h.simple}</button>
+          <button type="button" data-set-mode="detail" aria-pressed="false">{h.detail}</button>
+        </div>
         <div class="seg" role="group" aria-label={h.view}>
           <button type="button" data-set-view="slider" aria-pressed="true">{h.slider}</button>
           <button type="button" data-set-view="list" aria-pressed="false">{h.list}</button>
@@ -104,26 +100,22 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
           </div>
           <p class="sheet-meta">{f.cat} · {f.period}</p>
           <p class="sheet-line">{f.line}</p>
-          {f.plain && (
-            <>
-              <ol class="flow" aria-label={h.flow}>
-                {f.flow.map((x, i) => <li><b>{['IN', 'DO', 'OUT'][i]}</b><span>{x}</span></li>)}
-              </ol>
-              <button type="button" class="more-btn" aria-expanded="false" aria-controls={`more-${f.id}`}>
-                <span class="when-closed">{h.more}</span><span class="when-open">{h.less}</span><Icon name="chevron-down" />
-              </button>
-              <div class="more" id={`more-${f.id}`}>
-                <div>
-                  <dl class="psr">
-                    <div><dt>{h.psr[0]}</dt><dd>{f.problem}</dd></div>
-                    <div><dt>{h.psr[1]}</dt><dd>{f.solution}</dd></div>
-                    <div><dt>{h.psr[2]}</dt><dd>{f.result}</dd></div>
-                  </dl>
-                  {f.id === 'hrga-hub' && <HubDiagram />}
-                </div>
-              </div>
-            </>
-          )}
+          <ol class="flow" aria-label={h.flow}>
+            {f.flow.map((x, i) => <li><b>{['IN', 'DO', 'OUT'][i]}</b><span>{x}</span></li>)}
+          </ol>
+          <button type="button" class="more-btn" aria-expanded="false" aria-controls={`more-${f.id}`}>
+            <span class="when-closed">{h.more}</span><span class="when-open">{h.less}</span><Icon name="chevron-down" />
+          </button>
+          <div class="more" id={`more-${f.id}`}>
+            <div>
+              <dl class="psr">
+                <div><dt>{h.psr[0]}</dt><dd>{f.problem}</dd></div>
+                <div><dt>{h.psr[1]}</dt><dd>{f.solution}</dd></div>
+                <div><dt>{h.psr[2]}</dt><dd>{f.result}</dd></div>
+              </dl>
+              {f.id === 'hrga-hub' && <HubScreen locale={locale} />}
+            </div>
+          </div>
           <a class="full" href={f.href}>{h.full}<Icon name="arrow-right" size={18} /></a>
         </article>
       ))}

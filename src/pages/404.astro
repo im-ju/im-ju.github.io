@@ -5,7 +5,6 @@ import Base from '../layouts/Base.astro';
 ---
 <Base locale="ko" title="404" description="요청한 기록이 없습니다." noindex>
   <section class="wrap nf">
-    <p class="label">RECORD · NOT FOUND</p>
     <h1 class="nf-code">404</h1>
     <p class="nf-lede">요청한 주소에 해당하는 기록이 없습니다. 주소가 바뀌었거나 처음부터 없던 항목입니다.</p>
     <p class="nf-lede nf-en" lang="en">No record at this address. It may have moved, or it never existed.</p>
@@ -18,9 +17,9 @@ import Base from '../layouts/Base.astro';
 </Base>
 
 <style>
-  .nf { padding-block: var(--space-2xl); display: grid; gap: var(--space-md); max-width: var(--measure); }
+  .nf { padding-block: var(--space-2xl); display: grid; justify-items: start; gap: var(--space-md); }
   .nf-code { font-size: var(--text-display); letter-spacing: -0.04em; line-height: 1; }
-  .nf-lede { font-size: var(--text-lg); color: var(--color-ink-2); }
+  .nf-lede { max-width: var(--measure); font-size: var(--text-lg); color: var(--color-ink-2); }
   .nf-en { color: var(--color-ink-3); font-size: var(--text-base); }
   .nf-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-sm); }
 </style>

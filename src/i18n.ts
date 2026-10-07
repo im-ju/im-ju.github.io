@@ -118,7 +118,7 @@ export const t = {
       note: '이 사이트의 모든 수치는 저장소 소스·커밋 이력·산출 리포트 실측 기준입니다. 임직원 실명과 사내 식별자는 제외했습니다.',
       built: '직접 만들었습니다 · Astro · GitHub Pages',
     },
-    detail: { back: '← 작업 파일', period: '기간', status: '상태', stack: '스택', replaced: '대체한 것', next: '다음 파일' },
+    detail: { back: '작업 파일', period: '기간', status: '상태', stack: '스택', replaced: '대체한 것', next: '다음 파일' },
   },
   en: {
     htmlLang: 'en',
@@ -204,11 +204,10 @@ export const t = {
       psr: ['Problem', 'Solution', 'Result'],
       full: 'Read the full write-up',
       principlesTitle: 'Working principles',
-      // EN principles reuse the existing site copy (policy.articles 1–3 below) until plain English copy is written
       principles: [
-        ['Move rules out of memory and into code', 'Meal-allowance eligibility, training budgets and asset lifetimes were all written down, yet interpreted by a person every time. Fix the interpretation in code and judgements become consistent, with one place to change when the rule changes.'],
-        ['Find silent failures and make them loud', 'The real risk was never an error. It was being wrong while looking normal. A missing attendance record shows up as a zero deduction; a parse failure hides behind a "3 drafts created" success message. Each was promoted to an explicit review item or an alert.'],
-        ['Decide the boundary of automation first', 'Interview emails: drafting is automated, sending is human. The audit tool diagnoses and never edits. Access-log analysis narrows what to check and does not judge. Every project started by deciding what not to automate.'],
+        ['Rules move out of memory and into checks.', 'Eligibility rules and limits that each person used to read differently become fixed rules: decisions stay consistent, and a rule change means editing one place.'],
+        ['First, find what is wrong but looks normal.', 'A missing attendance record shows up as a zero deduction; a failed read shows up as a success message. These cases are collected and made visible.'],
+        ['Decide first what not to automate.', 'Interview emails stop at the draft; the audit tool stops at the diagnosis. Anything that cannot be undone is decided by a person at the end.'],
       ],
       recordTitle: 'Employee record',
       photoAlt: 'Portrait of Juyoung You',
@@ -225,6 +224,6 @@ export const t = {
       note: 'Every figure on this site is measured from repository sources, commit history and produced reports. Employee names and internal identifiers are excluded.',
       built: 'Built by hand · Astro · GitHub Pages',
     },
-    detail: { back: '← All files', period: 'Period', status: 'Status', stack: 'Stack', replaced: 'Replaced', next: 'Next file' },
+    detail: { back: 'All files', period: 'Period', status: 'Status', stack: 'Stack', replaced: 'Replaced', next: 'Next file' },
   },
 } as const;

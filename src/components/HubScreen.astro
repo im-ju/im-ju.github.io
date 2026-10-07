@@ -1,0 +1,94 @@
+---
+// Mock screen of HR/GA Hub for the HR-01 sheet. NOT a capture of the internal app: the layout is invented and
+// drawn only from the six features the write-up already publishes (src/content/projects/hrga-hub.md §3).
+// Every name, time, place and restaurant below is made up; no amounts or headcounts on purpose.
+import type { Locale } from '../i18n';
+
+interface Props { locale: Locale; }
+const en = Astro.props.locale === 'en';
+
+const t = en
+  ? {
+      nav: ['Home', 'Meeting rooms', 'Events', 'Directory', 'Restaurants', 'Training allowance', 'Anniversaries'],
+      user: 'User A', hello: 'Good morning, User A', login: 'Signed in with company account',
+      cards: [
+        ['Meeting rooms · today', [['Room A', '10:00–11:00 Weekly sync'], ['Room B', '14:00–15:30 Free · suggested']]],
+        ['Event team draw', [['Blind lunch', 'Team 3: User B · User C · User D']]],
+        ['Directory', [['Search', 'Name or team'], ['User E', 'Team A'], ['User F', 'Team B']]],
+        ['Partner restaurants · nearest', [['Restaurant A', 'Korean · 120 m'], ['Restaurant B', 'Snacks · 250 m']]],
+        ['Training allowance', [['Used', ''], ['Remaining', '']]],
+        ['This month', [['Work anniversary', 'User G · 3 years'], ['Birthday', 'User H'], ['Slack', 'Alert every morning']]],
+      ],
+      caption: ['Mock screen, not the real one.', 'Drawn only from the six features this site already describes. Every name, time, place and restaurant is made up.'],
+    }
+  : {
+      nav: ['홈', '회의실', '이벤트', '디렉토리', '제휴식당', '자기계발비', '근속 · 생일'],
+      user: '사용자A', hello: '좋은 아침입니다, 사용자A님', login: '회사 계정으로 로그인됨',
+      cards: [
+        ['회의실 · 오늘', [['회의실 A', '10:00–11:00 주간 회의'], ['회의실 B', '14:00–15:30 비어 있음 · 추천']]],
+        ['이벤트 랜덤픽', [['블라인드 런치', '3조: 사용자B · 사용자C · 사용자D']]],
+        ['구성원 디렉토리', [['검색', '이름 · 팀'], ['사용자E', '팀 가'], ['사용자F', '팀 나']]],
+        ['제휴식당 · 거리순', [['식당 가', '한식 · 120m'], ['식당 나', '분식 · 250m']]],
+        ['자기계발비', [['사용', ''], ['잔여', '']]],
+        ['이번 달', [['입사기념일', '사용자G · 3주년'], ['생일', '사용자H'], ['Slack', '매일 아침 알림']]],
+      ],
+      caption: ['가상 화면 · 실제 화면 아님.', '사이트에 공개된 6개 기능 설명만으로 새로 그렸습니다. 이름·시간·장소·식당은 모두 가짜입니다.'],
+    };
+---
+<figure class="hub">
+  <div class="app" aria-hidden="true">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><b>HR/GA Hub</b><span class="who"><span class="av">A</span>{t.user}</span></div>
+    <div class="body">
+      <ul class="side">{t.nav.map((n, i) => <li class:list={{ on: i === 0 }}>{n}</li>)}</ul>
+      <div class="main">
+        <p class="hello">{t.hello}<span>{t.login}</span></p>
+        <div class="grid">
+          {t.cards.map(([head, rows], i) => (
+            <section data-clay={i % 5}>
+              <h4>{head}</h4>
+              {i === 4
+                ? <div class="meter"><span class="used"></span></div>
+                : null}
+              <ul>{(rows as string[][]).map(([k, v]) => <li class:list={{ legend: i === 4 }}><b>{k}</b>{v && <span>{v}</span>}</li>)}</ul>
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+  <figcaption><strong>{t.caption[0]}</strong> {t.caption[1]}</figcaption>
+</figure>
+
+<style>
+  .hub { margin: 1.25rem 0 0; }
+  .app { border: 1.5px solid var(--color-ink); border-radius: var(--radius-md); overflow: hidden; background: var(--color-paper); font-size: var(--text-xs); line-height: 1.45; }
+  .bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.9rem; background: var(--color-ink); color: #fff; font-size: var(--text-sm); }
+  .dots { display: flex; gap: 0.3rem; }
+  .dots i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #5f5b52; }
+  .who { margin-left: auto; display: flex; align-items: center; gap: 0.4rem; color: #cfc8b4; font-size: var(--text-xs); }
+  .av { display: grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--clay-pink); color: #0a0a0a; font-weight: 800; }
+  .body { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); }
+  .side { list-style: none; margin: 0; padding: 0.75rem 0.5rem; border-right: 1px solid var(--color-rule); display: grid; align-content: start; gap: 0.15rem; }
+  .side li { padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); color: var(--color-ink-3); font-weight: 600; }
+  .side li.on { background: var(--color-ink); color: #fff; }
+  .main { padding: 0.9rem; }
+  .hello { font-size: var(--text-sm); font-weight: 800; letter-spacing: -0.02em; }
+  .hello span { display: block; font-size: var(--text-xs); font-weight: 500; letter-spacing: 0; color: var(--color-ink-3); }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.55rem; margin-top: 0.75rem; }
+  .grid section { padding: calc(0.7rem + 5px) 0.75rem 0.7rem; background: #fff; border-radius: var(--radius-sm); box-shadow: inset 0 5px 0 var(--clay), 0 1px 0 var(--color-rule); }
+  .grid h4 { font-size: var(--text-xs); font-weight: 800; letter-spacing: -0.01em; }
+  .grid ul { list-style: none; margin: 0.45rem 0 0; padding: 0; display: grid; gap: 0.3rem; }
+  .grid li { display: flex; justify-content: space-between; gap: 0.5rem; }
+  .grid li b { font-weight: 700; white-space: nowrap; }
+  .grid li span { color: var(--color-ink-3); text-align: right; }
+  /* allowance card: a bar with no amounts, so nothing reads as the real limit */
+  .meter { height: 0.6rem; margin-top: 0.55rem; border-radius: 999px; background: var(--color-panel); overflow: hidden; }
+  .used { display: block; width: 62%; height: 100%; background: var(--clay); }
+  .grid li.legend { justify-content: flex-start; }
+  .grid li.legend::before { content: ""; width: 0.6rem; height: 0.6rem; margin-top: 0.2rem; border-radius: 999px; background: var(--clay); }
+  .grid li.legend + li.legend::before { background: var(--color-panel); box-shadow: inset 0 0 0 1px var(--color-rule-strong); }
+  figcaption { margin-top: 0.6rem; font-size: var(--text-sm); color: var(--color-ink-3); }
+  figcaption strong { color: var(--color-ink); }
+  @media (max-width: 760px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .body { grid-template-columns: 1fr; } .side { display: none; } .grid { grid-template-columns: 1fr; } }
+</style>

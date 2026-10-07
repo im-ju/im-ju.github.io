@@ -4,6 +4,7 @@
 import { render, getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { t, STATUS_LABEL, type Locale } from '../i18n';
 import { CASES, fileNo } from '../data/cases';
+import Icon from './Icon.astro';
 
 interface Props { locale: Locale; entry: CollectionEntry<'projects'>; }
 const { locale, entry } = Astro.props;
@@ -22,18 +23,18 @@ if (idx < 0 || !next) throw new Error(`Work page for "${entry.id}": missing from
 const title = en ? d.titleEn : d.title;
 ---
 <article class="wrap work">
-  <a class="back" href={`${prefix}#files`}>{s.back}</a>
+  <a class="back" href={`${prefix}#files`}><Icon name="arrow-left" size={18} />{s.back}</a>
   <header class="work-head">
+    <h1 class="work-title">{title}</h1>
     <div class="work-top">
       <span class="work-id" data-clay={idx % 5}>{fileNo(entry.id)}</span>
       <span class="label">{en ? CASES[idx].catEn : CASES[idx].cat}</span>
       <span class="status" data-status={d.status}>{STATUS_LABEL[locale][d.status]}</span>
     </div>
-    <h1 class="work-title">{title}</h1>
     <p class="work-summary">{en ? d.summaryEn : d.summary}</p>
     <dl class="record work-meta">
       <dt>{s.period}</dt><dd>{en ? d.periodEn : d.period}</dd>
-      <dt>{s.stack}</dt><dd class="mono">{d.stack.join(' · ')}</dd>
+      <dt>{s.stack}</dt><dd>{d.stack.join(' · ')}</dd>
       <dt>{s.replaced}</dt><dd>{en ? d.replacedEn : d.replaced}</dd>
     </dl>
   </header>
@@ -48,13 +49,13 @@ const title = en ? d.titleEn : d.title;
 
   <nav class="work-next" aria-label={s.next}>
     <span class="label">{s.next}</span>
-    <a href={`${prefix}work/${next.id}/`}>{fileNo(next.id)} · {en ? next.data.titleEn : next.data.title} →</a>
+    <a href={`${prefix}work/${next.id}/`}>{fileNo(next.id)} · {en ? next.data.titleEn : next.data.title}<Icon name="arrow-right" size={18} /></a>
   </nav>
 </article>
 
 <style>
   .work { padding-block: var(--space-xl) var(--space-2xl); }
-  .back { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--text-sm); font-weight: 700; color: var(--color-ink-3); text-decoration: none; margin-bottom: var(--space-md); }
+  .back { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; font-size: var(--text-sm); font-weight: 700; color: var(--color-ink-3); text-decoration: none; margin-bottom: var(--space-md); }
   .back:hover { color: var(--color-ink); }
   .work-head { display: grid; gap: var(--space-md); max-width: 44rem; padding-bottom: var(--space-xl); border-bottom: var(--rule); margin-bottom: var(--space-xl); }
   .work-top { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
@@ -64,6 +65,6 @@ const title = en ? d.titleEn : d.title;
   .work-meta { margin-top: var(--space-sm); }
   .notice { max-width: var(--measure); font-size: var(--text-sm); color: var(--color-ink-2); background: var(--color-paper-2); border: var(--rule); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); margin-bottom: var(--space-xl); }
   .work-next { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: var(--rule); display: grid; gap: var(--space-2xs); }
-  .work-next a { text-decoration: none; font-weight: 600; }
+  .work-next a { display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; font-weight: 700; }
   .work-next a:hover { text-decoration: underline; }
 </style>

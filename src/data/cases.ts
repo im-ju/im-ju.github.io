@@ -1,20 +1,23 @@
 // Plain-language copy for the home page's case files (HR-01 … HR-08).
 // Kept out of src/content/projects because scripts/import-projects.mjs overwrites those files.
 // Array order = file number on the home page. `id` must match a file name in src/content/projects.
-// Facts here may only restate what the full write-ups already publish (confirmed 2026-10-07).
-// English plain copy is not written yet: /en/ shows titleEn + summaryEn from the content collection.
+// Facts here may only restate what the full write-ups already publish (KO confirmed 2026-10-07;
+// EN follows the wording of src/content/projects-en, added 2026-10-08).
 
-export interface Case {
-  id: string;
+interface Copy {
   title: string;    // ← EDIT: folder headline (plain words)
-  name: string;     // short project name shown on the sheet header
-  cat: string;      // folder category label
-  catEn: string;
   line: string;     // one-line summary (always visible)
   flow: [string, string, string]; // what came in / what it does / what comes out
   problem: string;
   solution: string;
   result: string;
+}
+export interface Case extends Copy {
+  id: string;
+  name: string;     // short project name shown on the sheet header (KO; EN uses titleEn)
+  cat: string;      // category label
+  catEn: string;
+  en: Copy;
 }
 
 export const CASES: Case[] = [
@@ -29,6 +32,14 @@ export const CASES: Case[] = [
     problem: '인사총무 업무가 캘린더, 별도 웹앱, 구글시트, 엑셀 네 곳에 흩어져 있었습니다. 매달 같은 일을 손으로 다시 했고, 숫자가 틀려도 아무도 알아채지 못했습니다.',
     solution: '회사 Google 계정으로 로그인하는 웹앱 하나로 합쳤습니다. 회의실 현황, 사내 이벤트 조 편성, 구성원 디렉토리, 제휴식당, 자기계발비, 근속 알림까지 6개 기능이 들어 있습니다.',
     result: '5개월째 멈춤 없이 운영 중입니다. 사내 앱은 2개에서 1개로 줄었고, 자동 테스트 978개가 모두 통과합니다.',
+    en: {
+      title: "Scattered internal tools, now one",
+      line: "Meeting rooms, company events, the training allowance: tools and spreadsheets that lived in different places are now one web app you sign into with your company account.",
+      flow: ["Calendar · a separate web app · Google Sheets · Excel", "One web app behind the company account", "6 features"],
+      problem: "HR and general-affairs work was spread across four places: a calendar, a separate web app, Google Sheets and Excel. The same work was redone by hand every month, and when a number was wrong, nobody noticed.",
+      solution: "I merged them into one web app that you sign into with your company Google account. It has six features: meeting-room status, team draws for company events, a member directory, partner restaurants, the training allowance and work-anniversary alerts.",
+      result: "In production for five months with no unplanned downtime. Two internal apps became one, and all 978 automated tests pass.",
+    },
   },
   {
     id: 'meal-allowance',
@@ -41,6 +52,14 @@ export const CASES: Case[] = [
     problem: '식대는 먼저 지급하고 나중에 자격을 확인합니다. 식권 사용 내역과 근태 기록을 사람마다, 날짜마다 눈으로 맞추느라 매달 하루에서 이틀이 걸렸고, 한 건을 놓쳐도 드러나지 않았습니다.',
     solution: '복리후생·지출 규정의 지원 요건을 조항 단위로 규칙으로 옮기고 두 데이터를 자동으로 대조합니다. 판정할 수 없는 건은 그냥 통과시키지 않고 별도 확인 목록으로 모읍니다.',
     result: '5개월째 매달 실행 중입니다. 확인은 몇 분, 예외 확인까지 30분 안팎이면 끝납니다. 결과는 실제 급여 차감에 쓰이고, 당사자에게 보여줄 차감 사유 문장까지 만들어집니다.',
+    en: {
+      title: "Meal-allowance checks: from two days to minutes",
+      line: "Matching meal-card usage against attendance records used to be done by eye. Now rules taken from the regulation do the matching automatically.",
+      flow: ["Meal-card usage + attendance records", "Automatic check, clause by clause", "Deduction reasons · manual-review list"],
+      problem: "The meal allowance is paid first and eligibility is checked afterwards. Matching meal-card usage against attendance, person by person and date by date, took one to two days every month, and a single miss never surfaced.",
+      solution: "I turned the eligibility requirements in the benefits and expense regulations into rules, clause by clause, and the two data sets are now compared automatically. Cases the rules cannot decide are not waved through; they go to a separate review list.",
+      result: "Run every month for five months. The check takes minutes, and about 30 minutes including the exceptions. The results feed actual payroll deductions, and each one comes with a sentence explaining the deduction to the person concerned.",
+    },
   },
   {
     id: 'interview-reminder',
@@ -53,6 +72,14 @@ export const CASES: Case[] = [
     problem: '면접 전날 후보자에게 장소, 시간, 준비물을 안내하는 메일을 보냅니다. 면접 유형마다 양식이 다르고, 바쁜 날일수록 빠뜨리기 쉬웠습니다. 빠뜨리면 후보자 경험이 바로 나빠집니다.',
     solution: '매일 아침 공유 캘린더에서 다음 날 면접을 찾아 유형에 맞는 양식으로 Gmail 초안을 만듭니다. 발송은 자동화하지 않았습니다. 한 번 보낸 메일은 되돌릴 수 없기 때문입니다.',
     result: '담당자에게 남은 일은 초안을 확인하고 보내기를 누르는 것뿐입니다. 읽지 못한 일정은 경고로 요약 메일에 올리고, 같은 초안이 두 번 만들어지지 않게 막았습니다.',
+    en: {
+      title: "Interview reminders that never get missed",
+      line: "It finds tomorrow's interviews in the calendar and prepares a reminder draft for each interview type. The send button is left to a person, on purpose.",
+      flow: ["Tomorrow's interviews in the shared calendar", "Identify the type · pick the template", "Gmail draft (a person sends it)"],
+      problem: "The day before an interview, the candidate gets an email with the location, the time and what to bring. Each interview type has its own template, and on busy days it was easy to miss one. A missed email hurts the candidate experience right away.",
+      solution: "Every morning it finds the next day's interviews in the shared calendar and creates a Gmail draft from the right template. Sending is not automated, because an email cannot be taken back once it is sent.",
+      result: "All that is left for the coordinator is to check the draft and press send. Events it cannot read are flagged as warnings in a summary email, and the same draft is never created twice.",
+    },
   },
   {
     id: 'benefits-audit',
@@ -65,6 +92,14 @@ export const CASES: Case[] = [
     problem: '자기계발비는 월·연 한도와 지원 항목이 정해진 제도인데, 운영은 구글시트로 하고 있었습니다. 표끼리 이름과 팀명으로만 이어져 있어서 동명이인이 있거나 팀명이 한 글자만 달라도 숫자가 조용히 틀어졌고, 틀렸는지 아무도 알 수 없었습니다.',
     solution: '시트를 읽기만 하는 감사 도구를 만들었습니다. 규정에서 가져온 8가지 기준(동명이인, 한도 초과, 팀명 불일치, 날짜 오류 등)으로 검사하고, 문제가 있는 행과 이유를 심각도와 함께 별도 탭에 적습니다. 원본은 고치지 않습니다. 여러 사람이 매일 쓰는 문서를 스크립트가 몰래 고치면 아무도 그 시트를 믿을 수 없기 때문입니다.',
     result: '드러난 건 몇 건의 실수가 아니라 시트라는 방식의 한계였습니다. 동명이인 문제는 시트로는 풀 수 없고 사람마다 고유번호가 필요했습니다. 이 진단을 근거로 자기계발비 관리를 사내 웹앱(HR/GA Hub)으로 옮겼습니다.',
+    en: {
+      title: "An audit tool that finds numbers that don't add up",
+      line: "It finds numbers that disagree with each other in a training allowance run on Google Sheets. It never changes a single cell, and its findings became the case for moving to the web app.",
+      flow: ["Training-allowance Google Sheet (3 tables)", "8 regulation-based checks · read-only", "Problem rows · reasons · severity"],
+      problem: "The training allowance has monthly and yearly limits and a fixed list of eligible items, but it was run on Google Sheets. The tables were linked only by names and team names, so two people with the same name, or a team name off by one character, quietly broke the numbers, and nobody could tell.",
+      solution: "I built an audit tool that only reads the sheet. It applies eight checks taken from the regulation (same-name people, limits exceeded, team-name mismatches, unreadable dates and more) and writes each problem row, its reason and its severity to a separate tab. It never edits the source: a script silently fixing a document that many people edit every day would leave nobody able to trust it.",
+      result: "What it exposed was not a handful of mistakes but the limit of the spreadsheet itself. Same-name people cannot be told apart in a sheet; each person needs a unique ID. On the strength of that diagnosis, the training allowance moved into the internal web app (HR/GA Hub).",
+    },
   },
   {
     id: 'access-log',
@@ -77,6 +112,14 @@ export const CASES: Case[] = [
     problem: '근태 시스템은 출근과 퇴근만 기록합니다. 근무 중 장시간 자리를 비운 실태를 알려면 출입문 기록을 봐야 했는데, 그대로 세면 잠깐 나갔다 온 기록, 나간 것처럼 보이지만 실제로는 건물 안에 있던 경우까지 전부 외출로 잡혔습니다. 결과가 특정인을 가리키는 목록이라, 잘못 잡힌 한 건이 곧 한 사람에 대한 근거 없는 의심이 됩니다.',
     solution: '5분 안에 다시 들어온 기록은 지우고 60분이 넘는 외출만 남겼습니다. 남은 건마다 같은 시간에 건물 안 다른 출입문을 지난 기록이 있는지 다시 확인해, 있으면 목록에서 뺐습니다. 몇 분부터 외출로 볼지는 회사가 정할 기준이라, 기준값을 한곳에 모아 실행할 때마다 보여주게 했습니다.',
     result: '2026년 1~3월 석 달 치를 분석해 월별 보고서 3건과 통합 보고서 1건을 냈습니다. 목록 이름은 "위반자 명단"이 아니라 "확인이 필요한 건"으로 붙였습니다. 출입 기록은 이유를 담지 않기 때문에, 도구는 확인할 대상을 좁힐 뿐 판단은 사람이 합니다.',
+    en: {
+      title: "Attendance analysis that doesn't point at the wrong person",
+      line: "The attendance system doesn't record time away during the workday, so I looked at door access logs. Because the output points at specific people, most of the effort went into filtering out false hits.",
+      flow: ["Door access logs (three months)", "Drop short exits · keep 60+ minutes · drop if still inside", "\"Needs checking\" list"],
+      problem: "The attendance system records only clock-in and clock-out. Long absences during the day show up only in the door access logs, but counted as-is they flagged everything: a quick step outside, and even people who looked as if they had left but were still inside the building. The output points at individuals, so one wrong hit is an unfounded suspicion about one person.",
+      solution: "Re-entries within 5 minutes are discarded and only absences over 60 minutes are kept. For each remaining case it checks whether the same person passed another door inside the building during that time, and drops the case if so. How many minutes count as an absence is a company decision, so the thresholds sit in one place and are printed on every run.",
+      result: "It covered three months, January to March 2026, producing three monthly reports and one combined report. The list is titled \"needs checking\", not \"violators\". Access logs carry no reasons, so the tool only narrows down what to check; a person makes the call.",
+    },
   },
   {
     id: 'guide-redesign',
@@ -89,6 +132,14 @@ export const CASES: Case[] = [
     problem: '사내 안내서는 신규 입사자가 처음 여는 문서이자, 모든 구성원이 규정과 사무실 이용법을 찾는 입구입니다. 그런데 8개 섹션 아래 46개 페이지가 평평하게 나열돼 있어 필요한 것을 찾으려면 전부 훑어야 했습니다. 사내 곳곳에서 링크된 문서라, 새로 만들다 주소가 바뀌면 그 링크가 모두 깨집니다.',
     solution: '인터뷰로 요구사항을 좁히고, 성격이 다른 시안 4개를 나란히 놓고 하나를 골랐습니다. 옮기기 전에 원본과 시안을 하나씩 대조하다가, 원본의 46개 항목이 링크가 아니라 페이지 그 자체라는 것을 발견했습니다. 시안을 그대로 붙였다면 46개 페이지가 한 번에 지워졌을 겁니다. 그래서 새 레이아웃만 가져오고 페이지는 원본 그대로 두는 방법으로 바꿨습니다.',
     result: '원본은 한 번도 건드리지 않았습니다. 페이지가 하나라도 지워지는 작업은 실행 자체가 거부되게 설정했고, 가짜 페이지로 만든 작은 리허설에서 이 방법이 통하는 것을 확인했습니다. 주소와 사이드바 구조는 그대로 유지됩니다. 지금은 실제 적용 승인을 기다리고 있습니다.',
+    en: {
+      title: "Catching a migration that would have deleted 46 pages",
+      line: "I redesigned the company handbook every employee opens daily, starting from its structure. I caught in advance that moving it as drafted would delete 46 child pages, and built a migration that never touches the original.",
+      flow: ["8 sections · 46 child pages", "Take only the new layout · keep the original pages", "Non-destructive migration (rehearsal passed)"],
+      problem: "The company handbook is the first document a new hire opens and where everyone looks up rules and office information. But its 46 pages were listed flat under 8 sections, so finding anything meant scanning all of it. It is linked from all over the company, so changing its addresses during a rebuild would break every one of those links.",
+      solution: "I narrowed the requirements through interviews, then compared four different mock-ups side by side and picked one. Checking the original against the mock-up item by item before moving anything, I found that the 46 entries in the original were not links but the pages themselves. Pasting the mock-up in as drafted would have deleted all 46 pages at once, so I switched to taking only the new layout and keeping the original pages in place.",
+      result: "The original was never touched. Any operation that would delete even one page is set to be refused outright, and a small rehearsal with dummy pages confirmed the approach works. Page addresses and the sidebar stay as they are. It is now waiting for approval to apply.",
+    },
   },
   {
     id: 'asset-regulation',
@@ -101,6 +152,14 @@ export const CASES: Case[] = [
     problem: '자산관리 규정은 2023년 11월 이후 그대로였습니다. 퇴사자가 장비를 반납할 때 데이터 삭제와 계정 회수를 확인할 근거 조항이 없었고, 분실·파손 변상 기준은 모호했습니다. "노후 장비"의 기준도 없어 교체 요청이 올 때마다 그때그때 판단했습니다.',
     solution: '규정을 법·세무, 정보보안, 실무 세 관점으로 따로 읽어 고칠 곳을 찾고, 가장 중요한 15건을 반영했습니다. 노후화를 "구매 후 4년"으로 정의하고, 변상금은 급여에서 일방적으로 빼지 않고 별도 합의로만 청구하도록 명시했습니다. 규정 문서는 손으로 편집하지 않고 코드로 만들어, 개정본과 개정 이력이 서로 어긋나지 않게 했습니다.',
     result: '대표이사 승인을 받았습니다. 새 노후화 기준과 경영진이 정한 조건을 자산대장에 적용해 노트북 교체 대상 17명을 우선순위별로 추천했고, 그 과정에서 반납되지 않은 구형 장비도 찾아 함께 보고했습니다.',
+    en: {
+      title: "Rewriting a two-year-old asset regulation",
+      line: "I rewrote the regulation from three angles (legal and tax, information security, day-to-day practice) and got CEO approval. The new obsolescence standard then picked the equipment due for replacement.",
+      flow: ["2023 regulation + asset register", "Three-angle review · 15 changes · obsolescence standard", "Approved regulation · 17 replacement picks"],
+      problem: "The asset management regulation had not changed since November 2023. When a leaver returned equipment, no clause required checking that data was wiped and accounts were revoked, and the rules for compensating loss or damage were vague. There was no definition of \"obsolete equipment\" either, so every replacement request was judged case by case.",
+      solution: "I read the regulation separately from three angles (legal and tax, information security, practice), found what needed fixing and applied the 15 most important items. Obsolescence is now defined as \"four years after purchase\", and compensation is never deducted from pay unilaterally; it can only be claimed by separate agreement. The regulation documents are generated from code rather than edited by hand, so the revised text and the revision history cannot drift apart.",
+      result: "Approved by the CEO. Applying the new obsolescence standard and leadership's criteria to the asset register, I recommended 17 people for laptop replacement in priority order, and reported old equipment that had never been returned along the way.",
+    },
   },
   {
     id: 'skill-intelligence',
@@ -113,6 +172,14 @@ export const CASES: Case[] = [
     problem: '회사가 가진 인력 정보는 직급, 연차, 소속뿐입니다. 정작 알고 싶은 건 "이 사람이 내일 그만두면 무엇이 멈추는가"인데, 누가 무엇을 할 줄 아는지는 어디에도 정리돼 있지 않았습니다. 전 직원에게 스킬을 적어내라고 하면 응답률도 기준도 제각각이라 시작부터 무너집니다.',
     solution: '이미 있는 팀 미션, 직무기술서, 팀 목표(OKR) 문서 29건에서 AI로 스킬을 뽑아 사람과 연결했습니다. 스킬끼리의 관계도 함께 기록해 "A를 할 사람이 없으면 B 업무가 멈추고, B에 기대던 C 보고도 못 한다"처럼 연쇄 영향을 따라갑니다. AI가 뽑은 결과는 본인과 팀장이 확인해 다시 반영하는 단계를 뒀습니다.',
     result: '석 달 뒤 제 보고서를 스스로 다시 검증해, 다시 계산해도 나오지 않는 숫자를 찾아 정정했습니다. 같은 스킬이 다른 이름으로 중복돼 있던 것을 합치자 "한 명만 가진 스킬"이 101개에서 83개로 줄었습니다. 경영진에게는 전면 도입 대신 2~3개 팀의 실제 데이터로 정확도부터 재 보자며 조건부 진행을 권고했습니다.',
+    en: {
+      title: "If someone leaves, what stops?",
+      line: "A proof of concept (PoC) that mapped each employee's skills from existing internal documents alone and traced what stops when one person leaves. All figures are synthetic data.",
+      flow: ["29 team-mission, job-description and OKR documents", "AI skill extraction · match to people · trace knock-on effects", "Attrition-risk report · conditional go"],
+      problem: "All the company holds about its people is grade, tenure and team. What it really wants to know is \"if this person quit tomorrow, what would stop?\", yet who can do what was written down nowhere. Asking every employee to list their skills fails from the start: response rates and standards vary too much.",
+      solution: "Using AI, I pulled skills out of 29 existing documents (team missions, job descriptions and team goals, or OKRs) and linked them to people. Relationships between skills are recorded too, so it can follow knock-on effects such as \"with nobody left who can do A, task B stops, and report C that depends on B cannot be filed\". Each person and their team lead check what the AI extracted, and their answers are fed back in.",
+      result: "Three months later I re-audited my own report, found figures that could not be reproduced, and corrected them. Merging skills that were duplicates under different names cut the \"skills only one person has\" from 101 to 83. Instead of a full rollout, I recommended a conditional go to leadership: measure accuracy first on real data from two or three teams.",
+    },
   },
 ];
 
