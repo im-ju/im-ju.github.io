@@ -1,0 +1,69 @@
+---
+// HR/GA Hub 데모 스크린샷. 실제 사내 앱이 아니라, 같은 화면을 가상 데이터로 다시 띄운 데모를 찍은 것이다.
+// variant="card"는 홈 카드에 2장, "gallery"는 상세 페이지에 8장 전부.
+import type { Locale } from '../i18n';
+
+interface Props { locale: Locale; variant: 'card' | 'gallery'; }
+const { locale, variant } = Astro.props;
+const en = locale === 'en';
+
+// 파일은 public/work/hrga-hub/ 에 있다 (1600×1000 WebP).
+const SHOTS = [
+  { file: 'hrga-01-home', ko: ['허브 홈', '흩어져 있던 도구를 한 화면에서 고릅니다. 왼쪽 메뉴는 아이콘만 남기고 접을 수 있습니다.'], en: ['Hub home', 'Every tool from one screen. The left menu folds down to icons.'] },
+  { file: 'hrga-02-rooms-today', ko: ['회의실 · 오늘', '회의실마다 지금 사용 중인지, 곧 시작하는지, 비어 있는지와 하루 타임라인을 보여줍니다.'], en: ['Meeting rooms · today', 'Each room shows whether it is in use, starting soon or free, above a timeline of the day.'] },
+  { file: 'hrga-03-rooms-booking', ko: ['회의실 · 빈 방 찾기', '인원과 시간을 넣으면 비어 있는 회의실을 추천하고, 그 자리에서 예약합니다.'], en: ['Meeting rooms · find a free room', 'Enter headcount and time, get free rooms suggested, and book one on the spot.'] },
+  { file: 'hrga-04-events-draw', ko: ['이벤트 랜덤픽', '블라인드 런치 조 편성. 같은 팀과 최근에 만난 사람은 떨어뜨리고, 함께·따로 제약조건을 지킵니다.'], en: ['Event random pick', 'Blind-lunch groups that split teammates and recent pairs, and respect together/apart rules.'] },
+  { file: 'hrga-05-org-chart', ko: ['조직도', '끌어서 옮기고 확대·축소하는 조직도. 본부와 팀을 펼치면 구성원이 보입니다.'], en: ['Org chart', 'A pan-and-zoom org chart; open a division or team to see its people.'] },
+  { file: 'hrga-06-directory', ko: ['구성원 디렉토리', '이름·팀·이메일로 찾고, 맨 위 내 정보 카드에서 입사일과 근속을 확인합니다.'], en: ['Member directory', 'Search by name, team or email; your own card at the top shows join date and tenure.'] },
+  { file: 'hrga-07-dining', ko: ['제휴식당', '카테고리와 구역으로 거르고, 사무실에서 가까운 순으로 정렬합니다.'], en: ['Partner restaurants', 'Filter by category and area, sorted by distance from the office.'] },
+  { file: 'hrga-08-anniversaries', ko: ['근속 · 생일', '이번 달 생일과 입사기념일, 근속 분포를 한 화면에 모았습니다.'], en: ['Tenure and birthdays', "This month's birthdays and work anniversaries, with the tenure spread."] },
+];
+
+// 홈 카드에는 가장 움직임이 잘 보이는 두 장만
+const shots = variant === 'card'
+  ? SHOTS.filter((s) => s.file === 'hrga-02-rooms-today' || s.file === 'hrga-04-events-draw')
+  : SHOTS;
+
+const note = en
+  ? ['Demo screens, not the internal app.', 'Re-run with made-up data: every name, room, restaurant and date is fictional.']
+  : ['데모 화면 · 사내 앱 화면 아님.', '같은 화면을 가상 데이터로 다시 띄워 찍었습니다. 이름·회의실·식당·날짜는 모두 가짜입니다.'];
+---
+<section class:list={['shots', variant]} aria-label={en ? 'HR/GA Hub screens' : 'HR/GA Hub 화면'}>
+  {variant === 'gallery' && <h2 class="shots-title">{en ? 'Screens' : '화면 둘러보기'}</h2>}
+  <p class="shots-note"><strong>{note[0]}</strong> {note[1]}</p>
+  <ul class="grid">
+    {shots.map((s) => {
+      const [title, body] = en ? s.en : s.ko;
+      const src = `/work/hrga-hub/${s.file}.webp`;
+      return (
+        <li>
+          <figure>
+            <a href={src} target="_blank" rel="noopener" aria-label={en ? `${title} — open full size` : `${title} — 크게 보기`}>
+              <img src={src} width="1600" height="1000" alt={`${title}: ${body}`} loading="lazy" decoding="async" />
+            </a>
+            <figcaption><b>{title}</b>{variant === 'gallery' && <span>{body}</span>}</figcaption>
+          </figure>
+        </li>
+      );
+    })}
+  </ul>
+</section>
+
+<style>
+  .shots { margin: 1.25rem 0 0; }
+  .shots.gallery { margin: 0 0 var(--space-xl); padding-bottom: var(--space-xl); border-bottom: var(--rule); }
+  .shots-title { font-size: var(--text-xl); margin-bottom: var(--space-xs); }
+  .shots-note { font-size: var(--text-sm); color: var(--color-ink-3); max-width: var(--measure); }
+  .shots-note strong { color: var(--color-ink); }
+  .grid { list-style: none; margin: var(--space-md) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-lg) var(--space-md); }
+  .card .grid { gap: var(--space-sm); margin-top: var(--space-sm); }
+  figure { margin: 0; }
+  figure a { display: block; border: 1px solid var(--color-rule-strong); border-radius: var(--radius-md); overflow: hidden; background: #fff; transition: border-color var(--dur-fast) var(--ease-out); }
+  figure a:hover { border-color: var(--color-accent); }
+  figure a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  img { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: var(--space-xs); font-size: var(--text-sm); color: var(--color-ink-2); line-height: 1.5; }
+  figcaption b { display: block; color: var(--color-ink); font-weight: 800; }
+  figcaption span { display: block; color: var(--color-ink-3); }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+</style>

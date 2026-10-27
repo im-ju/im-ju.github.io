@@ -5,6 +5,7 @@ import { render, getCollection, getEntry, type CollectionEntry } from 'astro:con
 import { t, STATUS_LABEL, type Locale } from '../i18n';
 import { CASES, fileNo } from '../data/cases';
 import Icon from './Icon.astro';
+import HubShots from './HubShots.astro';
 
 interface Props { locale: Locale; entry: CollectionEntry<'projects'>; }
 const { locale, entry } = Astro.props;
@@ -44,6 +45,8 @@ const title = en ? d.titleEn : d.title;
       The full write-up below is in Korean. <a href={`/work/${entry.id}/`} lang="ko">Read the Korean page</a> for the same content without the English header, or email me for an English walkthrough.
     </p>
   )}
+
+  {entry.id === 'hrga-hub' && <HubShots locale={locale} variant="gallery" />}
 
   <div class="prose" lang={bodyLang}><Content /></div>
 
