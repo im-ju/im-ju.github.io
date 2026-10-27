@@ -5,7 +5,8 @@ import { render, getCollection, getEntry, type CollectionEntry } from 'astro:con
 import { t, STATUS_LABEL, type Locale } from '../i18n';
 import { CASES, fileNo } from '../data/cases';
 import Icon from './Icon.astro';
-import HubShots from './HubShots.astro';
+import ProjectShots from './ProjectShots.astro';
+import { PROJECT_SHOTS } from '../data/shots';
 
 interface Props { locale: Locale; entry: CollectionEntry<'projects'>; }
 const { locale, entry } = Astro.props;
@@ -46,7 +47,7 @@ const title = en ? d.titleEn : d.title;
     </p>
   )}
 
-  {entry.id === 'hrga-hub' && <HubShots locale={locale} variant="gallery" />}
+  {PROJECT_SHOTS[entry.id] && <ProjectShots id={entry.id} locale={locale} variant="gallery" />}
 
   <div class="prose" lang={bodyLang}><Content /></div>
 

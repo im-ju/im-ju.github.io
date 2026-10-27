@@ -6,7 +6,8 @@ import { getCollection } from 'astro:content';
 import { t, EMAIL, LINKEDIN, STATUS_LABEL, type Locale } from '../i18n';
 import { CASES, fileNo } from '../data/cases';
 import Icon from './Icon.astro';
-import HubShots from './HubShots.astro';
+import ProjectShots from './ProjectShots.astro';
+import { PROJECT_SHOTS } from '../data/shots';
 
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
@@ -113,7 +114,7 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
                 <div><dt>{h.psr[1]}</dt><dd>{f.solution}</dd></div>
                 <div><dt>{h.psr[2]}</dt><dd>{f.result}</dd></div>
               </dl>
-              {f.id === 'hrga-hub' && <HubShots locale={locale} variant="card" />}
+              {PROJECT_SHOTS[f.id] && <ProjectShots id={f.id} locale={locale} variant="card" />}
             </div>
           </div>
           <a class="full" href={f.href}>{h.full}<Icon name="arrow-right" size={18} /></a>

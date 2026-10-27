@@ -1,0 +1,54 @@
+---
+// 프로젝트 데모 스크린샷 갤러리. 데이터는 src/data/shots.ts.
+// variant="card"는 홈 카드에 2장, "gallery"는 상세 페이지에 전부.
+import type { Locale } from '../i18n';
+import { PROJECT_SHOTS } from '../data/shots';
+
+interface Props { id: string; locale: Locale; variant: 'card' | 'gallery'; }
+const { id, locale, variant } = Astro.props;
+const en = locale === 'en';
+const set = PROJECT_SHOTS[id];
+if (!set) throw new Error(`ProjectShots: no screenshots registered for "${id}" in src/data/shots.ts`);
+
+const shots = variant === 'card' ? set.shots.filter((s) => set.card.includes(s.file)) : set.shots;
+const note = en ? set.note.en : set.note.ko;
+---
+<section class:list={['shots', variant]} aria-label={en ? 'Screens' : '화면'}>
+  {variant === 'gallery' && <h2 class="shots-title">{en ? 'Screens' : '화면 둘러보기'}</h2>}
+  <p class="shots-note"><strong>{note[0]}</strong> {note[1]}</p>
+  <ul class="grid">
+    {shots.map((s) => {
+      const [title, body] = en ? s.en : s.ko;
+      const src = `/work/${id}/${s.file}.webp`;
+      return (
+        <li>
+          <figure>
+            <a href={src} target="_blank" rel="noopener" aria-label={en ? `${title} — open full size` : `${title} — 크게 보기`}>
+              <img src={src} width="1600" height="1000" alt={`${title}: ${body}`} loading="lazy" decoding="async" />
+            </a>
+            <figcaption><b>{title}</b>{variant === 'gallery' && <span>{body}</span>}</figcaption>
+          </figure>
+        </li>
+      );
+    })}
+  </ul>
+</section>
+
+<style>
+  .shots { margin: 1.25rem 0 0; }
+  .shots.gallery { margin: 0 0 var(--space-xl); padding-bottom: var(--space-xl); border-bottom: var(--rule); }
+  .shots-title { font-size: var(--text-xl); margin-bottom: var(--space-xs); }
+  .shots-note { font-size: var(--text-sm); color: var(--color-ink-3); max-width: var(--measure); }
+  .shots-note strong { color: var(--color-ink); }
+  .grid { list-style: none; margin: var(--space-md) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-lg) var(--space-md); }
+  .card .grid { gap: var(--space-sm); margin-top: var(--space-sm); }
+  figure { margin: 0; }
+  figure a { display: block; border: 1px solid var(--color-rule-strong); border-radius: var(--radius-md); overflow: hidden; background: #fff; transition: border-color var(--dur-fast) var(--ease-out); }
+  figure a:hover { border-color: var(--color-accent); }
+  figure a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  img { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: var(--space-xs); font-size: var(--text-sm); color: var(--color-ink-2); line-height: 1.5; }
+  figcaption b { display: block; color: var(--color-ink); font-weight: 800; }
+  figcaption span { display: block; color: var(--color-ink-3); }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+</style>
