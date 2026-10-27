@@ -31,6 +31,30 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
       { file: 'hrga-08-anniversaries', ko: ['근속 · 생일', '이번 달 생일과 입사기념일, 근속 분포를 한 화면에 모았습니다.'], en: ['Tenure and birthdays', "This month's birthdays and work anniversaries, with the tenure spread."] },
     ],
   },
+  'meal-allowance': {
+    card: ['mc-01-summary', 'mc-03-dinner'],
+    note: {
+      ko: ['데모 화면 · 실제 결과 아님.', '원본 검증 스크립트에 가상의 식대 내역과 근태기록을 넣어 돌린 결과입니다. 이름·금액·규정 수치는 모두 가짜입니다.'],
+      en: ['Demo screens, not real results.', 'The original checking script run on made-up meal and attendance records. Names, amounts and rule values are fictional.'],
+    },
+    shots: [
+      { file: 'mc-01-summary', ko: ['차감 대상과 사유 문장', '사람별 차감액, 걸린 규칙, 스크립트가 만든 사유 문장. 행을 누르면 오른쪽에 그 사람의 판정 근거가 펼쳐집니다.'], en: ['Who is deducted, and why', 'Deduction per person, the rule that caught it and the reason sentence the script writes. Click a row to see the evidence on the right.'] },
+      { file: 'mc-02-lunch', ko: ['중식 · 잔액 검증', '중식은 건별이 아니라 잔액으로 봅니다. 휴가·출장 같은 제외일만큼 잔액이 남아 있지 않으면 모자란 만큼 차감합니다.'], en: ['Lunch · balance check', 'Lunch is judged by balance, not per use: if the balance left is less than the excluded days are worth, the gap is deducted.'] },
+      { file: 'mc-03-dinner', ko: ['석식 · 건별 판정', '석식은 그날 근태의 최종 종료시각으로 판정합니다. 기록이 없거나 예외 근무제인 건은 사람이 따로 확인하도록 돌립니다.'], en: ['Dinner · per-use ruling', "Dinner is judged against that day's final clock-out. Missing records and exception schedules go to a person to check."] },
+    ],
+  },
+  'interview-reminder': {
+    card: ['ir-01-calendar', 'ir-02-drafts'],
+    note: {
+      ko: ['데모 화면 · 실제 메일 아님.', '원본 스크립트의 판별·템플릿·알림 로직을 그대로 옮겨 가상 일정에 돌렸습니다. 회사명·이름·주소는 모두 가짜입니다.'],
+      en: ['Demo screens, not real mail.', "The original script's detection, template and alert logic, run on made-up calendar events. Company, names and addresses are fictional."],
+    },
+    shots: [
+      { file: 'ir-01-calendar', ko: ['내일 일정에서 면접만 골라내기', '매일 아침 공유 캘린더의 내일 일정을 읽어, 제목으로 면접 유형을 가리고 설명란에서 후보자 이름과 이메일을 찾습니다. 이메일이 없는 건은 초안을 만들지 않습니다.'], en: ["Picking interviews out of tomorrow's calendar", "Every morning it reads tomorrow's shared calendar, tells the interview type from the title and finds the candidate's name and email in the description. No email, no draft."] },
+      { file: 'ir-02-drafts', ko: ['유형별 안내메일 초안', '폰 스크리닝·직무·컬쳐핏 템플릿에 이름·날짜·시간을 채워 임시보관함에 둡니다. 보내기는 사람이 직접 누릅니다.'], en: ['Drafts by interview type', 'Phone-screen, role and culture-fit templates filled with name, date and time, left in Drafts. A person presses Send.'] },
+      { file: 'ir-03-notice', ko: ['담당자 요약 알림', '만든 초안 목록과, 처리하지 못한 일정과 그 사유를 실행한 담당자에게 보냅니다.'], en: ['Summary to the operator', 'A list of the drafts it made, plus any interviews it could not handle and why.'] },
+    ],
+  },
   'skill-intelligence': {
     card: ['si-01-overview', 'si-02-heatmap'],
     note: {
