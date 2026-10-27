@@ -43,7 +43,7 @@ A script that takes the raw logs, extracts **anomalous absence sessions**, and e
 Raw logs (all passage records)
         │
         ▼
- ① Narrow the scope ── limited to the 2 main access terminals · after 16:00
+ ① Narrow the scope ── main entrance only · a set time window
         │
         ▼
  ② Build sessions ── pair exit → entry, scanned sequentially per person and per day
@@ -69,7 +69,7 @@ Raw logs (all passage records)
 
 Up to the anomaly determination (stage 3) it is simple. **Stage 4, which tears down what has just been determined**, is the substance of this tool.
 
-Looking only at the two main-entrance terminals it looks like the person "went out", but there are several other terminals inside the company. **If a passage record on another terminal exists in the time window between the exit record and the entry record, it means that person was inside the building at that time.** It is counter-evidence that the determination made from the main-entrance records alone was wrong.
+Looking only at the main-entrance records it looks like the person "went out", but some doors inside the building also record passages. **If a passage record on another terminal exists in the time window between the exit record and the entry record, it means that person was inside the building at that time.** It is counter-evidence that the determination made from the main-entrance records alone was wrong.
 
 So for a session already determined to be "anomalous", I look up that same person's activity on other terminals in that time window in reverse, and **if evidence turns up, I take it off the list.**
 
@@ -79,11 +79,10 @@ This filter is a stage that negates the determination it made itself, and for th
 
 ## 5. Why I exposed the determination criteria as constants
 
-I gathered four thresholds as constants at the top of the code.
+I gathered three criteria as constants at the top of the code.
 
 | Constant | Value | Meaning |
 |---|---|---|
-| Analysis start time | 16:00 | Only records after this time are considered |
 | Noise threshold | 5 min | Re-entry within this is not counted as an absence |
 | Anomaly threshold | 60 min | Must be exceeded to be treated as anomalous |
 | Internal-activity filter | on | Exclude if there is intermediate terminal activity |
@@ -115,8 +114,6 @@ It recognises files automatically by naming convention, and if there are several
 | Item | Figure |
 |---|---|
 | Analysis period | 2026-01 ~ 03 (3 months) |
-| Final anomalous absences | 39 |
-| People involved | 20 (deduplicated) |
 | Deliverables | 3 monthly reports + 1 consolidated 3-month report |
 | Filter stages | 2 stages (noise pairs + internal-activity counter-evidence) |
 
@@ -127,7 +124,7 @@ It recognises files automatically by naming convention, and if there are several
 ## 8. Limitations of this tool — written into the documentation alongside it
 
 - Access logs **carry no intent.** The fact that someone was away from their desk for 60 minutes or more, and whether that is a problem, are separate things. This tool **only narrows down what to check; it does not judge.**
-- Movements that do not pass a terminal (entering alongside someone else, for instance) are simply not in the data to begin with. That is, **omissions exist structurally**, and this list is not a complete list.
+- Movements that leave no access record are simply not in the data to begin with. That is, **omissions exist structurally**, and this list is not a complete list.
 - So I named the output not "a list of violators" but "**cases that need checking**".
 
 ---

@@ -23,7 +23,7 @@ The regulation in force was the 2023-11 revision. In the meantime the company ha
 
 Concretely, these were the gaps.
 
-- **When a leaver returned equipment**, the regulation said nothing about whether the data had been wiped or account permissions revoked. In practice we were doing it, but **there was no clause to point to.**
+- **The leaver equipment return** procedure was not laid out in steps in the regulation. The checks done in practice **needed to be written into clauses.**
 - **When an asset was lost or damaged**, how much was to be compensated and by what method was vague, and deducting it unilaterally from pay **could have been a legal problem.**
 - **There was no standard for "obsolete equipment."** Every replacement request was judged individually.
 - The regulation covered "rental assets" and "intangible assets (SW licences, SaaS)", but there were no rental assets in reality and intangible assets belonged to information security. **The regulation did not match what was actually being managed.**
@@ -60,7 +60,7 @@ Of those, I applied the 15 [High] items in this rewrite and **left the rest in t
 ### New clauses
 
 - **Article 11-2 [Loss and Theft]** — a situation entirely absent from the previous regulation
-- **Article 12 [Data Security]** — expanded the 1 existing "data backup" paragraph into security as a whole. It now covers the duty to erase, disk encryption (specified per operating system), and even the automatic screen lock interval
+- **Article 12 [Data Security]** — covers the duty to erase, disk encryption (specified per operating system), and even the automatic screen lock interval
 - **Article 19-2 [Measures for Breach of the Regulation]** — without measures for a breach, a regulation is a recommendation, not a regulation
 
 ### I broke procedures into steps
@@ -120,7 +120,7 @@ I applied the **obsolescence (4 years from the purchase date)** standard defined
 
 **I submitted it in Tiers.** Instead of putting everything in a single ranked list, I layered it into top priority and next priority, so that **whatever the budget turned out to be, you could cut from the top down.** I recommended 17 people in total, and showed asset age and **the individual's own period of use** separately — because the same 4-year-old machine is a different thing when one person has used it from the start and when it was handed over partway through.
 
-As a by-product I found **cases where a replacement had been completed but the old machine had never been returned**, and reported those as well. It surfaced from checking against the asset register, and gaps exactly like that were why I put the return procedure into clauses in §4.
+As a by-product I found **entries where the asset register did not match reality**, and reported those as well. They surfaced once the new standard was applied to real data.
 
 ---
 
@@ -139,7 +139,7 @@ As a by-product I found **cases where a replacement had been completed but the o
    That standard applied to the asset register ── 17 replacement candidates selected
             │
             ▼
-   A new problem found while applying it (unreturned assets)
+   A new problem found while applying it (register vs. reality mismatches)
             │
             └──► on to the next revision
 ```

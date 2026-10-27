@@ -118,7 +118,7 @@ The most dangerous failure was not an error but **a deduction amount of 0 won.**
 - A person with no record at all in the attendance system → excluded days cannot be counted → deduction 0 → looks normal
 - The top-up reason format changes so it is not recognised as a "full top-up" → drops out of the verification scope → deduction 0
 
-The second actually happened in 2026-06. The top-up reason notation changed from the `근무일 N일` family to the format `21일 - 2일 = 19일 x 12,000원`, and the detection regex missed it, so many people were misclassified as partial top-ups.
+The second actually happened in 2026-06. The top-up reason notation changed from the `근무일 N일` family to the format `21일 - 2일 = 19일 x N원`, and the detection regex missed it, so many people were misclassified as partial top-ups.
 
 → I blocked it in two layers. **(a)** People with no work records are not passed through quietly at a deduction of 0 but promoted to `별도확인대상`. **(b)** If the full top-up ratio falls below 50%, it explicitly warns of "the possibility that the top-up reason format has changed again". A device to make a quiet 0 loud.
 
@@ -141,7 +141,7 @@ That is, a `12:00` entry cannot distinguish "punched at 11:59" from "genuinely p
 ## 6. Technical decisions
 
 **① I made the output the "deduction reason sentence", not the deduction amount**
-It automatically generates sentences in the form `연차(종일) 2일, 연차(반차) | 3일×12,000-0=36,000`. A deduction is only executable if it can be explained to the person concerned. A report of numbers alone means someone has to go back and find the basis again, so the benefit of the automation is cut off halfway.
+It automatically generates sentences carrying the exclusion reasons and the calculation, such as `연차(종일) 2일, 연차(반차) | 3일×N원=차감액`. A deduction is only executable if it can be explained to the person concerned. A report of numbers alone means someone has to go back and find the basis again, so the benefit of the automation is cut off halfway.
 
 **② I kept the exception records separately, as "reasons for not deducting"**
 The output of a verification usually holds only what was caught. Here I keep **the decisions not to deduct** on a separate sheet — cases paid despite off-site work because there was an office work record during the lunch hour, cases where a shift worker's partial leave was paid, and so on. When someone later asks "why was this person not caught", there has to be an answer.
@@ -163,11 +163,8 @@ The attendance report arrives with the leaving date already filled in for people
 |---|---|
 | Continuous operation | 5 months (2026-03 – 07) |
 | Time required per month | a day or two → **minutes** (around 30 minutes including exception checks) |
-| Monthly average subject to deduction | 23 people |
 | Report output | 8 sheets per month · every determination basis included |
 | Verification rules | 3 types (lunch, dinner, weekend) · 8 or more exception rules |
 | Handling of undeterminable cases | Separated out as separate review targets — 0 quiet pass-throughs |
-
-> Monthly deduction headcount and amount figures are internal, so this document carries only a summary. For external submission I recommend removing this item or obtaining company confirmation.
 
 ---

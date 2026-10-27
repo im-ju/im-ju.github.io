@@ -4,6 +4,11 @@
 // English bodies live in src/content/projects-en/ and are NOT touched by this script — update them by hand when the Korean source changes.
 import { readFileSync, writeFileSync } from 'node:fs';
 
+// 2026-10-27부터 실행 금지: src/content/projects/*.md 를 사이트용으로 고쳐 써서(민감 문단 제거) 이제 그 파일들이 원본이다.
+// 다시 돌리면 career-ops 원문(민감 내용 포함)으로 덮어쓴다. career-ops 쪽은 지원서용으로 그대로 둔다.
+console.error('import-projects.mjs: 실행 금지. 사이트 상세 페이지 원본은 이제 src/content/projects/*.md 입니다. 그 파일을 직접 고치세요.');
+process.exit(1);
+
 const SRC = '/Users/juyoung/Projects/career-ops/dsrv-projects'; // ← source folder
 const OUT = new URL('../src/content/projects/', import.meta.url).pathname;
 

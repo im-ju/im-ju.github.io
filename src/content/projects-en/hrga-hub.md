@@ -24,7 +24,7 @@
 HR and general affairs work was **scattered across 4 different places**.
 
 - Meeting room bookings had to be scanned by eye in Google Calendar.
-- Grouping for internal events (blind lunches, chimaek parties) ran in a **separate web app**, authenticated by **a single shared password**, so there was no way to tell who did what.
+- Grouping for internal events (blind lunches, chimaek parties) ran in a **separate web app** that had to be opened on its own.
 - The training allowance ran on **Google Sheets**, and two numbers inside the spreadsheet had been left disagreeing with each other.
 - The member roster, org chart and partner restaurant list circulated as Excel files.
 
@@ -39,7 +39,7 @@ A **single web app** entered with one login (company Google account). 6 features
 | Feature | What it does | What it replaced |
 |---|---|---|
 | **Meeting room dashboard** | Booking status, today's schedule, usage statistics, free-slot suggestions | Scanning Calendar by eye |
-| **Event random pick** | Grouping for blind lunches and chimaek parties, with constraints, history and badges | A separate app opened with a shared password |
+| **Event random pick** | Grouping for blind lunches and chimaek parties, with constraints, history and badges | A separate app |
 | **Member directory** | Full staff roster plus pan/zoom org chart, admin roster CRUD | Excel files passed around |
 | **Partner restaurants (식권대장)** | Search 337 partner restaurants by category, area and **distance from the office** | An Excel list |
 | **Training allowance** | Personal limit, remaining balance and usage history, plus a company-wide spend admin dashboard and CSV | Google Sheets |
@@ -88,10 +88,9 @@ Member browser ──HTTPS──> [Vercel]                       [External]
 
 **Every feature goes up as a PR and gets 2 independent reviews (design and security) in sessions separated from the implementation.** In this repository, review **caught a MEDIUM-or-worse defect every single time.**
 
-Things that were actually caught:
+One example of what was caught:
 
 - **I measured and adjudicated 1 BLOCKER on which the two reviews flatly contradicted each other.** `db.transaction()` was not atomic in this app — the shared DB handle is a driver Proxy, so the ORM cannot take a dedicated connection. Under sequential execution it **passes by luck**; it only breaks once concurrent queries are mixed in. Left alone, a full data replacement could have committed only the delete and left production at 0 rows.
-- **A security review just before merge caught a repository exposure incident.** The code repository was unintentionally PUBLIC, and a working branch was exposing infrastructure identifiers. The review stopped main from being contaminated, and re-scanning every branch and switching to PRIVATE were closed out the same day.
 
 ### The biggest lesson — "nobody checks the premises"
 
@@ -118,7 +117,7 @@ The rule paid for itself. With the exact cron send time unverified, I had alread
 **① I rejected a monorepo and micro-frontends when merging the two apps**
 The two apps were effectively on the same stack, so consolidation was "moving files", not "a rewrite", and the only real work was unifying authentication. I chose a single Next.js app plus route groups. A distributed architecture is pure overhead for an internal tool used by a few dozen people.
 
-**② I scrapped the shared password and standardised on Google SSO**
+**② I standardised login on company Google accounts (SSO)**
 If you do not know who logged in, neither auditing nor permissions are possible. I kept only 2 roles, member/admin (5 roles would have been over-design). Permission checks live in **`requireRole()` in each route**, not in a middleware path prefix — trust middleware alone and every newly added route is defenceless.
 
 **③ I reverted a finished feature instead of merging it**
@@ -127,7 +126,7 @@ I built the partner restaurant map view completely and then dropped it. It only 
 **④ I designed on the premise that "notification failures are silent"**
 A cron is not retried when it fails, the same run can arrive twice, and a delivery can be dropped. So: ① idempotency (enforced with a DB unique constraint), ② catch-up (tracking from the last covered date), and ③ **2 axes of failure visibility** — looking only at the failure count goes quietly to 0 when the cron itself is dead, so I look at the freshness of the last covered date alongside it.
 
-**⑤ I closed off local development writing directly to the production DB**
+**⑤ I separated local development from the production DB**
 I isolated it with a copy-on-write clone branch of the DB, a development-only OAuth client, and a **startup guard** (the dev server refuses to boot if it detects a prod endpoint). I did not use a local Postgres because branching on the driver creates "it worked locally" and reduces the value of regression checks.
 
 ---
@@ -139,7 +138,7 @@ I isolated it with a copy-on-write clone branch of the DB, a development-only OA
 | Time in production | 5 months · no unplanned downtime |
 | Internal apps consolidated | 2 → 1 |
 | Live features | 6 |
-| Manually managed assets migrated | 88 members on the roster · 337 partner restaurants · 66 training allowance spend records |
+| Manually managed assets migrated | around 90 members on the roster · 337 partner restaurants · 66 training allowance spend records |
 | Automated tests | 978 (all passing) |
 | Merged PRs | 37 (every one passed independent review) |
 | Production incidents | 0 |
