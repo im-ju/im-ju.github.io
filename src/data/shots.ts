@@ -15,8 +15,8 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
   'hrga-hub': {
     card: ['hrga-02-rooms-today', 'hrga-04-events-draw'],
     note: {
-      ko: ['데모 화면 · 사내 앱 화면 아님.', '같은 화면을 가상 데이터로 다시 띄워 찍었습니다. 이름·회의실·식당·금액·날짜는 모두 가짜입니다.'],
-      en: ['Demo screens, not the internal app.', 'Re-run with made-up data: every name, room, restaurant, amount and date is fictional.'],
+      ko: ['데모 화면.', '같은 화면을 가상 데이터로 다시 띄워 찍었습니다. 이름·회의실·식당·금액·날짜는 모두 가짜입니다.'],
+      en: ['Demo screens.', 'Re-run with made-up data: every name, room, restaurant, amount and date is fictional.'],
     },
     shots: [
       { file: 'hrga-01-home', ko: ['허브 홈', '흩어져 있던 도구를 한 화면에서 고릅니다. 왼쪽 메뉴는 아이콘만 남기고 접을 수 있습니다.'], en: ['Hub home', 'Every tool from one screen. The left menu folds down to icons.'] },

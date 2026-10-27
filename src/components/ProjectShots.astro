@@ -3,6 +3,7 @@
 // variant="card"는 홈 카드에 2장, "gallery"는 상세 페이지에 전부.
 import type { Locale } from '../i18n';
 import { PROJECT_SHOTS } from '../data/shots';
+import Icon from './Icon.astro';
 
 interface Props { id: string; locale: Locale; variant: 'card' | 'gallery'; }
 const { id, locale, variant } = Astro.props;
@@ -23,7 +24,7 @@ const note = en ? set.note.en : set.note.ko;
       return (
         <li>
           <figure>
-            <a href={src} target="_blank" rel="noopener" aria-label={en ? `${title} — open full size` : `${title} — 크게 보기`}>
+            <a href={src} target="_blank" rel="noopener" data-title={title} data-body={body} aria-label={en ? `${title} — open full size` : `${title} — 크게 보기`}>
               <img src={src} width="1600" height="1000" alt={`${title}: ${body}`} loading="lazy" decoding="async" />
             </a>
             <figcaption><b>{title}</b>{variant === 'gallery' && <span>{body}</span>}</figcaption>
@@ -32,7 +33,42 @@ const note = en ? set.note.en : set.note.ko;
       );
     })}
   </ul>
+  <dialog class="lightbox" aria-label={en ? 'Screen, enlarged' : '화면 크게 보기'}>
+    <div class="lb-box">
+      <div class="lb-head">
+        <b class="lb-title"></b>
+        <button type="button" class="lb-close" aria-label={en ? 'Close' : '닫기'}><Icon name="close" size={20} /></button>
+      </div>
+      <img class="lb-img" alt="" width="1600" height="1000" />
+      <p class="lb-body"></p>
+    </div>
+  </dialog>
 </section>
+
+<script>
+  // 사진을 누르면 새 탭 대신 같은 페이지 위 모달로 크게 보여준다.
+  // JS가 없거나 Ctrl/⌘+클릭이면 예전처럼 새 탭에서 열린다.
+  document.querySelectorAll<HTMLElement>('.shots').forEach((section) => {
+    const dlg = section.querySelector<HTMLDialogElement>('.lightbox')!;
+    // 홈에서는 펼친 파일 안에 있어서 Esc가 파일까지 닫으므로, 모달을 body 바로 아래로 옮긴다
+    document.body.append(dlg);
+    const img = dlg.querySelector<HTMLImageElement>('.lb-img')!;
+    section.querySelectorAll<HTMLAnchorElement>('figure a').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+        img.src = a.href;
+        img.alt = a.querySelector('img')!.alt;
+        dlg.querySelector('.lb-title')!.textContent = a.dataset.title!;
+        dlg.querySelector('.lb-body')!.textContent = a.dataset.body!;
+        dlg.showModal();
+      });
+    });
+    dlg.querySelector('.lb-close')!.addEventListener('click', () => dlg.close());
+    // 사진 바깥의 어두운 부분을 누르면 닫힌다
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  });
+</script>
 
 <style>
   .shots { margin: 1.25rem 0 0; }
@@ -51,4 +87,16 @@ const note = en ? set.note.en : set.note.ko;
   figcaption b { display: block; color: var(--color-ink); font-weight: 800; }
   figcaption span { display: block; color: var(--color-ink-3); }
   @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+
+  /* 모든 데모 사진은 1600×1000(16:10). 화면 너비와 높이 중 먼저 닿는 쪽에 맞춘다.
+     100%는 스크롤바를 뺀 화면 폭이라, 100vw와 달리 스크롤바 있는 PC에서도 넘치지 않는다 */
+  .lightbox { padding: 0; border: 0; background: transparent; width: min(calc(100% - 2.5rem), calc((100dvh - 10rem) * 1.6 + 2 * var(--space-sm))); }
+  .lightbox::backdrop { background: rgba(0, 0, 0, 0.72); }
+  .lb-box { padding: var(--space-sm); background: var(--color-paper-2); border-radius: var(--radius-md); }
+  .lb-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); margin-bottom: var(--space-xs); }
+  .lb-title { color: var(--color-ink); font-weight: 800; }
+  .lb-close { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border: 1px solid var(--color-rule-strong); border-radius: var(--radius-sm); background: none; color: var(--color-ink); cursor: pointer; }
+  .lb-close:hover { border-color: var(--color-accent); }
+  .lb-img { border-radius: var(--radius-sm); }
+  .lb-body { margin: var(--space-xs) 0 0; font-size: var(--text-sm); color: var(--color-ink-3); line-height: 1.5; }
 </style>
