@@ -31,14 +31,14 @@ export const CASES: Case[] = [
     flow: ['캘린더 · 별도 웹앱 · 구글시트 · 엑셀', '회사 계정 로그인 웹앱 하나로 통합', '6개 기능'],
     problem: '인사총무 업무가 캘린더, 별도 웹앱, 구글시트, 엑셀 네 곳에 흩어져 있었습니다. 매달 같은 일을 손으로 다시 했고, 숫자가 틀려도 아무도 알아채지 못했습니다.',
     solution: '회사 Google 계정으로 로그인하는 웹앱 하나로 합쳤습니다. 회의실 현황, 사내 이벤트 조 편성, 구성원 디렉토리, 제휴식당, 자기계발비, 근속 알림까지 6개 기능이 들어 있습니다.',
-    result: '5개월째 멈춤 없이 운영 중입니다. 사내 앱은 2개에서 1개로 줄었고, 자동 테스트 978개가 모두 통과합니다.',
+    result: '2026년 3월부터 멈춤 없이 운영 중입니다. 사내 앱은 2개에서 1개로 줄었고, 자동 테스트 978개가 모두 통과합니다.',
     en: {
       title: "Scattered internal tools, now one",
       line: "Meeting rooms, company events, the training allowance: tools and spreadsheets that lived in different places are now one web app you sign into with your company account.",
       flow: ["Calendar · a separate web app · Google Sheets · Excel", "One web app behind the company account", "6 features"],
       problem: "HR and general-affairs work was spread across four places: a calendar, a separate web app, Google Sheets and Excel. The same work was redone by hand every month, and when a number was wrong, nobody noticed.",
       solution: "I merged them into one web app that you sign into with your company Google account. It has six features: meeting-room status, team draws for company events, a member directory, partner restaurants, the training allowance and work-anniversary alerts.",
-      result: "In production for five months with no unplanned downtime. Two internal apps became one, and all 978 automated tests pass.",
+      result: "In production since March 2026 with no unplanned downtime. Two internal apps became one, and all 978 automated tests pass.",
     },
   },
   {
@@ -51,14 +51,14 @@ export const CASES: Case[] = [
     flow: ['식권 사용 내역 + 근태 기록', '규정 조항별 자동 대조', '차감 사유 문장 · 별도 확인 목록'],
     problem: '식대는 먼저 지급하고 나중에 자격을 확인합니다. 식권 사용 내역과 근태 기록을 사람마다, 날짜마다 눈으로 맞추느라 매달 하루에서 이틀이 걸렸고, 한 건을 놓쳐도 드러나지 않았습니다.',
     solution: '복리후생·지출 규정의 지원 요건을 조항 단위로 규칙으로 옮기고 두 데이터를 자동으로 대조합니다. 판정할 수 없는 건은 그냥 통과시키지 않고 별도 확인 목록으로 모읍니다.',
-    result: '5개월째 매달 실행 중입니다. 확인은 몇 분, 예외 확인까지 30분 안팎이면 끝납니다. 결과는 실제 급여 차감에 쓰이고, 당사자에게 보여줄 차감 사유 문장까지 만들어집니다.',
+    result: '2026년 3월부터 한 달도 빠짐없이 실행하고 있습니다. 확인은 몇 분, 예외 확인까지 30분 안팎이면 끝납니다. 결과는 실제 급여 차감에 쓰이고, 당사자에게 보여줄 차감 사유 문장까지 만들어집니다.',
     en: {
       title: "Meal-allowance checks: from two days to minutes",
       line: "Matching meal-card usage against attendance records used to be done by eye. Now rules taken from the regulation do the matching automatically.",
       flow: ["Meal-card usage + attendance records", "Automatic check, clause by clause", "Deduction reasons · manual-review list"],
       problem: "The meal allowance is paid first and eligibility is checked afterwards. Matching meal-card usage against attendance, person by person and date by date, took one to two days every month, and a single miss never surfaced.",
       solution: "I turned the eligibility requirements in the benefits and expense regulations into rules, clause by clause, and the two data sets are now compared automatically. Cases the rules cannot decide are not waved through; they go to a separate review list.",
-      result: "Run every month for five months. The check takes minutes, and about 30 minutes including the exceptions. The results feed actual payroll deductions, and each one comes with a sentence explaining the deduction to the person concerned.",
+      result: "Run every month since March 2026, without a miss. The check takes minutes, and about 30 minutes including the exceptions. The results feed actual payroll deductions, and each one comes with a sentence explaining the deduction to the person concerned.",
     },
   },
   {

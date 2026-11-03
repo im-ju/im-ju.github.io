@@ -81,6 +81,7 @@ kbd {
 .prose { max-width: var(--measure); }
 .prose > * + * { margin-top: 1em; }
 .prose h2 { font-size: var(--text-xl); margin-top: var(--space-2xl); padding-top: var(--space-md); border-top: var(--rule); }
+.prose > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; } /* header or gallery above already draws a rule */
 .prose h3 { font-size: var(--text-lg); margin-top: var(--space-xl); }
 .prose blockquote { margin: 1.5em 0; padding: 0.25em 0 0.25em 1em; border-left: 2px solid var(--color-accent); color: var(--color-ink-2); }
 .prose ul, .prose ol { padding-left: 1.3em; }

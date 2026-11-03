@@ -1,6 +1,6 @@
 ---
 // 프로젝트 데모 스크린샷 갤러리. 데이터는 src/data/shots.ts.
-// variant="card"는 홈 카드에 2장, "gallery"는 상세 페이지에 전부.
+// 둘 다 사진을 전부 보여준다. variant="card"는 홈 카드(제목만), "gallery"는 상세 페이지(제목+설명).
 import type { Locale } from '../i18n';
 import { PROJECT_SHOTS } from '../data/shots';
 import Icon from './Icon.astro';
@@ -11,7 +11,7 @@ const en = locale === 'en';
 const set = PROJECT_SHOTS[id];
 if (!set) throw new Error(`ProjectShots: no screenshots registered for "${id}" in src/data/shots.ts`);
 
-const shots = variant === 'card' ? set.shots.filter((s) => set.card.includes(s.file)) : set.shots;
+const shots = set.shots;
 const note = en ? set.note.en : set.note.ko;
 ---
 <section class:list={['shots', variant]} aria-label={en ? 'Screens' : '화면'}>

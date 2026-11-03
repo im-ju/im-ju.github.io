@@ -5,15 +5,12 @@
 type Text = [title: string, body: string];
 export interface Shot { file: string; ko: Text; en: Text; }
 export interface ShotSet {
-  /** 홈 카드에 보일 파일 (2장 권장) */
-  card: string[];
   note: { ko: [string, string]; en: [string, string] };
   shots: Shot[];
 }
 
 export const PROJECT_SHOTS: Record<string, ShotSet> = {
   'hrga-hub': {
-    card: ['hrga-02-rooms-today', 'hrga-04-events-draw'],
     note: {
       ko: ['데모 화면.', '같은 화면을 가상 데이터로 다시 띄워 찍었습니다. 이름·회의실·식당·금액·날짜는 모두 가짜입니다.'],
       en: ['Demo screens.', 'Re-run with made-up data: every name, room, restaurant, amount and date is fictional.'],
@@ -32,7 +29,6 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
     ],
   },
   'meal-allowance': {
-    card: ['mc-01-summary', 'mc-03-dinner'],
     note: {
       ko: ['데모 화면 · 실제 결과 아님.', '원본 검증 스크립트에 가상의 식대 내역과 근태기록을 넣어 돌린 결과입니다. 이름·금액·규정 수치는 모두 가짜입니다.'],
       en: ['Demo screens, not real results.', 'The original checking script run on made-up meal and attendance records. Names, amounts and rule values are fictional.'],
@@ -44,7 +40,6 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
     ],
   },
   'interview-reminder': {
-    card: ['ir-01-calendar', 'ir-02-drafts'],
     note: {
       ko: ['데모 화면 · 실제 메일 아님.', '원본 스크립트의 판별·템플릿·알림 로직을 그대로 옮겨 가상 일정에 돌렸습니다. 회사명·이름·주소는 모두 가짜입니다.'],
       en: ['Demo screens, not real mail.', "The original script's detection, template and alert logic, run on made-up calendar events. Company, names and addresses are fictional."],
@@ -56,7 +51,6 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
     ],
   },
   'skill-intelligence': {
-    card: ['si-01-overview', 'si-02-heatmap'],
     note: {
       ko: ['데모 화면 · 실제 분석 결과 아님.', '같은 대시보드 코드에 가상의 사람·팀·스킬을 넣어 다시 만들었습니다. 이름과 수치는 모두 가짜입니다.'],
       en: ['Demo screens, not the real analysis.', 'Rebuilt from the same dashboard code with made-up people, teams and skills. Every name and number is fictional.'],
