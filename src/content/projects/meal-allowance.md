@@ -10,7 +10,7 @@ stack: ["Python", "pandas"]
 replaced: "하루~이틀 걸리던 수기 대조"
 replacedEn: "a 1–2 day manual review each month"
 summary: "복리후생·지출 규정의 식대 지원 요건을 규칙으로 옮겨, 식권 사용 내역과 근태 기록을 자동으로 대조합니다. 결과는 실제 급여 차감에 쓰이고, 사람마다 차감 사유 문장이 함께 나옵니다."
-summaryEn: "Encoded the benefits and expense regulations as verification rules and reconciled meal-card usage against attendance. Output feeds actual payroll deductions with a per-employee justification."
+summaryEn: "I turned the meal-allowance requirements in the benefits and expense regulations into rules that automatically match meal-card usage against attendance records. The results feed actual payroll deductions, with a sentence for each person explaining the deduction."
 ---
 ## 결과
 

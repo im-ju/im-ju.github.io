@@ -10,7 +10,7 @@ stack: ["Next.js", "TypeScript", "Postgres", "Vercel"]
 replaced: "사내 도구 2개 + 엑셀·구글시트"
 replacedEn: "2 internal apps + spreadsheets"
 summary: "흩어져 있던 사내 도구와 시트를 회사 Google 계정 하나로 들어가는 웹앱으로 합쳤습니다. 회의실·이벤트·구성원 디렉토리·제휴식당·자기계발비·근속 알림 6개 기능이 운영 중입니다."
-summaryEn: "Consolidated two internal apps and spreadsheet processes into one web service behind company SSO. Six modules live; fifth month in production with no unplanned downtime."
+summaryEn: "I merged scattered internal tools and spreadsheets into one web app you sign into with your company Google account. Six features are running: meeting rooms, company events, a member directory, partner restaurants, the training allowance and work-anniversary alerts."
 ---
 ## 결과
 

@@ -1,171 +1,60 @@
-> A workforce-risk analysis pipeline that uses AI to extract and match every employee's skills from internal
-> documents, and traces "what stops if this person leaves" through a skills ontology.
-> I completed the PoC and delivered **the Go/No-Go decision pack for leadership**.
+## Results
 
----
+Without a new survey, using only documents that already existed, I mapped "who can do what" and produced an attrition-risk report and a decision paper for leadership. All figures on this page are based on synthetic data.
 
-## 1. At a glance
+- **29 existing documents, 0 new ones written.** Only team missions, job descriptions and team goals (OKRs) were used.
+- **494 skills and 642 links between them.** Skills are organised not as a list but as a connected map.
+- **"Skills only one person has": 101 → 83.** I re-audited my own report and corrected an inflated number.
 
-| | |
-|---|---|
-| **Role** | Planning · methodology design · implementation · self-audit · leadership reporting (solo) |
-| **Period** | 2026-04 to 2026-07 (PoC phase 2 complete) |
-| **Status** | Phase 2 complete · **conditional Go recommendation, awaiting the leadership decision** |
-| **Scope** | All 77 employees / 20 teams · 29 internal documents (team missions, JDs, OKRs) |
-| **Stack** | TypeScript(strict) · PostgreSQL · Drizzle ORM · Claude Code CLI · Vitest |
-| **Size** | 3,200 lines of source · 10 CLI commands · 45 commits · 12 analysis documents |
-| **Data** | **Currently all synthetic (anonymisation complete)** — a real-data pilot is for leadership to approve |
+## The problem
 
----
+When a company talks about people risk, all it has is grade, tenure and team. What it really wants to know is something else: if this person quit tomorrow, what would stop?
 
-## 2. Background — what was the problem
+Answering that needs data on "who can do what", and it was written down nowhere. Asking every employee to list their own skills falls apart from the start, because response rates and standards vary too much.
 
-When workforce risk comes up, what the organisation actually holds is **job grade, tenure and team**. But what we want to know is something else.
+Meanwhile, the company already had team missions, job descriptions and team goal documents. They were not people writing about their own skills, but they did say what each team is responsible for.
 
-> If this person quits tomorrow, **what stops?**
+## What I did
 
-Answering that requires "who can do what" to exist as data. It was written down nowhere, and asking every employee to list their own skills **collapses at the start, because of response rates and inconsistent standards.**
+**I pulled skills out of existing documents and linked them to people.** Using AI, I extracted skills from 29 documents and linked each person to the skills they have, and at what level (on a four-level scale). Then I calculated attrition risk from who holds the rare skills and the knock-on effects if that person left. Re-running the whole process from scratch takes about three hours, not counting collecting the documents.
 
-Meanwhile, the organisation already had documents: team missions, JDs, OKRs. Nobody had written down their own skills, but **what each team is responsible for was written down.**
+**I recorded the relationships between skills too.** Each skill carries links such as "needs this first", "goes deeper than", "complements" and "makes this possible". That means risk can be described like this:
 
----
+- A simple analysis: "Only one person has skill A."
+- An analysis that follows the links: "If A is gone, the review work done with A stops, and the regulatory reporting that relies on that review cannot be done either."
 
-## 3. What I built
+By following the links up to three steps, it produced two to three times more information useful for decisions than a simple analysis.
 
-**A CLI pipeline that descends from "existing documents → skills → people → risk".** Nothing new has to be written.
+**People check what the AI extracted.** The skills the AI pulled out are exported to a sheet for each person and their team lead to check, and their answers are fed back in. To avoid applying anything by mistake, the default is to show what would change before anything is applied.
 
-```
-import-csv  →  extract  →  match  →  import-results  →  risk  →  dashboard
- load HR       extract     match       load into DB     compute    report
- roster        skills      people to                    attrition
-               from docs   skills                       risk
-                                    ↑
-                        verify-sheet / member-verify-sheet
-                        import-verifications  (feeds human confirmation back in)
-```
+**Three months later, I took my own report apart.** This is the most important part of the project. I issued the report in April 2026, and in July I re-audited it myself and issued a corrected version, because the report's numbers could not be reproduced from the stored data.
 
-| Stage | What it does |
-|---|---|
-| **Extract** | Pulls skills and **relations between skills** out of 29 team missions, JDs and OKRs |
-| **Match** | Links person ↔ skill at proficiency 1 to 4 |
-| **Risk** | Computes attrition risk from rare-skill ownership plus **knock-on impact** |
-| **Verify** | The person and their team lead confirm what the AI produced, and that goes back in |
-
-### What makes it different — I treated skills as a graph, not a list
-
-I assigned `prerequisite` · `specialization` · `complementary` · `enables` relations between skills. That lets risk be stated like this.
-
-> Simple analysis: "Only 1 person holds skill A."
-> Ontology analysis: "A goes missing → the review work A enabled stops → the regulatory reporting that depended on it becomes impossible."
-
-By tracing relations up to 3 hops, it produced **2 to 3 times the decision-relevant information of the simple analysis**.
-
----
-
-## 4. Architecture
-
-```
-  [29 internal docs]        [HR system CSV]
-  team missions/JD/OKR       member roster
-       │                        │
-       ▼                        ▼
-  ┌─────────────────────────────────┐
-  │  CLI pipeline (TypeScript)      │
-  │                                 │
-  │  extract ──► LLM Runner ────────┼──► Claude Code CLI
-  │  match   ──► (local CLI call)   │    (no HTTP API — deliberate)
-  └──────────────┬──────────────────┘
-                 │
-                 ▼
-        ┌──────────────────┐        ┌────────────────────┐
-        │  PostgreSQL      │◄───────┤  verification loop │
-        │  members         │        │  issue verify-sheet│
-        │  skills          │        │  → person/lead     │
-        │  skill_relations │        │    confirms        │
-        │  member_skills   │        │  → import back in  │
-        │  risk_snapshots  │        └────────────────────┘
-        └────────┬─────────┘
-                 │
-                 ▼
-        ┌──────────────────┐
-        │  risk computation│  rare skills + ontology chains
-        │  + snapshot save │  ← the key to reproducibility
-        └────────┬─────────┘
-                 ▼
-         HTML report · leadership decision pack
-```
-
-**Two things are deliberate in the design.**
-
-- **The LLM is called through a local CLI, not an HTTP API.** This pipeline handles employee information, so I never built a path that pushes that data out through an external API key in the first place.
-- **Risk results are stored as 1 snapshot row per member.** The reason is in §5.
-
----
-
-## 5. The most valuable part of this project — I demolished my own results
-
-I issued the PoC report in 2026-04. In 2026-07 **I audited that report and issued a corrected version.**
-
-### What was wrong
-
-The figures in the report **did not reproduce from the stored state of the database.**
-
-| Item | First reported (2026-04) | After correction (2026-07) |
+| Item | April report | July correction |
 |---|---|---|
-| Skill catalogue | 560 | **494** (near-duplicates merged) |
-| Single-holder skills | 101 | **83** (18 false singles removed) |
-| Risk distribution | C14 · H11 · M23 · L29 | **C12 · H19 · M6 · L40** |
+| Number of skills | 560 | 494 |
+| Skills only one person has | 101 | 83 |
+| Breakdown by risk level | Could not be recalculated | Recalculated from stored data |
 
-There were three causes.
+There were three causes:
 
-1. **An unnormalised skill catalogue.** What was effectively the same skill existed several times under different names, so "rare skills held by only 1 person" was **inflated beyond the truth.** The input to the risk computation was contaminated.
-2. **Non-reproducible figures.** The report's numbers were the output of one particular run, and as the database drifted afterwards the same numbers could no longer be produced.
-3. **Uncalibrated thresholds.** Unverified AI extraction results rode the chain analysis all the way up to Critical.
+- Several skills were effectively the same skill under different names. That inflated the count of "skills only one person has". The raw material for the risk calculation was contaminated from the start.
+- The report's numbers came from a single run at one point in time. As the data changed bit by bit afterwards, the same numbers could no longer be produced.
+- AI guesses that nobody had checked were carried along the knock-on analysis all the way up to the highest risk level.
 
-### What I fixed
+So I fixed it like this:
 
-- I introduced **a skill normalisation pass** — read-only detection first, then an apply tool (with a rollback-capable dry-run) — and merged the near-duplicates.
-- I changed it to store **1 reproducible risk snapshot row per member**. The report's figures now come back out of the stored state unchanged.
-- I put **verification status on the face of every output**, and **capped unverified chains at High so they cannot rise to Critical**. The risk grade now distinguishes what the AI extracted from what a human confirmed.
-- I built a per-person verification loop (`member-verify-sheet` → confirm → `import-verifications`), but made **dry-run the default**.
+- I found and merged skills that were the same under different names. A first step only finds them, so they can be checked, and the merge itself can be undone.
+- Each person's risk result is now stored as it was at that moment. The report's numbers now come straight back out of the stored data.
+- Whether a person has checked a result is now shown at the very front, and knock-on effects nobody has checked can no longer push anyone to the top risk level; they stop one level below.
 
-### Why this matters
+Without the correction, leadership would have made people decisions based on an inflated 101 "skills only one person has" and a risk breakdown that could not be recalculated.
 
-This project is not "AI analysed HR data". It is **a record of auditing, on my own initiative, whether AI analysis reproduces and whether it was verified — before it reaches a leadership decision — and correcting the wrong numbers with my own hands.**
+**I asked leadership not to "adopt" but to "measure".** My recommendation was a conditional go: not a full rollout, but approval for a pilot on real data from two or three teams whose skills are clearly defined. The analysis method and security controls were ready, but how accurately the AI extracts skills from real data cannot be known from synthetic data, and that measurement cannot happen without leadership's approval. I proposed deciding on any expansion after seeing those results.
 
-> Without the correction, leadership would have made workforce decisions on the basis of **101 inflated rare skills and a risk distribution that does not reproduce**.
+## What I chose not to do
 
----
+**I did not survey every employee.** Instead of self-reporting with uneven response rates and standards, I started from documents that already existed.
 
-## 6. What I recommended to leadership
+**I did not dress up what I didn't know as known.** Instead of seeking approval on unverified results, I wrote down what was still unknown (accuracy on real data) and asked for permission to find it out.
 
-"**Conditional Go.**" Not a full rollout: I asked them to approve **a real-data pilot limited to 2 or 3 teams** whose skill definitions are clear.
-
-The logic goes like this.
-
-- The technical pipeline, the methodology and the security governance are **ready.**
-- Exactly one unknown is left — **extraction accuracy on real data.** The current data is entirely synthetic, so that figure cannot be produced.
-- And that measurement **cannot go ahead without leadership approval.**
-
-So I narrowed the request from "please adopt this" to "**please let me measure the accuracy.**" The decision to scale comes at the next checkpoint, after seeing that result.
-
-> Instead of dressing up the unverified as verified to win approval, **I wrote down what I still don't know as not known, and asked for the authority to find it out.**
-
----
-
-## 7. Results in numbers
-
-| Item | Figure |
-|---|---|
-| Coverage | 77 people / 20 teams (100%) |
-| Input documents | 29 — **all existing documents, 0 newly written** |
-| Skill catalogue | 494 (after normalisation) · 642 relations |
-| Skill matches | 2,096 · about 27 per person on average |
-| Pipeline runtime | about 3 hours excluding document collection (repeat runs automated) |
-| Metrics corrected by the self-audit | 3 (skill count · single-holder skill count · risk distribution) |
-| Documents produced | PoC report · audit · methodology review · threshold calibration · Go/No-Go pack |
-
-> Analysis figures such as the risk distribution are **all based on synthetic data**. Both this document and the original report state that on their first page.
-
----
-
+**I did not hide that the data was synthetic.** Both this page and the original report state up front that the figures are based on synthetic data.

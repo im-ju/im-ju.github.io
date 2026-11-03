@@ -10,7 +10,7 @@ stack: ["Google Apps Script"]
 replaced: "검증되지 않던 시트"
 replacedEn: "an unverified spreadsheet"
 summary: "구글시트로 운영하던 자기계발비에서 서로 맞지 않는 숫자를 찾아내는 감사 도구입니다. 규정에서 가져온 8가지 기준으로 동명이인, 팀명 불일치, 한도 초과를 심각도와 함께 찾아내고, 그 결과가 웹앱으로 옮기는 근거가 됐습니다."
-summaryEn: "A read-only tool applying eight regulation-derived checks to spreadsheet-managed benefits data. Its findings proved the structural limits of the sheet and became the basis for migrating into the Hub."
+summaryEn: "An audit tool that finds numbers that don't add up in a training allowance run on Google Sheets. Eight checks taken from the regulation flag same-name people, team-name mismatches and limits exceeded, each with a severity, and the findings became the case for moving to the web app."
 ---
 ## 결과
 

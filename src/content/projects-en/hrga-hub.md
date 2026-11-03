@@ -1,149 +1,59 @@
-> An internal consolidation platform that an HR & General Affairs practitioner built and runs as a production web app for their own team's repetitive work.
-> Implementation by AI pair programming (Claude Code); design, verification and decisions my own.
+## Results
 
----
+As the HR and general-affairs person, I built my team's repetitive work into a web app myself, and it has been running for all staff since March 2026.
 
-## 1. At a glance
+- **Running without interruption since March 2026.** There have been no outages.
+- **2 internal apps → 1, with 6 features.** Work that lived in a calendar, a separate web app, Google Sheets and Excel moved into one place.
+- **All 978 automated tests pass.** These are checks in which the program verifies on its own that each feature works.
 
-| | |
-|---|---|
-| **Role** | Planning · design · implementation · deployment · operations (solo) |
-| **Period** | 2026-03 – live (about 5 months) |
-| **Status** | Production live · rolled out company-wide |
-| **Scope managed** | Around 90 members (as of 2026-03) |
-| **Stack** | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · NextAuth v5 · Drizzle ORM · Postgres (Neon) · Vercel |
-| **Size** | 203 source files, 36,904 lines · 13 screens · 28 APIs · 5 DB tables · 9 migrations |
-| **Quality** | **978** automated tests (42 files, all passing) · 166 commits · 37 merged PRs |
+The data moved over includes a member list of about 90 people, 337 partner restaurants and 66 training-allowance spending records. I have not measured how many people actually use it or how often, though. About 90 is the size of the list the Hub manages, not the number of people who use it every day.
 
-> ⚠️ **Actual user counts and usage frequency were not measured.** The headcount above is the size of the member roster the Hub manages, not the number of active users. Team counts shift with personnel changes and reorganisations, so I always state them with an as-of date.
+## The problem
 
----
+HR and general-affairs work was spread across four places:
 
-## 2. Background — what was the problem
+- To see meeting-room bookings, someone had to scan the Google Calendar by eye.
+- Team draws for company events such as blind lunches needed a separate web app.
+- The training allowance ran on Google Sheets, and two numbers in the sheet disagreed with each other.
+- The member list, the org chart and the partner-restaurant list were passed around as Excel files.
 
-HR and general affairs work was **scattered across 4 different places**.
+They had two things in common. People redid the same work by hand every month, and when something was wrong, nobody noticed.
 
-- Meeting room bookings had to be scanned by eye in Google Calendar.
-- Grouping for internal events (blind lunches, chimaek parties) ran in a **separate web app** that had to be opened on its own.
-- The training allowance ran on **Google Sheets**, and two numbers inside the spreadsheet had been left disagreeing with each other.
-- The member roster, org chart and partner restaurant list circulated as Excel files.
+## What I did
 
-What they had in common was that **a person redid the same work by hand every month**, and that **when it was wrong, it was silent**.
+**I merged six jobs into one web app.** Sign in once with your company Google account and you can use all of them.
 
----
+- **Meeting rooms**: rooms in use now, today's schedule, usage statistics and suggestions for a free room. Replaces scanning the calendar by eye.
+- **Event team draws**: splits up people from the same team or who met recently, and respects "together" and "apart" requests. Replaces the separate web app.
+- **Member directory**: the full staff list and org chart. Replaces the Excel files going around.
+- **Partner restaurants**: search 337 meal-card partner restaurants by type, area or distance from the office.
+- **Training allowance**: your own limit, remaining balance and spending history, plus company-wide spending for admins. Replaces the Google Sheet.
+- **Birthdays and work anniversaries**: posts this month's birthdays and work anniversaries to Slack every morning. Replaces people having to remember.
 
-## 3. What I built
+**I tied sign-in to the company account.** If you do not know who came in, you cannot control access or check anything later. There are only two access levels, regular staff and admin, and every feature checks access on its own, so adding a new screen cannot skip the check.
 
-A **single web app** entered with one login (company Google account). 6 features are live.
+**I left notifications to Slack, not a dashboard.** Nobody keeps a dashboard open all day. The web app keeps the records and does the managing; delivery goes through the channel people already watch. Automatic alerts can fail without anyone noticing, so I guarded against three things: the same alert is never sent twice, a skipped day is caught up on the next run, and the date the last alert went out is shown separately, so that if the alerts themselves stop, it shows.
 
-| Feature | What it does | What it replaced |
-|---|---|---|
-| **Meeting room dashboard** | Booking status, today's schedule, usage statistics, free-slot suggestions | Scanning Calendar by eye |
-| **Event random pick** | Grouping for blind lunches and chimaek parties, with constraints, history and badges | A separate app |
-| **Member directory** | Full staff roster plus pan/zoom org chart, admin roster CRUD | Excel files passed around |
-| **Partner restaurants (식권대장)** | Search 337 partner restaurants by category, area and **distance from the office** | An Excel list |
-| **Training allowance** | Personal limit, remaining balance and usage history, plus a company-wide spend admin dashboard and CSV | Google Sheets |
-| **Tenure and birthdays** | This month's birthdays and work anniversaries, plus **an automatic Slack notification every morning** | People remembering |
+**AI wrote the code; I made the decisions and did the checking.** Most of the code was written by an AI tool (Claude Code), and I do not hide that. My part was deciding what to build and what not to build, setting the training-allowance limit rules by checking them clause by clause against the company regulation, deciding the data structure and access levels, and deciding when to release a change to the live service or roll it back. I also designed how the AI's output gets checked. Every change goes through two AI reviews (design and security) kept separate from the AI that wrote it, and every time these reviews caught problems of medium severity or higher.
 
-**One design principle:** the portal records and manages; the channel delivers. Nobody leaves a dashboard open, so Slack carries the notifications.
+Once, the two reviews reached opposite conclusions, and I settled it by running an experiment myself. The question was whether an operation that replaces a whole set of data at once is guaranteed to be "all or nothing". Tested one at a time, it happened to pass; the problem only showed up when several operations ran at the same time. Left as it was, the old data could have been deleted without the new data going in, leaving the live service with zero records.
 
----
+**I made "what checks that statement?" a rule.** I noticed the same kind of mistake six times in one day. For example:
 
-## 4. Architecture
+- The on-screen message said "we will send it again on the next working day", but the next working day's run did not actually pick up the missed day.
+- A change was reported as "checked by eye on the preview screen", but that preview was running code 2,426 lines behind the live service.
+- A document said "locations collected for all 337 restaurants", but a count found 334.
 
-```
-Member browser ──HTTPS──> [Vercel]                       [External]
-                          DSRV HR/GA Hub  ──OAUTH─────>  Google OAuth
-                          (Next.js · 6 features)
-                                │ FETCH
-                                ▼
-                          API Routes ────CALENDAR─────>  Google Calendar
-                          (28 handlers ·                 (room bookings)
-                           requireRole())
-                                │ SQL
-                                ▼
-    Neon Postgres <──READ/WRITE── birthday cron ──HOLIDAYS──> public data portal
-    (drizzle + raw)              (1× per day)   ──WEBHOOK───> Slack channel
-```
+In each case, something nothing could actually check was stated as fact, and it went unnoticed for a long time. So now, whenever I write an on-screen message, a number in a document or a promise, I decide at the same time what will check it, and if nothing can, I word it more cautiously. The rule paid off. Because the alert time had not been confirmed, I had already changed the message from "09:00" to "in the morning". Later it turned out that a limit of the service plan made sending at an exact time impossible. There was nothing to fix.
 
-- A structure where the **human path** and the **machine path** share the same DB.
-- The cron has no login session → it gets public holidays from the **public data portal's special-day API**, not from Google Calendar. (Because Calendar calls are tied to the logged-in user's OAuth token.)
-- Detailed diagrams: `architecture.html` / `architecture.png`
+**I kept testing separate from the real data.** So that testing on my own computer never touches the live service's data, I set up a separate test copy and a separate test sign-in. If it is accidentally connected to the real data, the test server refuses to start at all.
 
----
+## What I chose not to do
 
-## 5. How I built it — AI pair programming
+**I left out a map feature I had already finished.** I completed a partner-restaurant map, but using it would have meant registering the company domain in an outside service's admin console. I judged that the convenience of a map was not worth that burden and left it out. Sorting by "closest to the office" needed no such registration, so most of what was needed came without the map.
 
-**Claude Code wrote most of the code. I do not hide that. The real difficulty of this project lay elsewhere.**
+**I did not split it into a complex structure.** When merging the two apps, I considered splitting them into several pieces run separately, but merged them into one app instead. Both apps were already built with the same technology, so the only genuinely hard part was merging the sign-in. At the scale of an internal tool, a complex structure only adds maintenance burden.
 
-| What I did | What the AI did |
-|---|---|
-| Deciding what to build, and what **not** to build | Writing code |
-| Fixing the calculation logic by checking internal regulations clause by clause | Writing tests |
-| Deciding the architecture, data model and permission boundaries | Refactoring |
-| **Designing the system that verifies the AI's output** | Drafting documentation |
-| Judgement calls on prod migrations, deployment and rollback | |
+**I did not add more access levels.** There was a proposal for five roles, but the only distinction actually needed was regular staff and admin.
 
-### The verification system — the most valuable part of this project
-
-**Every feature goes up as a PR and gets 2 independent reviews (design and security) in sessions separated from the implementation.** In this repository, review **caught a MEDIUM-or-worse defect every single time.**
-
-One example of what was caught:
-
-- **I measured and adjudicated 1 BLOCKER on which the two reviews flatly contradicted each other.** `db.transaction()` was not atomic in this app — the shared DB handle is a driver Proxy, so the ORM cannot take a dedicated connection. Under sequential execution it **passes by luck**; it only breaks once concurrent queries are mixed in. Left alone, a full data replacement could have committed only the delete and left production at 0 rows.
-
-### The biggest lesson — "nobody checks the premises"
-
-I noticed **the same shape of mistake 6 times in one day** and turned it into a rule.
-
-| What | What it claimed | The unchecked premise |
-|---|---|---|
-| On-screen banner | "The next working day will retry" | Does the cron actually pick up that date → **it did not** |
-| Deployment discipline | "I checked it by eye on preview" | Is preview the same code as prod → **it was 2,426 lines behind** |
-| A figure in documentation | "Coordinates collected, 337/337" | Did anyone count → **actually 334** |
-
-All of them **asserted as true something they could not verify themselves**, and all of them stayed quiet for a long time.
-
-> **Rule:** when creating a claim, a promise, a discipline, a record or a figure, **decide at the same time what checks its premise.** If it cannot be checked, weaken the claim.
-
-The rule paid for itself. With the exact cron send time unverified, I had already weakened the wording from "09:00" to "morning"; it later turned out that sending on the hour was impossible because of a plan limitation — **there was no code to fix.**
-
-**AI-written code is wrong in plausible ways. So the habit of asking "what checks this?" mattered more than coding ability.**
-
----
-
-## 6. Technical decisions
-
-**① I rejected a monorepo and micro-frontends when merging the two apps**
-The two apps were effectively on the same stack, so consolidation was "moving files", not "a rewrite", and the only real work was unifying authentication. I chose a single Next.js app plus route groups. A distributed architecture is pure overhead for an internal tool used by a few dozen people.
-
-**② I standardised login on company Google accounts (SSO)**
-If you do not know who logged in, neither auditing nor permissions are possible. I kept only 2 roles, member/admin (5 roles would have been over-design). Permission checks live in **`requireRole()` in each route**, not in a middleware path prefix — trust middleware alone and every newly added route is defenceless.
-
-**③ I reverted a finished feature instead of merging it**
-I built the partner restaurant map view completely and then dropped it. It only works if the company domain is registered in an external console, and I judged that the map's usefulness did not outweigh that burden. **Distance sorting is unaffected by that constraint, because the server preloads coordinates into the DB** — splitting the requirement up got me 90% of the value with no burden.
-
-**④ I designed on the premise that "notification failures are silent"**
-A cron is not retried when it fails, the same run can arrive twice, and a delivery can be dropped. So: ① idempotency (enforced with a DB unique constraint), ② catch-up (tracking from the last covered date), and ③ **2 axes of failure visibility** — looking only at the failure count goes quietly to 0 when the cron itself is dead, so I look at the freshness of the last covered date alongside it.
-
-**⑤ I separated local development from the production DB**
-I isolated it with a copy-on-write clone branch of the DB, a development-only OAuth client, and a **startup guard** (the dev server refuses to boot if it detects a prod endpoint). I did not use a local Postgres because branching on the driver creates "it worked locally" and reduces the value of regression checks.
-
----
-
-## 7. Results in numbers
-
-| Item | Figure |
-|---|---|
-| Time in production | 5 months · no unplanned downtime |
-| Internal apps consolidated | 2 → 1 |
-| Live features | 6 |
-| Manually managed assets migrated | around 90 members on the roster · 337 partner restaurants · 66 training allowance spend records |
-| Automated tests | 978 (all passing) |
-| Merged PRs | 37 (every one passed independent review) |
-| Production incidents | 0 |
-
-> **Boxes worth filling (numbers I cannot produce myself):** hours saved per month, user counts and frequency, and the HR & General Affairs team's own perception. With those three attached, this document would be far stronger.
-
----
-
+**I did not put unconfirmed promises on screen.** As with "09:00 → in the morning" above, times or numbers I had not confirmed could be kept were worded cautiously or left out.

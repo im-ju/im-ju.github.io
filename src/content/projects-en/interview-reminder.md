@@ -1,120 +1,39 @@
-> A tool that reads the calendar and automatically prepares the reminder email that goes to the candidate the day before an interview — **as far as the draft**.
-> It does not automate sending. That is the most important decision in this project.
+## Results
 
----
+Writing reminder emails the day before interviews has shrunk to "check the draft and press send".
 
-## 1. At a glance
+- **Five steps → one.** Checking the calendar, working out the interview type, choosing the template, writing and sending used to be done by hand every day. Now it is just checking the draft and sending it.
+- **3 interview types.** Phone screening, role interview and culture-fit interview each have their own template.
+- **Runs automatically every morning.** In use since April 2026.
 
-| | |
-|---|---|
-| **Role** | Design · implementation · operations (solo) |
-| **Period** | 2026-04 – live |
-| **Stack** | Google Apps Script · Calendar API · Gmail API · clasp |
-| **Size** | 6 source files · 11 commits · integration test suite included |
-| **Execution** | 1 time-based trigger each morning · a separate dry-run mode |
-| **Coverage** | 3 interview types (phone screening · role interview · culture-fit interview) |
+## The problem
 
----
+When an interview is booked, the candidate gets an email the day before with the location, the time, what to bring and who to contact. The content is fixed, but each interview type has its own template, and there can be several interviews in one day.
 
-## 2. Background — what was the problem
+It was not hard, but it could never be missed. A missed email hurts the candidate experience right away. And a person checking the calendar every day tends to fail on exactly the busiest day.
 
-Once an interview is scheduled, a reminder email goes to the candidate the day before. It carries the location, the time, what to bring, and the coordinator's contact details.
+## What I did
 
-The content itself is standardised. But **the template differs by interview type**, several can be scheduled on the same day, and above all **forgetting one directly damages the candidate's experience.**
+**I had it prepare drafts every morning.** I wrote a small program that runs inside Google's work tools (Google Apps Script). Every morning it reads the next day's events in the shared calendar, uses each title to tell whether it is an interview and of what type, finds the candidate's name and email in the event description, and creates a Gmail draft from the right template. When it is done, it sends a summary email saying how many drafts it made.
 
-So this was the kind of task that is "not hard, but must never be missed". Having a person check the calendar every day and handle it by hand **fails on exactly the days that are busy.**
+**It shows the events it could not read.** If it cannot find the candidate's name or email in the description, it does not just skip the event; it lists it as a warning, with the reason, in the morning summary. If it simply skipped, the summary would say "3 drafts created" and nobody would know there were actually 4 interviews. A missing case looks like success, so it has to be visible. On days with warnings, the summary's subject line gets "needs checking", so a normal morning and a problem morning look different in the inbox.
 
----
+**The same draft is never created twice.** Sometimes the program runs twice, or the same event appears twice in the calendar. Before creating a draft, it checks whether a draft with the same subject and recipient already exists, and if so, it does not create another.
 
-## 3. What I built
+**It can preview without touching the real mailbox.** When changing a template or adding words for spotting interview types, there is a separate way to run it that shows what would be created without actually creating any drafts.
 
-One set of Apps Script that runs automatically each morning.
+**It keeps working when the person in charge changes.** So that nothing needs reconfiguring when the recruiting coordinator changes or more people join, I did three things:
 
-```
-  Daily morning trigger
-        │
-        ▼
- ① Fetch tomorrow's events ─ every next-day event in the shared calendar
-        │
-        ▼
- ② Identify interviews ──── detect the 3 types by title keyword
-        │                   (skipped if none match)
-        ▼
- ③ Parse candidate details ─ extract name · email from the event description
-        │                   ├─ success → on to ④
-        │                   └─ failure → into the warning list (not passed over silently)
-        ▼
- ④ Duplicate check ─────── skip if a draft with the same subject + recipient exists
-        │
-        ▼
- ⑤ Create the draft ────── substitute variables into the type's template → Gmail draft
-        │                   ※ it does not send
-        ▼
- ⑥ Notify the operator ─── send a summary of drafts created + warnings to the running account
-```
+- It finds the calendar by name, not by an ID that differs from account to account. Anyone whose account subscribes to that calendar can run it. If it cannot find the calendar, it stops with the message "the account running this must have access to the shared calendar". It does not quietly finish with zero drafts.
+- The summary email goes not to a fixed address but to whoever is running the program, because the drafts are created in that person's mailbox too.
+- The list of words used to spot interview types is kept in one place. When the spelling varies, for example with spacing or English words, you add a line to the list instead of changing the code.
 
----
+## What I chose not to do
 
-## 4. The most important decision — it does not send
+**I did not have it send emails automatically.** This is the most important decision in the project. Technically, sending is easier, and stopping at drafts looks less automated, because a person still has to open the mailbox every day. I stopped at drafts for three reasons:
 
-The tool **does not send the email automatically; it goes only as far as the draft.**
+- The recipients are applicants outside the company. Unlike an internal alert, a wrong email cannot be taken back.
+- The calendar is filled in by hand. There are always events whose time changed, that were cancelled, or whose description is incomplete.
+- When the input is not 100% reliable and the result cannot be undone, the final human check must not be removed.
 
-Technically, sending would have been easier. With a draft, a person still has to open their mailbox every day, so on the face of it the automation looks less complete. I chose the draft anyway, for these reasons.
-
-- The recipient of this email is **a candidate outside the company**. Unlike an internal notification, **once it goes out wrong it cannot be recalled.**
-- Calendar events depend on fields a person fills in by hand. Events whose time has changed, events that were cancelled, events with an incomplete description **exist as a normal matter of course.**
-- In other words, this is **a structure where the inputs are not 100% reliable but the output is irreversible.** In that combination, the final human check must not be removed.
-
-> What I automated is "**the writing**"; what I did not automate is "**the judgement to send**".
-> Almost all of the burden of the repetitive work sat at the front end, so I took most of the benefit without keeping the risk.
-
----
-
-## 5. What I did so that failures are not silent
-
-### Parse failures are part of the result
-
-If the candidate's name or email cannot be found in the event description, that case is not simply skipped. **It goes into a warning list with the reason attached, and is carried in the morning summary email.**
-
-If it were only skipped, the result would read "3 drafts created", and nobody would know there had in fact been 4 interviews. **Because an omission looks like a success**, it has to show up in the output.
-
-I also made the subject of the notification email change with the situation — if there are 0 drafts and only warnings, `확인 필요` ("needs review") goes into the subject. A morning where nothing happened and a morning where something is wrong have to be distinguishable in the inbox.
-
-### It tolerates being run more than once
-
-The trigger can fire twice, and the same schedule sometimes lands in the calendar twice. Before creating a draft, it **checks whether a draft with the same subject and recipient already exists**, and if so does not create one. That structurally prevents the same reminder being prepared twice for the same candidate.
-
-### I kept a separate dry-run
-
-I put the path that **only returns what would be created**, without creating any drafts, in its own function. When changing a template or adding a keyword, I see the result first without touching the real mailbox.
-
----
-
-## 6. How I made it usable by several coordinators
-
-This script had to keep working as the recruiting owner changed or more of them were added.
-
-**① It finds the calendar by name, not by ID**
-Calendar IDs differ per account, so hard-coding an ID means it will not work from another coordinator's account. Looking it up by name means the same code runs **from any account subscribed to that calendar**. If it cannot be found, it fails explicitly with the message that the running account must have access to this shared calendar — it does not quietly return 0 results.
-
-**② It resolves the notification recipient at run time**
-The summary email goes not to a fixed address but to **the account that is running the script**. The drafts are created in the running account's mailbox, so the notification has to reach the same person. Nothing needs reconfiguring when the owner changes.
-
-**③ I pulled the interview-type keywords out into configuration**
-Type detection is title-keyword matching, and the keyword list lives in one configuration file. Variant spellings (with or without a space, the English form) sit in the array alongside, so when a new spelling appears I add a line to the list rather than to the code.
-
----
-
-## 7. Results in numbers
-
-| Item | Figure |
-|---|---|
-| Interview types supported | 3 types · a dedicated template per type |
-| What a person did daily | check the calendar → identify the type → pick the template → write → send |
-| What remains after automation | **review the draft, then click send** |
-| Omission prevention | parse failures promoted to warnings and included in the summary email |
-| Risk of duplicate sending | structurally blocked by the draft duplicate check |
-| Multiple operators | supported by calendar lookup by name and notification based on the running account |
-
----
-
+What I automated is the writing; what I left to a person is the decision to send. Almost all of the repetitive burden was in the writing, so it captures most of the benefit without taking on the risk.

@@ -10,7 +10,7 @@ stack: ["Notion", "Notion API"]
 replaced: "46개 페이지가 평평하게 나열된 구조"
 replacedEn: "a flat list of 46 pages"
 summary: "전 직원이 매일 여는 사내 안내서를 구조부터 다시 설계했습니다. 그대로 옮겼다면 하위 페이지 46개가 지워졌을 문제를 미리 찾아, 원본을 건드리지 않는 이관 방법과 안전한 리허설을 만들었습니다."
-summaryEn: "Redesigned the company handbook from its information architecture up. Caught a migration step that would have deleted 46 child pages, and designed a non-destructive migration and rehearsal."
+summaryEn: "I redesigned the company handbook every employee opens daily, starting from its structure. I caught in advance that moving it as drafted would have deleted 46 child pages, and built a migration that never touches the original, plus a safe rehearsal."
 ---
 ## 결과
 

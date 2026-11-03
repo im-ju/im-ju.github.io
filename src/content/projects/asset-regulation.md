@@ -10,7 +10,7 @@ stack: ["Python", "python-docx"]
 replaced: "2년 묵은 규정 + 재량 판단"
 replacedEn: "a 2-year-old regulation and case-by-case judgement"
 summary: "자산관리 규정을 법·세무, 정보보안, 실무 세 관점으로 나눠 읽고 전면 개정해 대표이사 승인을 받았습니다. 새로 정한 노후화 기준을 자산대장에 대 보고 교체할 장비를 우선순위별로 골랐습니다."
-summaryEn: "Analysed the regulation through legal/tax, security and structure lenses and led a full rewrite to CEO approval. Applied the new obsolescence standard to the asset register to tier replacement candidates."
+summaryEn: "I read the asset management regulation from three angles (legal and tax, information security, day-to-day practice), rewrote it in full and got CEO approval. Then I applied its new obsolescence standard to the asset register to pick the equipment to replace, in priority order."
 ---
 ## 결과
 

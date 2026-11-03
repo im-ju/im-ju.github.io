@@ -1,131 +1,39 @@
-> An attendance-data analysis tool that finds long-absence patterns in access-control
-> terminal logs, but **spends most of its design on filtering out false positives**.
-> Used for the 3-month analysis covering 2026-01 to 03.
+## Results
 
----
+From three months of door access logs, I produced a list of "cases that need checking": times when someone appears to have been away from their desk for a long stretch during the workday.
 
-## 1. At a glance
+- **Three months analysed.** I went back over the records for January to March 2026.
+- **Four reports.** Three monthly reports and one combined report for the three months.
+- **Two filtering stages.** First I removed quick in-and-out records, then I removed cases with evidence that the person was still inside the building.
 
-| | |
-|---|---|
-| **Role** | Analysis design · implementation · review of results (solo) |
-| **Period** | 2026-03 (retrospective analysis of 3 months) |
-| **Stack** | Python 3 · pandas · numpy · openpyxl |
-| **Size** | Analysis script about 250 lines + monthly consolidation script |
-| **Input** | Raw access terminal logs (employee number · timestamp · terminal ID) |
-| **Output** | Anomalous-absence detail + per-person summary (monthly / consolidated) |
+## The problem
 
----
+The attendance system records only clock-in and clock-out. It keeps nothing about what happens in between. The doors, on the other hand, log every time someone passes through. So the only trace of someone stepping out during the workday and coming back is in the access logs. I was asked to use these logs to find out how often long absences really happened.
 
-## 2. Background — what was the problem
+But counted as they were, almost every hit in the access logs was a false one:
 
-The attendance system records **clock-in and clock-out**. It does not record what happened in between.
+- someone stepping just outside the door and coming straight back in
+- short trips, such as picking up a delivery
+- and, most importantly, people who looked as if they had gone out but were actually still inside the building
 
-The access-control terminals, on the other hand, record **every passage**. In other words, the trace of someone leaving during working hours and coming back exists only here. The request was to use this data to find out the real state of "long absences from desk".
+On top of that, the output of this analysis is a list that points at specific people. One false hit is not a statistical error; it is an unfounded suspicion about one person. So I set the goal not as "find as many as possible" but as "never point at the wrong person".
 
-The problem was that counting this data as it stands makes **almost all of it false positives**.
+## What I did
 
-- Records of stepping just outside the door and coming straight back in
-- Short movements such as a cigarette break or picking up a delivery
-- And decisively — **cases that look like someone went outside but where they were in fact still inside the building**
+**I removed quick in-and-out records first.** For each person and each day, I paired every "out" with the next "in" and treated the pair as one absence. If someone came back within 5 minutes, it did not count as an absence, and I discarded both records. Discarding only one side would leave a stray "in" that could be paired with a different "out", creating an absence that never happened. After that, I kept only absences longer than 60 minutes.
 
-And this analysis carried a different kind of risk. The output is **a list that names specific individuals**. A single false positive is not a statistical error but **unfounded suspicion directed at one person**.
+**If there was evidence the person was still inside, I took the case off the list.** This is the heart of the analysis. Going by the main entrance alone, someone may look as if they left, but some doors inside the building also keep records. If the same person passed another door inside the building between the time they went out and the time they came back, they were inside the building at that time. For every case already judged to be an absence, I searched for such a record and removed the case if one turned up. Every run also had to show how many cases it removed. Whether this analysis can be trusted depends less on how many cases it catches than on how many it cancels on its own.
 
-> So the design goal of this tool was not "find as many as possible" but "**do not point at the wrong person**".
+**I kept the rules in one place and showed them every time.** "Back within 5 minutes is not an absence", "only absences over 60 minutes need checking", "remove the case if there is a record from inside the building". These are not values the data decides; they are operating rules the company decides. So instead of scattering them through the program, I gathered them in one place with clear names, and every run prints the rules it applied before anything else. The answer to "on what basis was this list made?" should be there before anyone has to ask.
 
----
+**I left the reviewer what they need to judge.** When someone left and when they came back is not enough to tell what kind of absence it was. So I also recorded when the person left for the day after coming back. It plays no part in the decision; it is there for the person reviewing the list.
 
-## 3. What I built
+**If the reports disagree, the program stops.** The output comes as two sheets: a case-by-case detail sheet and a per-person summary. If the summary total does not match the number of cases in the detail sheet, the program stops immediately. A report whose two sheets quietly disagree is worse than a plainly wrong one, because nobody can tell which sheet is right. The monthly input file is found automatically too, but if there are several candidates it asks which one to use, and if there are none it stops. Quietly running on the wrong file is the most common failure in repeated work.
 
-A script that takes the raw logs, extracts **anomalous absence sessions**, and exports them as two sheets: a detail list and a per-person summary.
+## What I chose not to do
 
-```
-Raw logs (all passage records)
-        │
-        ▼
- ① Narrow the scope ── main entrance only · a set time window
-        │
-        ▼
- ② Build sessions ── pair exit → entry, scanned sequentially per person and per day
-        │         ├─ re-entry within 5 minutes = noise → discard both records
-        │         └─ also record the final exit time of that day after the return
-        ▼
- ③ Anomaly determination ── keep only absences over 60 minutes
-        │
-        ▼
- ④ Remove false positives ── exclude if there is activity on another terminal
-        │                     between the exit and the entry
-        │                     (= evidence that the person was inside the building)
-        ▼
- ⑤ Consistency check ── detail count == summary total, fail immediately on mismatch
-        │
-        ▼
-   Detail list + per-person summary (Excel, 2 sheets)
-```
+**I did not call the output a "list of violators".** Access logs carry no reasons. Being away for more than 60 minutes is one thing; whether that is a problem is another. This tool only narrows down what to check and does not judge, so I titled the output "cases that need checking".
 
----
+**I did not claim the list was complete.** Movements that leave no access record are simply not in the data. Some cases will always be missing by design, and I wrote that limit down alongside the results.
 
-## 4. The core of the design is stage 4 — removing false positives
-
-Up to the anomaly determination (stage 3) it is simple. **Stage 4, which tears down what has just been determined**, is the substance of this tool.
-
-Looking only at the main-entrance records it looks like the person "went out", but some doors inside the building also record passages. **If a passage record on another terminal exists in the time window between the exit record and the entry record, it means that person was inside the building at that time.** It is counter-evidence that the determination made from the main-entrance records alone was wrong.
-
-So for a session already determined to be "anomalous", I look up that same person's activity on other terminals in that time window in reverse, and **if evidence turns up, I take it off the list.**
-
-This filter is a stage that negates the determination it made itself, and for that reason I made it **always print the number of removals to the execution log**. Because the reliability indicator of this analysis is not how many cases it caught but **how many cases it cancelled**.
-
----
-
-## 5. Why I exposed the determination criteria as constants
-
-I gathered three criteria as constants at the top of the code.
-
-| Constant | Value | Meaning |
-|---|---|---|
-| Noise threshold | 5 min | Re-entry within this is not counted as an absence |
-| Anomaly threshold | 60 min | Must be exceeded to be treated as anomalous |
-| Internal-activity filter | on | Exclude if there is intermediate terminal activity |
-
-These numbers are **operating policy, not technically optimal values**. "From how many minutes do we treat it as an absence" is not something the data decides but something the company decides.
-
-So rather than scattering them through the code I collected them in one place and gave them names, and made every run **print the criteria applied on the first line of the console**. The answer has to be there before the person reading the results asks "on what basis was this extracted".
-
----
-
-## 6. Technical decisions
-
-**① I handled session pairing as a sequential scan per person and per day**
-In access logs one person goes out and comes back several times a day. When an exit is met, the nearest entry after it is found, and once a pair is established the scan resumes from that point. A noise pair has **both records discarded** and the scan resumes after them — because mis-pairing the entry of a noise pair with a different exit would manufacture an absence that never happened.
-
-**② I recorded the final exit time after the return alongside it**
-"Left at this time, came back at that time" alone makes judgement difficult. Only with when they left for the day after returning does the character of that absence become visible. It is a column I added **for a person to look at during review**, not for the determination.
-
-**③ I enforced consistency between detail and summary with an assert**
-If the total count in the summary sheet differs from the number of detail rows, it fails immediately. A report whose two sheets have quietly drifted apart is worse than a wrong report — because you cannot tell which side is right.
-
-**④ Input files are detected automatically, but it asks when ambiguous**
-It recognises files automatically by naming convention, and if there are several candidates it shows the list and lets you choose. If there are none, it stops execution. When you repeat the same task every month, **quietly running on the wrong file** is the most common failure.
-
----
-
-## 7. Results in numbers
-
-| Item | Figure |
-|---|---|
-| Analysis period | 2026-01 ~ 03 (3 months) |
-| Deliverables | 3 monthly reports + 1 consolidated 3-month report |
-| Filter stages | 2 stages (noise pairs + internal-activity counter-evidence) |
-
-> Information on individual subjects is not included in this document. The original output is internal material for HR purposes.
-
----
-
-## 8. Limitations of this tool — written into the documentation alongside it
-
-- Access logs **carry no intent.** The fact that someone was away from their desk for 60 minutes or more, and whether that is a problem, are separate things. This tool **only narrows down what to check; it does not judge.**
-- Movements that leave no access record are simply not in the data to begin with. That is, **omissions exist structurally**, and this list is not a complete list.
-- So I named the output not "a list of violators" but "**cases that need checking**".
-
----
-
+**I did not loosen the rules to catch more.** Looser rules would catch more cases, but they would also put the wrong people on the list. When a case was unclear, I chose not to flag it.

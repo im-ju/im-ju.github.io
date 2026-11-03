@@ -10,7 +10,7 @@ stack: ["Python", "pandas"]
 replaced: "확인 불가능하던 영역"
 replacedEn: "a blind spot in attendance data"
 summary: "근태 시스템에 남지 않는 근무 중 외출을 출입문 기록으로 다시 그려 봤습니다. 결과가 특정인을 가리키는 자료라서, 설계의 대부분을 잘못 잡힌 건을 걸러내는 데 썼습니다."
-summaryEn: "Reconstructed mid-day movement from access-control logs. Because the output names individuals, most of the design went into removing false positives."
+summaryEn: "The attendance system doesn't record time away during the workday, so I rebuilt it from door access logs. Because the results point at specific people, most of the design went into filtering out false hits."
 ---
 ## 결과
 

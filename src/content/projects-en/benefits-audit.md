@@ -1,129 +1,43 @@
-> An audit tool that finds **numbers that disagree with each other** in a training allowance scheme run on Google Sheets.
-> It never modifies the data; it only finds problems and writes them to a separate tab.
-> This diagnosis later became the basis for migrating into an internal web app.
+## Results
 
----
+The sheet went from a state where nobody could tell whether it was right to one where a list shows which row is wrong and why. That diagnosis then became the case for moving the training allowance into the internal web app (HR/GA Hub).
 
-## 1. At a glance
+- **8 checks based on the regulation.** It looks for people with the same name, limits exceeded, team-name mismatches, date errors and more.
+- **3 levels of severity.** Fix now, breaks the totals, or only makes tracking harder.
+- **0 cells changed in the source.** The tool only reads the sheet and writes its results to a separate tab.
 
-| | |
-|---|---|
-| **Role** | Regulation interpretation · check-rule design · implementation (solo) |
-| **Period** | 2026-06 |
-| **Stack** | Google Apps Script · Spreadsheet API |
-| **Size** | 306 lines · 8 checks · 3 severity levels |
-| **Nature** | **READ-ONLY** — does not modify a single cell of the source data |
-| **Basis** | Benefits Operating Regulation article 7 · expense regulation |
-| **Follow-up** | The problems confirmed here became the basis for the decision to migrate into an internal web app |
+## The problem
 
----
+The training allowance is a benefit with fairly detailed rules. Each person has a monthly and a yearly limit, only certain items are covered, and anything paid for before the probation period ends is not covered.
 
-## 2. Background — what was the problem
+Yet it was run on Google Sheets. The sheet held three tables (the member list, the spending records and a table of limits by team), and they were linked only by the text of names and team names. On top of that, several people edited it by hand every day. So things like this could happen without anyone noticing:
 
-The training allowance has a **monthly limit and an annual limit** per person, a fixed set of eligible categories, and payments made before the end of the probation period are not eligible. In other words, it is **a fairly tightly specified scheme**.
+- If two people share a name, nobody can tell which one a spending record belongs to, so both people's spending is added up under one person.
+- If a department name differs by a single character from the team-limit table, that person drops out of the team totals entirely.
+- If a payment date is entered in a format the sheet does not read as a date, it disappears from the monthly totals.
 
-But it was being run on Google Sheets. Inside the spreadsheet were three tables of different kinds.
+In every one of these cases the sheet says nothing, and the totals still look believable. In fact, two numbers in the sheet already disagreed with each other. The real problem was not that it was wrong, but that nobody could tell whether it was wrong.
 
-- **Member DB** — name, hire date, probation end date, department, annual limit
-- **Spend records** — payment date, name, category, amount, approval status
-- **Team limits table** — team name, limit
+## What I did
 
-The three tables were **linked by nothing but the name and team-name strings**. And it was a document people edited by hand every day.
+**I added a "Run audit" menu to the sheet.** I wrote a small program that runs inside Google's work tools (Google Apps Script). When you open the sheet, a menu appears, and pressing it writes the check results to a dedicated tab.
 
-So the following could happen quietly.
+**I turned the regulation into checks.** The limits, the covered items and the probation rule all come from the benefits regulation and the expense regulation. The checks are grouped into three levels of severity:
 
-- **If two people share a name**, there is no way to tell whose the "Hong Gil-dong" in the spend records is. Two people's spending is added up against one person.
-- **If a department name differs from the team limits table by even one character**, that person drops out of the team roll-up entirely.
-- **If a payment date is entered in a format not recognised as a date**, it disappears from the monthly roll-up.
-- And in all of these cases **the spreadsheet says nothing.** The totals still show a plausible-looking number.
+- **Fix now**: a name shared by two people, or spending recorded under that name (there is no way to settle whose spending it is); spending over the monthly or yearly limit.
+- **Breaks the totals**: a missing department or a team name that does not match the limit table, a category outside the covered items, a payment date that cannot be read as a date, a payment made during probation (needs checking for an approved exception).
+- **Only makes tracking harder**: a payout date that cannot be read as a date.
 
-In practice, two numbers inside the spreadsheet had been left disagreeing with each other. The problem was not "it is wrong" but "**nobody can tell whether it is wrong**".
+When the regulation changes, there is one place to update, and each number is written down with the clause it comes from.
 
----
+**I wrote each finding as a sentence someone can act on.** Every item states which row it is and why it is a problem. Not "2 people with the same name", but "this name is shared by two people, so matching spending records by name alone may mix up their spending". Whoever reads the results should know at once what to do.
 
-## 3. What I built
+**I made it find the right table even when the sheet changes shape.** If a table's position is fixed as "starting at row such-and-such", the moment someone inserts a row the tool reads the wrong data and still returns results without any warning. So it finds tables by their header rows: a row with name, start date and department is the member list; a row with payment date, name and category is the spending records. Columns are also found by their headers rather than their order, so it copes when someone moves a column or slightly renames it. If it cannot find a table, it reports that as the most serious problem.
 
-Opening the spreadsheet adds a **custom menu**, and pressing "Run integrity audit" there stacks the check results in a dedicated tab.
+**I connected the diagnosis to the next decision.** What the audit showed was less a set of individual errors than the limits of the structure. Telling apart two people with the same name requires a unique ID for each person, and the sheet had no such thing. Team-name mismatches and date-format problems also keep coming back in cells where anyone can type anything. The tool showed not only "how many rows are wrong now" but also "this way of working will keep being wrong". So the next step was not to manage the sheet better but to move to the web app. Personal limits, remaining balances, spending history and company-wide spending later went into the HR/GA Hub.
 
-```
-  Google Sheets (edited by people daily)
-   ├ Member DB
-   ├ Spend records
-   └ Team limits table
-          │
-          │  ← reads only
-          ▼
-   ┌────────────────────────────────────┐
-   │  Auto-detect table position        │  found by header signature
-   │  locateTable_()                    │  (works even if the sheet structure changes)
-   └─────────────────┬──────────────────┘
-                     ▼
-   ┌────────────────────────────────────┐
-   │  Run the 8 checks                  │
-   │  structure · matching · regulation │
-   └─────────────────┬──────────────────┘
-                     ▼
-   🔍 Integrity_Audit tab ── severity · area · row number · description
-```
+## What I chose not to do
 
-### Checks
+**I did not change a single cell of the source data.** This sheet is not mine; it is an operational document that many people use every day. The moment a program starts fixing values automatically, there are values nobody knows who changed, and nobody can trust the sheet any more. That is worse than the current problem of numbers not adding up. I kept finding and fixing separate, and a person decides on the fixes.
 
-| Severity | Item | What is at risk |
-|:---:|---|---|
-| 🔴 | Shared names exist | Name matching does not hold → **a unique ID is needed** |
-| 🔴 | Spend entries referring to a shared name | Impossible to determine whose spending it is |
-| 🔴 | Monthly limit exceeded | Spending in breach of the regulation |
-| 🔴 | Annual limit exceeded | The per-person annual limit applies first |
-| 🟠 | Missing department / team name mismatch | **Silently dropped from the team roll-up** |
-| 🟠 | Unknown category | Outside the 5 categories the regulation covers |
-| 🟠 | Payment date not recognised as a date | Disappears from the monthly roll-up |
-| 🟠 | Payment before the end of the probation period | Excluded under the regulation — needs a check for exceptional approval |
-| 🟡 | Disbursement date not recognised | No effect on the roll-up, but hard to trace |
-
-Each item records **which row it was found in** and **why it is a problem**, as a sentence. Not "2 shared names" but "**this name is shared, so matching spend records by name alone can mix up the amounts used**". The person reading the audit result has to be able to act on it straight away.
-
----
-
-## 4. Three things I paid attention to in the design
-
-### ① It never modifies the data
-
-This tool **does not modify a single cell of the source data.** Findings are written only to a dedicated report tab. I stated that in the comment at the top of the file.
-
-The reason is simple. **This spreadsheet is not mine.** It is an operational document that several people edit every day, and the moment a script that changes values automatically is attached to it, nobody can trust the spreadsheet any more. Creating "values nobody knows who changed" is worse than the current problem (broken integrity).
-
-I did not mix the diagnosis tool with a correction tool. **Finding and fixing are different jobs, and the judgement about fixing is a person's.**
-
-### ② It does not pin down the table position
-
-If you hard-code the table positions in the sheet as coordinates, the moment somebody inserts a single row the script reads the wrong data. And it **produces a result with no error**.
-
-So it **finds the tables by header signature.** If `성명·입사일·부서` are all in one row, that is the member DB; if `결제일·성명·카테고리` are there, that is the spend records. It scans part of the top of the sheet to find them automatically, and **if it cannot find them, it records that fact itself as a 🔴 finding.**
-
-Columns are likewise found by partial match on the header name rather than by order. It holds up even if someone moves a column or changes a name slightly. **Code that reads a document people edit has to stand on the premise that the document changes.**
-
-### ③ I attached the regulatory basis to the code
-
-The limit amounts, the eligible categories and the probation-period exclusion principle are all **values that come from the regulation**. So I wrote the basis clauses (Benefits article 7 / expense regulation) at the top of the file and separated the limits and categories out as **named constants**.
-
-If the regulation changes there is one place to fix, and **why that number is what it is** sits inside the code.
-
----
-
-## 5. What this tool actually did — it became the basis for the migration
-
-What the audit result showed was not individual errors but a **structural limit**.
-
-- The shared-name problem **cannot in principle be solved in a spreadsheet.** It needs a unique ID, and that is a database's job, not a spreadsheet's.
-- Team-name string mismatches are the same in nature. They will keep happening in **a store with no referential integrity**.
-- Date format problems likewise recur in free-entry cells.
-
-So the tool told us "how many entries are wrong right now" and at the same time proved "**this approach will keep being wrong**".
-
-> So the next step was not to manage the spreadsheet better, but **to move training allowance management into an internal web app**.
-> The features covering personal limits, remaining balance and usage history, plus the company-wide spend rate, were later implemented in the internal consolidation platform (HR/GA Hub).
-
-**I diagnosed before fixing, and the diagnosis became the basis for the migration decision.**
-
----
-
+**I did not make the sheet more elaborate.** Instead of adding more checks or bolting input restrictions onto the sheet, I used the diagnosis as the basis for changing how the allowance is managed.

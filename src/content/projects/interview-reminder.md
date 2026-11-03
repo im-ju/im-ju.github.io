@@ -10,7 +10,7 @@ stack: ["Google Apps Script", "Gmail", "Calendar"]
 replaced: "매일 수기 작성"
 replacedEn: "daily hand-written emails"
 summary: "공유 캘린더에서 다음 날 면접을 찾아, 면접 유형에 맞는 양식으로 Gmail 초안까지 만들어 둡니다. 발송은 일부러 자동화하지 않았습니다. 캘린더는 사람이 채우는 것이라 틀릴 수 있고, 보낸 메일은 되돌릴 수 없기 때문입니다."
-summaryEn: "Detects next-day interviews from a shared calendar and prepares templated Gmail drafts. Sending is deliberately not automated: the inputs are human-maintained and the output is irreversible."
+summaryEn: "It finds the next day's interviews in a shared calendar and prepares a Gmail draft from the template for each interview type. Sending is deliberately not automated: the calendar is filled in by people and can be wrong, and a sent email cannot be taken back."
 ---
 ## 결과
 

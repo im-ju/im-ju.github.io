@@ -10,7 +10,7 @@ stack: ["TypeScript", "PostgreSQL", "LLM CLI"]
 replaced: "스킬 데이터의 부재"
 replacedEn: "the absence of any skills data"
 summary: "기존 사내 문서만으로 직원별 스킬을 정리하고, \"이 사람이 나가면 무엇이 멈추는가\"를 추적한 시범 분석입니다. 석 달 뒤 제 보고서를 스스로 다시 검증해, 다시 계산해도 나오지 않는 숫자를 찾아 정정했습니다. 수치는 모두 가상 데이터 기준입니다."
-summaryEn: "Extracted a skills graph from existing documents to map coverage and dependency chains without a new survey. Re-audited my own report, found non-reproducible figures, and reissued a corrected version. All figures synthetic."
+summaryEn: "A trial analysis that mapped each employee's skills from existing internal documents alone and traced \"if this person leaves, what stops?\". Three months later I re-audited my own report, found numbers that could not be reproduced, and corrected them. All figures are synthetic data."
 ---
 ## 결과
 
