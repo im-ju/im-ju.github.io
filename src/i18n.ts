@@ -9,7 +9,7 @@ export const SITE_URL = 'https://im-ju.github.io'; // ← EDIT: keep in sync wit
 
 export const STATUS_LABEL: Record<Locale, Record<string, string>> = {
   ko: { live: '운영 중', poc: 'PoC 완료', approved: '승인 완료', pending: '적용 승인 대기', done: '완료' },
-  en: { live: 'in production', poc: 'PoC complete', approved: 'approved', pending: 'awaiting rollout', done: 'complete' },
+  en: { live: 'live', poc: 'PoC complete', approved: 'approved', pending: 'awaiting rollout', done: 'complete' },
 };
 
 export const t = {

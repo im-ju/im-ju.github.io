@@ -38,7 +38,7 @@ export const CASES: Case[] = [
       flow: ["Calendar · a separate web app · Google Sheets · Excel", "One web app behind the company account", "6 features"],
       problem: "HR and general-affairs work was spread across four places: a calendar, a separate web app, Google Sheets and Excel. The same work was redone by hand every month, and when a number was wrong, nobody noticed.",
       solution: "I merged them into one web app that you sign into with your company Google account. It has six features: meeting-room status, team draws for company events, a member directory, partner restaurants, the training allowance and work-anniversary alerts.",
-      result: "In production since March 2026 with no unplanned downtime. Two internal apps became one, and all 978 automated tests pass.",
+      result: "Running since March 2026 with no unplanned downtime. Two internal apps became one, and all 978 automated tests pass.",
     },
   },
   {
