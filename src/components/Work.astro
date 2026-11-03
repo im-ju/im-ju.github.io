@@ -29,7 +29,7 @@ const title = en ? d.titleEn : d.title;
   <header class="work-head">
     <h1 class="work-title">{title}</h1>
     <div class="work-top">
-      <span class="work-id" data-clay={idx % 5}>{fileNo(entry.id)}</span>
+      <span class="work-id">{fileNo(entry.id)}</span>
       <span class="label">{en ? CASES[idx].catEn : CASES[idx].cat}</span>
       <span class="status" data-status={d.status}>{STATUS_LABEL[locale][d.status]}</span>
     </div>
@@ -59,11 +59,17 @@ const title = en ? d.titleEn : d.title;
 
 <style>
   .work { padding-block: var(--space-xl) var(--space-2xl); }
+  /* 상세 머리(뒤로 가기 ~ 기간·스택) = 파랑 구역. 스카이 블루 위 회색 글자는 대비 부족 → 짙은 남색, 포커스는 검정 */
+  .back, .work-head { --color-ink-2: #0a2330; --color-ink-3: #0a2330; --color-rule: rgba(10, 35, 48, 0.22); --color-rule-strong: rgba(10, 35, 48, 0.45); --color-focus: var(--color-ink); }
   .back { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; font-size: var(--text-sm); font-weight: 700; color: var(--color-ink-3); text-decoration: none; margin-bottom: var(--space-md); }
   .back:hover { color: var(--color-ink); }
-  .work-head { display: grid; gap: var(--space-md); max-width: 44rem; padding-bottom: var(--space-xl); border-bottom: var(--rule); margin-bottom: var(--space-xl); }
+  .work-head {
+    display: grid; gap: var(--space-md); max-width: 44rem; padding-bottom: var(--space-xl); border-bottom: var(--rule); margin-bottom: var(--space-xl);
+    /* 가운데 폭 요소지만 파랑을 화면 양끝과 위(뒤로 가기 링크 뒤, 메뉴바 아래)까지 칠함. 글자는 이 칠 위에 그려짐 */
+    color: var(--color-ink); border-image: linear-gradient(var(--color-band) 0 0) fill 0 / / 100vmax 100vmax 0;
+  }
   .work-top { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
-  .work-id { padding: 0.2rem 0.7rem; border-radius: 999px; background: var(--clay); color: var(--clay-on); font-weight: 800; font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+  .work-id { padding: 0.2rem 0.7rem; border-radius: 999px; background: var(--color-paper-2); color: var(--color-ink); font-weight: 800; font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
   .work-title { font-size: clamp(2.2rem, 5vw, 3.75rem); line-height: 1.12; }
   .work-summary { font-size: var(--text-lg); color: var(--color-ink-2); line-height: 1.5; }
   .work-meta { margin-top: var(--space-sm); }

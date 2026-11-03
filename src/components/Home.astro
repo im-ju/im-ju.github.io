@@ -27,7 +27,6 @@ const files = CASES.map((c, i) => {
   return {
     ...c,
     no: fileNo(c.id),
-    clay: i % 5, // folder colour slot; 5 colours cycle so neighbours never match
     ...(en ? c.en : {}), // English plain copy: title, line, flow, problem, solution, result
     cat: en ? c.catEn : c.cat,
     head: en ? d.titleEn : c.name,
@@ -74,7 +73,7 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
 
     <ol class="drawer">
       {files.map((f) => (
-        <li class="folder" data-clay={f.clay} data-file={f.id}>
+        <li class="folder" data-file={f.id}>
           <a class="folder-btn" href={f.href} aria-controls={`sheet-${f.id}`}>
             <span class="tab">{f.no}</span>
             <span class="face">
@@ -90,7 +89,7 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
     <!-- One sheet per file; the script shows one at a time and moves it under its folder (list view) or the drawer (slider view). -->
     <div class="sheets">
       {files.map((f) => (
-        <article class="sheet" id={`sheet-${f.id}`} data-clay={f.clay} aria-labelledby={`sheet-${f.id}-title`} hidden>
+        <article class="sheet" id={`sheet-${f.id}`} aria-labelledby={`sheet-${f.id}-title`} hidden>
           <header class="sheet-head">
             <span><b>{f.no}</b> · {f.head}</span>
             <button type="button" class="sheet-close" aria-label={h.close}><Icon name="close" /></button>
@@ -292,7 +291,15 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
   .hero-cta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.75rem; }
 
   /* ── files: head + controls ───────────────────────── */
-  .files { padding-block: clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2.5rem); }
+  .files {
+    padding-block: clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2.5rem);
+    /* 파일 서랍 = 사이트에서 유일한 파랑 구역. 스카이 블루 위 회색 글자는 대비 부족 → 짙은 남색(4.6:1), 포커스는 검정(핑크는 1.2:1) */
+    --color-paper: var(--color-band); --color-paper-3: #44aed4;
+    --color-ink-2: #0a2330; --color-ink-3: #0a2330;
+    --color-rule: rgba(10, 35, 48, 0.22); --color-rule-strong: rgba(10, 35, 48, 0.45);
+    --color-focus: var(--color-ink);
+    background: var(--color-band); color: var(--color-ink);
+  }
   .files-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem 1.5rem; }
   .files-head h2 { font-size: clamp(1.9rem, 3.4vw, 2.75rem); }
   .files-head p { margin-top: 0.3rem; color: var(--color-ink-3); }
@@ -317,20 +324,20 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
   }
   .folder { flex: 0 0 clamp(16rem, 24vw, 18.5rem); scroll-snap-align: start; }
   .folder-btn {
-    position: relative; display: block; height: 100%; padding-top: 2.1rem; color: var(--clay-on); text-decoration: none;
+    position: relative; display: block; height: 100%; padding-top: 2.1rem; color: var(--color-ink); text-decoration: none;
     transition: transform 400ms var(--ease-out);
   }
   .folder-btn:hover, .folder.on .folder-btn { transform: translateY(-10px); }
   .folder-btn:focus-visible { outline: none; }
-  .folder-btn:focus-visible .face { outline: 3px solid var(--color-stamp); outline-offset: 4px; }
+  .folder-btn:focus-visible .face { outline: 3px solid var(--color-focus); outline-offset: 4px; }
   .tab {
     position: absolute; top: 0; left: 1.1rem; height: 2.25rem; padding: 0 0.9rem; display: flex; align-items: center;
-    background: var(--color-ink); color: #fff; font-weight: 800; font-size: var(--text-sm); letter-spacing: 0.02em;
+    background: var(--color-point); color: var(--color-ink); font-weight: 800; font-size: var(--text-sm); letter-spacing: 0.02em;
     border-radius: var(--radius-sm) var(--radius-sm) 0 0; font-variant-numeric: tabular-nums;
   }
   .face {
     display: flex; flex-direction: column; gap: 0.75rem; height: 100%; min-height: 15rem; padding: 1.4rem 1.25rem 1.1rem;
-    background: var(--clay); border-radius: 6px var(--radius-lg) var(--radius-lg) var(--radius-lg);
+    background: var(--color-paper-2); border-radius: 6px var(--radius-lg) var(--radius-lg) var(--radius-lg);
     box-shadow: 0 18px 36px -24px rgba(10, 10, 10, 0.45);
   }
   .folder.on .face { outline: 3px solid var(--color-ink); outline-offset: 4px; }
@@ -345,11 +352,11 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
   .files[data-view="list"] .drawer { display: grid; gap: 0.75rem; overflow: visible; padding: 1.5rem 0 0; margin: 0; }
   .files[data-view="list"] .folder-btn {
     display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 1rem; align-items: center;
-    padding: 1rem 1.25rem; background: var(--clay); border-radius: var(--radius-md); height: auto;
+    padding: 1rem 1.25rem; background: var(--color-paper-2); border-radius: var(--radius-md); height: auto;
   }
   .files[data-view="list"] .folder-btn:hover, .files[data-view="list"] .folder.on .folder-btn { transform: translateX(6px); }
   .files[data-view="list"] .folder.on .folder-btn { outline: 3px solid var(--color-ink); outline-offset: 3px; }
-  .files[data-view="list"] .folder-btn:focus-visible { outline: 3px solid var(--color-stamp); outline-offset: 3px; }
+  .files[data-view="list"] .folder-btn:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
   .files[data-view="list"] .face { display: contents; min-height: 0; }
   .files[data-view="list"] .folder.on .face, .files[data-view="list"] .folder-btn:focus-visible .face { outline: none; }
   .files[data-view="list"] .tab { position: static; grid-column: 1; grid-row: 1 / span 3; align-self: start; height: auto; padding: 0.3rem 0.7rem; border-radius: 999px; }
@@ -365,12 +372,16 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
   .sheet {
     position: relative; margin: 0.5rem 0 0; padding: clamp(1.4rem, 3vw, 2.5rem);
     background: var(--color-paper-2); color: var(--color-ink); border-radius: var(--radius-lg);
-    box-shadow: inset 0 8px 0 var(--clay), var(--shadow-sheet); /* top edge in its folder's colour: shows which file it came out of */
+    box-shadow: inset 0 8px 0 var(--color-point), var(--shadow-sheet); /* 윗선 = 폴더 탭과 같은 핑크: 어느 파일에서 나왔는지 */
+    /* 흰 시트는 파랑 서랍 안에 있으므로 회색 글자·핑크 포커스로 되돌림 (:root 값과 같게) */
+    --color-ink-2: #2a2f33; --color-ink-3: #5a6268;
+    --color-rule: rgba(10, 10, 10, 0.1); --color-rule-strong: rgba(10, 10, 10, 0.22);
+    --color-focus: var(--color-point);
   }
   .sheet.anim { animation: pull 550ms var(--ease-out); }
   @keyframes pull { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
   .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1.5px solid var(--color-ink); font-size: var(--text-sm); }
-  .sheet-head b { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--clay); color: var(--clay-on); font-variant-numeric: tabular-nums; }
+  .sheet-head b { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--color-point); color: var(--color-ink); font-variant-numeric: tabular-nums; }
   .sheet-close { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid var(--color-ink); border-radius: var(--radius-sm); background: transparent; color: var(--color-ink); cursor: pointer; }
   .sheet-close:hover { background: var(--color-ink); color: var(--color-paper); }
   .sheet-trow { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem 1.5rem; margin-top: 1.4rem; }
@@ -378,7 +389,7 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
   .sheet h3:focus { outline: none; }
   .stamp {
     flex: none; margin-top: 0.25rem; padding: 0.35rem 0.9rem; border: 3px solid var(--color-stamp); border-radius: var(--radius-sm);
-    color: var(--color-stamp); font-weight: 800; font-size: 1.1rem; white-space: nowrap; transform: rotate(-8deg); mix-blend-mode: multiply;
+    color: var(--color-stamp); font-weight: 800; font-size: 1.2rem; white-space: nowrap; /* 1.2rem(19.2px) 굵은 글씨 = 큰 글자 기준 3:1 → 흰 시트 위 핑크 4.23:1 통과 */ transform: rotate(-8deg); mix-blend-mode: multiply;
   }
   .sheet.anim .stamp { animation: stamp 500ms 300ms cubic-bezier(0.2, 1.5, 0.4, 1) both; }
   @keyframes stamp { from { transform: rotate(-8deg) scale(1.7); opacity: 0; } to { transform: rotate(-8deg) scale(1); opacity: 1; } }
@@ -392,7 +403,7 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
     display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.4rem; min-height: 44px; padding: 0 1rem;
     border: 0; border-radius: var(--radius-sm); background: var(--color-ink); color: var(--color-paper); font: inherit; font-weight: 700; font-size: 0.95rem; cursor: pointer;
   }
-  .more-btn:hover { background: var(--color-stamp); }
+  .more-btn:hover { background: var(--color-point); color: var(--color-ink); }
   .more-btn :global(svg) { transition: transform 350ms var(--ease-out); }
   .sheet.open .more-btn :global(svg) { transform: rotate(180deg); }
   .when-open, .sheet.open .when-closed { display: none; }
@@ -404,7 +415,7 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
   .psr div { padding: 1rem 1.1rem; background: var(--color-panel); border-radius: var(--radius-md); }
   .psr dt { font-weight: 800; padding-bottom: 0.5rem; margin-bottom: 0.6rem; border-bottom: 1px dashed var(--color-rule-strong); }
   .psr dd { margin: 0; font-size: 0.97rem; line-height: 1.75; }
-  .full { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.4rem; font-weight: 700; }
+  .full { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.4rem; font-weight: 700; text-decoration-color: var(--color-point); }
   .full:hover { color: var(--color-stamp); }
 
   /* ── principles memo ──────────────────────────────── */
@@ -444,12 +455,9 @@ const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Locatio
   .contact { padding-block: clamp(3.5rem, 7vw, 5.5rem); }
   .contact h2 { font-size: clamp(1.9rem, 3.8vw, 3rem); max-width: 16em; }
   .contact-lede { margin-top: 0.75rem; color: var(--color-ink-2); max-width: 40em; }
-  .contact-card { display: inline-grid; gap: 1rem; max-width: 100%; margin-top: 1.5rem; padding: clamp(1.25rem, 3vw, 2rem); background: var(--clay-teal); color: #fff; border-radius: var(--radius-lg); }
+  .contact-card { display: inline-grid; gap: 1rem; max-width: 100%; margin-top: 1.5rem; padding: clamp(1.25rem, 3vw, 2rem); background: var(--color-band); color: var(--color-ink); border-radius: var(--radius-lg); }
   .mail { font-size: clamp(1.3rem, 3.2vw, 2rem); font-weight: 800; letter-spacing: -0.03em; overflow-wrap: anywhere; }
   .contact-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-  .contact-card .btn { background: #fff; color: var(--color-ink); border-color: #fff; }
-  .contact-card .btn.ghost { background: transparent; color: #fff; }
-  .contact-card .btn:hover { background: var(--clay-pink); border-color: var(--clay-pink); color: var(--color-ink); }
   .copy-status:empty { display: none; }
   .copy-status { font-size: var(--text-sm); }
 
