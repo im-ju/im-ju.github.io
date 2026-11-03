@@ -47,7 +47,8 @@ const navItems = Object.entries(s.nav); // [section id, label]
     <a class="skip" href="#main">{en ? 'Skip to content' : '본문으로 건너뛰기'}</a>
     <header class="topbar">
       <div class="wrap topbar-in">
-        <a class="brand" href={prefix}>{s.hero.name}<span>{s.hero.role.split(' · ')[0]} · DSRV</span></a>
+        {/* 머리글은 분야만: role 앞부분("HR Operations")은 행정 처리 직무로 좁게 읽혀 2026-11-03 "HR"로 고정. role 값은 /print/에서 그대로 씀 */}
+        <a class="brand" href={prefix}>{s.hero.name}<span>HR · DSRV</span></a>
         <nav class="topnav" aria-label={en ? 'Sections' : '섹션'}>
           {navItems.map(([id, label]) => <a href={navHref(id)}>{label}</a>)}
         </nav>
