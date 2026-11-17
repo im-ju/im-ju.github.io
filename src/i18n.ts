@@ -132,7 +132,7 @@ export const t = {
       name: 'Juyoung You',
       role: 'HR Operations · People Systems',
       statement: 'An HR generalist who writes the policy when none exists, then builds the systems that make it hold.',
-      sub: 'Manager, HR & General Affairs at DSRV, a blockchain infrastructure company in Seoul. Through growth from under 50 to about 90 employees: two HR system transitions, recruiting operations for 20+ requisitions as sole owner, and an internal web service that encodes company regulation at the clause level.',
+      sub: 'Manager, HR & General Affairs at DSRV, a blockchain infrastructure company in Seoul. While the company grew from under 50 to about 90 employees, I ran two HR system transitions, owned recruiting alone for 20+ requisitions, and built an internal web service that encodes company regulation clause by clause.',
       fields: [
         ['Employer', 'DSRV · Manager, HR & General Affairs'],
         ['Tenure', 'Dec 2024 – present'],
@@ -153,12 +153,12 @@ export const t = {
     },
     policy: {
       title: 'Operating rules of this site',
-      lede: 'Six projects, different domains and sizes, one set of concerns. Written as articles, the way I write policy.',
+      lede: 'The six projects differ in domain and size but share the same concerns. I wrote them up as articles, the way I write policy.',
       articles: [
         ['Art. 1', 'Move rules out of memory and into code', 'Meal-allowance eligibility, training budgets and asset lifetimes were all written down, yet interpreted by a person every time. Fix the interpretation in code and judgements become consistent, with one place to change when the rule changes.'],
-        ['Art. 2', 'Find silent failures and make them loud', 'The real risk was never an error. It was being wrong while looking normal. A missing attendance record shows up as a zero deduction; a parse failure hides behind a "3 drafts created" success message. Each was promoted to an explicit review item or an alert.'],
-        ['Art. 3', 'Decide the boundary of automation first', 'Interview emails: drafting is automated, sending is human. Meal-allowance cases the rules cannot decide are never waved through; they go to a person. Every project started by deciding what not to automate.'],
-        ['Art. 4', 'Irreversible changes get a procedure', 'A handbook migration would have deleted 46 child pages if applied as planned. When the act of verifying is itself the hazard, design a rehearsal that never touches the original.'],
+        ['Art. 2', 'Find silent failures and make them loud', 'The risk was never an error message. It was a result that was wrong but looked normal. A missing attendance record shows up as a zero deduction; a parse failure hides behind a "3 drafts created" success message. Each was promoted to an explicit review item or an alert.'],
+        ['Art. 3', 'Decide the boundary of automation first', 'Interview emails: drafting is automated, sending is human. Meal-allowance cases the rules cannot decide are never waved through; they go to a person.'],
+        ['Art. 4', 'Irreversible changes get a procedure', 'A handbook migration would have deleted 46 child pages if applied as planned. Testing it on the real pages would itself have caused the damage, so I rehearsed on a copy and never touched the original.'],
         ['Art. 5', 'Audit your own results', 'AI-generated code and documents fail plausibly. So every deployment goes through an independent review in a session separate from the one that built it, and numbers written in documents get recounted.'],
       ],
       silentTitle: 'Annex · Register of silent failures',
@@ -175,8 +175,8 @@ export const t = {
       lede: 'Key entries since December 2024, in order.',
       entries: [
         ['Dec 2024', 'Joined', 'Joined DSRV. Two weeks in, the team lead became unavailable; took over attendance, leave, health screening and statutory administration with no handover.'],
-        ['Feb 2025', 'HRIS build', 'Replaced the incumbent HR ERP. Configured the admin console with effectively no vendor support, migrated data, integrated badge access, redesigned approvals. Company-wide launch in about five weeks.'],
-        ['2025', 'Office relocation', 'Competitive bids across 8+ categories, a five-day execution schedule, a four-step inspection chain. Then the corporate filings and landlord cost separation.'],
+        ['Feb 2025', 'HR SaaS migration', 'Moved from the old HR ERP to flex, an HR SaaS. Configured the admin console with effectively no vendor support, migrated data, integrated badge access, redesigned approvals. Company-wide launch in about five weeks.'],
+        ['2025', 'Office relocation', 'Competitive bids across 8+ categories, a five-day execution schedule, a four-step inspection chain, followed by the corporate filings and splitting costs with the landlord.'],
         ['2025 –', 'Recruiting operations', 'Sole owner end to end for 20+ requisitions. AI-assisted screening, four channels consolidated into one team account, documented SLAs, interviewer training.'],
         ['2025 –', 'Onboarding from nothing', 'Designed the programme, cleared it with the CFO, redesigned it from six steps to eight, and ran it personally for about 50 new hires.'],
         ['Jan 2026', 'ERP transition', 'Douzone Amaranth10: org structure, approval routing, forms and HR master data plus training. E-approval live; finance and HR modules in progress.'],
@@ -184,6 +184,8 @@ export const t = {
         ['Mar 2026', 'HR/GA Hub shipped', 'Internal HR & workplace platform opened to all staff. No unplanned downtime since.'],
         ['Apr 2026', 'New-hire feedback loop', 'Designed 1:1 coffee chats, analysed ~580 comments alone, briefed the executive team on a top-10 issue list and ~40 actions. Second round redesigned from first-round findings.'],
         ['2026', 'Zero-defect filings', '12 corporate registry filings and 10 partner KYB reviews as final reviewer of English submissions. No rejections.'],
+        // Oct 2026 = HRIS period in src/content/projects/hris.md; mirrors the KO entry
+        ['Oct 2026 –', 'In-house HRIS (PO)', 'Leading, as PO, an in-house HR system that brings employee records, org chart, leave, attendance, reviews and recruiting into one place. Took it from wireframes to development and asked the development, security and infrastructure teams to work with me on the decisions. Target: a company-wide test by end of 2026.'],
       ],
     },
     home: {
@@ -205,7 +207,7 @@ export const t = {
       principles: [
         ['Rules move out of memory and into checks.', 'Eligibility rules and limits that each person used to read differently become fixed rules: decisions stay consistent, and a rule change means editing one place.'],
         ['First, find what is wrong but looks normal.', 'A missing attendance record shows up as a zero deduction; a failed read shows up as a success message. These cases are collected and made visible.'],
-        ['Decide first what not to automate.', 'Interview emails stop at the draft; meal-allowance cases the rules cannot decide go to a person. Anything that cannot be undone is decided by a person at the end.'],
+        ['Decide first what not to automate.', 'Interview emails stop at the draft; meal-allowance cases the rules cannot decide go to a person. A person makes the final call on anything that cannot be undone.'],
       ],
       recordTitle: 'Employee record',
       photoAlt: 'Portrait of Juyoung You',

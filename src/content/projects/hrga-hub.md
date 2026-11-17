@@ -1,6 +1,6 @@
 ---
-title: "DSRV HR/GA Hub"
-titleEn: "DSRV HR/GA Hub"
+title: "HR/GA Hub"
+titleEn: "HR/GA Hub"
 order: 2
 module: "SYSTEMS"
 period: "2026.03 – 운영 중"

@@ -29,9 +29,9 @@ I sorted what came out by priority and put the 15 most important items into this
 
 **I broke procedures into steps.** Issuing equipment was a single line: "an acceptance form must be obtained." I split it into four steps: request, stock check, acceptance form (recording the condition on handover) and an entry in the asset register. I also wrote in the principle that new hires receive their equipment by their start date. For returns, the deadline (the last working day) and three security steps (erasing data, removing system access, recording it on the return form) are now in the clauses.
 
-**I closed off the legal risk in compensation.** Compensation now varies in tiers by degree of fault, and the regulation states that it is never deducted unilaterally from wages or severance pay; it can only be claimed through a separate compensation agreement. This clause puts legal soundness ahead of convenience.
+**I closed off the legal risk in compensation.** Compensation now varies in tiers by degree of fault, and the regulation states that it is never deducted unilaterally from wages or severance pay; it can only be claimed through a separate compensation agreement.
 
-**I matched the forms to the clauses.** If only the clauses change, the paper people actually use stays the same, and nothing really changes. I added asset-category checkboxes and a field for the condition on handover to the acceptance form, and confirmation boxes for data erasure and account removal (signed by the security officer) to the return form.
+**I matched the forms to the clauses.** If only the clauses change, people keep filling in the old forms. I added asset-category checkboxes and a field for the condition on handover to the acceptance form, and confirmation boxes for data erasure and account removal (signed by the security officer) to the return form.
 
 **I did not edit the regulation documents by hand.** A regulation needs consistent indentation and numbering at every level, from article down to paragraph and item, and hand edits always drift. It is also a document that gets regenerated several times as review comments come in. So I had a program produce both the regulation text and the revision history from the same source. The revised text and its history cannot contradict each other, and the reason for each change sits right next to the source.
 
@@ -43,4 +43,4 @@ I sorted what came out by priority and put the 15 most important items into this
 
 **I did not keep clauses that did not match reality.** The clause on rental assets, which the company did not have, and the clause on software licences, which belonged to another area, were brought in line with what the regulation actually manages.
 
-**I did not let the regulation stop at paper.** Without a standard, every decision is a judgement call, and without making a decision you cannot tell whether the standard fits reality. So I used the approved standard right away to pick the replacements.
+**I did not let the regulation stop at paper.** I wanted to see whether the new standard fit reality, so I used it right away to pick the replacements.

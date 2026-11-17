@@ -45,7 +45,7 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
       en: ['Demo screens, not real mail.', "The original script's detection, template and alert logic, run on made-up calendar events. Company, names and addresses are fictional."],
     },
     shots: [
-      { file: 'ir-01-calendar', ko: ['내일 일정에서 면접만 골라내기', '매일 아침 공유 캘린더의 내일 일정을 읽어, 제목으로 면접 유형을 가리고 설명란에서 후보자 이름과 이메일을 찾습니다. 이메일이 없는 건은 초안을 만들지 않습니다.'], en: ["Picking interviews out of tomorrow's calendar", "Every morning it reads tomorrow's shared calendar, tells the interview type from the title and finds the candidate's name and email in the description. No email, no draft."] },
+      { file: 'ir-01-calendar', ko: ['내일 일정에서 면접만 골라내기', '매일 아침 공유 캘린더의 내일 일정을 읽어, 제목으로 면접 유형을 가리고 설명란에서 후보자 이름과 이메일을 찾습니다. 이메일이 없는 건은 초안을 만들지 않습니다.'], en: ["Picking interviews out of tomorrow's calendar", "Every morning it reads tomorrow's shared calendar, tells the interview type from the title and finds the candidate's name and email in the description. If there is no email, it makes no draft."] },
       { file: 'ir-02-drafts', ko: ['유형별 안내메일 초안', '폰 스크리닝·직무·컬쳐핏 템플릿에 이름·날짜·시간을 채워 임시보관함에 둡니다. 보내기는 사람이 직접 누릅니다.'], en: ['Drafts by interview type', 'Phone-screen, role and culture-fit templates filled with name, date and time, left in Drafts. A person presses Send.'] },
       { file: 'ir-03-notice', ko: ['담당자 요약 알림', '만든 초안 목록과, 처리하지 못한 일정과 그 사유를 실행한 담당자에게 보냅니다.'], en: ['Summary to the operator', 'A list of the drafts it made, plus any interviews it could not handle and why.'] },
     ],

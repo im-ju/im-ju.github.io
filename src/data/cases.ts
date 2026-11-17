@@ -77,7 +77,7 @@ export const CASES: Case[] = [
       line: "Matching meal-card usage against attendance records used to be done by eye. Now rules taken from the regulation do the matching automatically.",
       flow: ["Meal-card usage + attendance records", "Automatic check, clause by clause", "Deduction reasons · manual-review list"],
       problem: "The meal allowance is paid first and eligibility is checked afterwards. Matching meal-card usage against attendance, person by person and date by date, took one to two days every month, and a single miss never surfaced.",
-      solution: "I turned the eligibility requirements in the benefits and expense regulations into rules, clause by clause, and the two data sets are now compared automatically. Cases the rules cannot decide are not waved through; they go to a separate review list.",
+      solution: "I turned the eligibility requirements in the benefits and expense regulations into rules, clause by clause, and the two data sets are now compared automatically. Cases the rules cannot decide go to a separate review list.",
       result: "Run every month since March 2026, without a miss. The check takes minutes, and about 30 minutes including the exceptions. The results feed actual payroll deductions, and each one comes with a sentence explaining the deduction to the person concerned.",
     },
   },
@@ -94,7 +94,7 @@ export const CASES: Case[] = [
     result: '담당자에게 남은 일은 초안을 확인하고 보내기를 누르는 것뿐입니다. 읽지 못한 일정은 경고로 요약 메일에 올리고 같은 초안이 두 번 만들어지지 않게 막았습니다.',
     en: {
       title: "Interview reminders that never get missed",
-      line: "It finds tomorrow's interviews in the calendar and prepares a reminder draft for each interview type. The send button is left to a person, on purpose.",
+      line: "It finds tomorrow's interviews in the calendar and prepares a reminder draft for each interview type. A person still presses send.",
       flow: ["Tomorrow's interviews in the shared calendar", "Identify the type · pick the template", "Gmail draft (a person sends it)"],
       problem: "The day before an interview, the candidate gets an email with the location, the time and what to bring. Each interview type has its own template, and on busy days it was easy to miss one. A missed email hurts the candidate experience right away.",
       solution: "Every morning it finds the next day's interviews in the shared calendar and creates a Gmail draft from the right template. Sending is not automated, because an email cannot be taken back once it is sent.",

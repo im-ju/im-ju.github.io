@@ -1,6 +1,6 @@
 ---
 title: "사내 HRIS"
-titleEn: "DSRV HRIS"
+titleEn: "In-house HRIS"
 order: 1
 module: "SYSTEMS"
 period: "2026.10 – 개발 중"
