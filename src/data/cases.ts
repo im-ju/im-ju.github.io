@@ -1,4 +1,4 @@
-// Plain-language copy for the home page's case files (HR-01 … HR-08).
+// Plain-language copy for the home page's case files (HR-01 … HR-09).
 // Kept out of src/content/projects because scripts/import-projects.mjs overwrites those files.
 // Array order = file number on the home page. `id` must match a file name in src/content/projects.
 // Facts here may only restate what the full write-ups already publish (KO confirmed 2026-10-07;
@@ -181,9 +181,29 @@ export const CASES: Case[] = [
       result: "Three months later I re-audited my own report, found figures that could not be reproduced, and corrected them. Merging skills that were duplicates under different names cut the \"skills only one person has\" from 101 to 83. Instead of a full rollout, I recommended a conditional go to leadership: measure accuracy first on real data from two or three teams.",
     },
   },
+  {
+    id: 'hris',
+    title: '회사 규정대로 움직이는 인사 시스템',
+    name: 'DSRV HRIS',
+    cat: '사내 시스템',
+    catEn: 'Internal platform',
+    line: '구성원, 근무, 휴가, 평가, 채용을 한 곳에서 다루는 사내 인사 시스템을 만들고 있습니다. 지금은 가짜 데이터로 돌아가는 시제품입니다.',
+    flow: ['기능별로 따로 운영하던 인사 시스템', '회사 규정을 설정값으로 옮긴 사내 시스템 하나', 'PC 웹 + 휴대폰 웹앱'],
+    problem: '인사 업무가 기능마다 다른 시스템에서 따로 돌았고, 회사 규정은 외부 서비스의 기본 동작에 맞춰 사람이 보정해야 했습니다.',
+    solution: '연차 발생, 근무 유형, 휴가 종류 같은 규칙을 출처와 함께 한 파일에 모으고, 그 값대로 움직이는 사내 시스템을 만들고 있습니다. PC에서는 웹으로, 휴대폰에서는 설치형 웹앱으로 씁니다.',
+    result: '개발 중입니다. 가짜 회사 데이터로 구성원·근무·휴가·평가·채용 흐름을 처음부터 끝까지 시연할 수 있는 단계이며, 실제 도입 여부와 시점은 아직 정해지지 않았습니다.',
+    en: {
+      title: "An HR system that runs on the company's own rules",
+      line: "I am building an in-house HR system for people, attendance, leave, reviews and recruiting in one place. For now it is a prototype running on fake data.",
+      flow: ["Separate HR systems, one per function", "One in-house system with company rules as settings", "Web on PC + web app on phones"],
+      problem: "HR work ran in a different system for each function, and company rules had to be patched by hand around an outside service's default behaviour.",
+      solution: "I am collecting rules such as leave grants, work types and leave types into one file with their sources, and building an in-house system that runs on those values. It is used in a browser on PC and as an installable web app on phones.",
+      result: "In development. The people, attendance, leave, review and recruiting flows can be demoed end to end on a fake company; whether and when it goes into real use has not been decided.",
+    },
+  },
 ];
 
-// "HR-01" … "HR-08": file number by position in CASES. Used on the home page and the detail pages.
+// "HR-01" … "HR-09": file number by position in CASES. Used on the home page and the detail pages.
 export const fileNo = (id: string) => {
   const i = CASES.findIndex((c) => c.id === id);
   if (i < 0) throw new Error(`src/data/cases.ts has no entry for project "${id}" — add one so it gets a file number.`);

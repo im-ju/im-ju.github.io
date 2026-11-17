@@ -10,7 +10,7 @@ const projects = defineCollection({
     module: z.string(),
     period: z.string(),
     periodEn: z.string(),
-    status: z.enum(['live', 'poc', 'approved', 'pending', 'done']),
+    status: z.enum(['live', 'wip', 'poc', 'approved', 'pending', 'done']),
     stack: z.array(z.string()),
     replaced: z.string(),
     replacedEn: z.string(),

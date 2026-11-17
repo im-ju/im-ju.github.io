@@ -61,4 +61,21 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
       { file: 'si-03-report', ko: ['개인 상세 리포트', '이 사람이 떠나면 어떤 스킬이 끊기고 무엇이 연쇄로 멈추는지, 그리고 권장 조치를 정리합니다.'], en: ['Per-person report', 'Which skills break if this person leaves, what stops downstream, and what to do about it.'] },
     ],
   },
+  'hris': {
+    note: {
+      ko: ['디자인 시안 화면.', '개발 중인 v2 디자인 시안을 그대로 찍었습니다. 실제 동작하는 앱 화면이 아니며, 이름·조직·날짜·숫자는 모두 가짜입니다.'],
+      en: ['Design mock-ups.', 'Captured from the v2 design mock-ups for the system in development, not the running app. Every name, team, date and number is fictional.'],
+    },
+    shots: [
+      { file: 'hris-01-home', ko: ['홈', '오늘 근무 시간, 이번 주 근무, 승인할 일과 내 요청을 한 화면에 모았습니다.'], en: ['Home', "Today's hours, this week's work, things to approve and my own requests on one screen."] },
+      { file: 'hris-02-my-work', ko: ['근무 · 내 근무', '출퇴근, 외근·원격 근무·출장 등록, 이번 주 근무시간과 확인할 기록.'], en: ['Attendance · my work', 'Clock in and out, register field work, remote work or trips, and see weekly hours and records to check.'] },
+      { file: 'hris-03-leave', ko: ['휴가 신청', '휴가 종류마다 남은 일수와 증빙 조건을 보고 고릅니다.'], en: ['Requesting leave', 'Pick a leave type with its remaining days and evidence rules in view.'] },
+      { file: 'hris-04-leave-requests', ko: ['휴가 신청 관리', '승인할 신청을 오래된 것부터 보여 주고, 같은 기간에 겹치는 팀원 휴가를 함께 알려 줍니다.'], en: ['Leave requests', 'Requests to approve, oldest first, with a warning when teammates are off at the same time.'] },
+      { file: 'hris-05-attendance-status', ko: ['근태 관리 · 근무 현황', '오늘 근무 중·외근·휴가 인원과 구성원별 이번 주 근무시간, 확인할 기록.'], en: ['Attendance management', "Who is working, out or on leave today, each person's weekly hours, and records to check."] },
+      { file: 'hris-06-people', ko: ['구성원 관리', '재직 상태, 입사일, 조직, 근속 기간으로 거르고 정렬합니다.'], en: ['People management', 'Filter and sort by status, join date, team and tenure.'] },
+      { file: 'hris-07-org', ko: ['조직도 관리', '조직을 만들고 옮기고, 언제 어떻게 바뀌었는지 남깁니다.'], en: ['Org chart management', 'Create and move teams, with a record of when and how each change happened.'] },
+      { file: 'hris-08-approval-policy', ko: ['승인 정책', '휴가·근무 요청 종류마다 누가 승인하고 합의하는지 정합니다.'], en: ['Approval policy', 'Who approves and who signs off, for each kind of leave or attendance request.'] },
+      { file: 'hris-09-phone', ko: ['휴대폰 웹앱', '출퇴근, 휴가 확인, 요청 승인처럼 자주 하는 일만 휴대폰으로 합니다.'], en: ['Phone web app', 'The frequent tasks on a phone: clocking in and out, checking leave, approving requests.'] },
+    ],
+  },
 };

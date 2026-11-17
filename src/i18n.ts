@@ -8,8 +8,8 @@ export const LINKEDIN = 'https://linkedin.com/in/juyoung-you-54aa921bb';
 export const SITE_URL = 'https://im-ju.github.io'; // ← EDIT: keep in sync with `site` in astro.config.mjs
 
 export const STATUS_LABEL: Record<Locale, Record<string, string>> = {
-  ko: { live: '운영 중', poc: 'PoC 완료', approved: '승인 완료', pending: '적용 승인 대기', done: '완료' },
-  en: { live: 'live', poc: 'PoC complete', approved: 'approved', pending: 'awaiting rollout', done: 'complete' },
+  ko: { live: '운영 중', wip: '개발 중', poc: 'PoC 완료', approved: '승인 완료', pending: '적용 승인 대기', done: '완료' },
+  en: { live: 'live', wip: 'in development', poc: 'PoC complete', approved: 'approved', pending: 'awaiting rollout', done: 'complete' },
 };
 
 export const t = {
