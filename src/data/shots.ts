@@ -50,17 +50,6 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
       { file: 'ir-03-notice', ko: ['담당자 요약 알림', '만든 초안 목록과, 처리하지 못한 일정과 그 사유를 실행한 담당자에게 보냅니다.'], en: ['Summary to the operator', 'A list of the drafts it made, plus any interviews it could not handle and why.'] },
     ],
   },
-  'skill-intelligence': {
-    note: {
-      ko: ['데모 화면 · 실제 분석 결과 아님.', '같은 대시보드 코드에 가상의 사람·팀·스킬을 넣어 다시 만들었습니다. 이름과 수치는 모두 가짜입니다.'],
-      en: ['Demo screens, not the real analysis.', 'Rebuilt from the same dashboard code with made-up people, teams and skills. Every name and number is fictional.'],
-    },
-    shots: [
-      { file: 'si-01-overview', ko: ['리스크 개요', '인원·스킬·관계 수와 Critical부터 Low까지 등급 분포, 팀별 요약. 아직 사람이 검증하지 않은 AI 추정치라는 경고를 맨 위에 둡니다.'], en: ['Risk overview', 'Headcount, skills and links, the Critical-to-Low spread and a per-team summary, under a banner saying the numbers are unverified AI estimates.'] },
-      { file: 'si-02-heatmap', ko: ['팀 리스크 히트맵', '팀마다 누가 어느 등급인지 색으로 보여줍니다. 아래 카드는 단독 보유·희소 스킬·연쇄 영향 수입니다.'], en: ['Team risk heatmap', "Each team's people coloured by risk level; the cards below count sole-held skills, rare skills and knock-on effects."] },
-      { file: 'si-03-report', ko: ['개인 상세 리포트', '이 사람이 떠나면 어떤 스킬이 끊기고 무엇이 연쇄로 멈추는지, 그리고 권장 조치를 정리합니다.'], en: ['Per-person report', 'Which skills break if this person leaves, what stops downstream, and what to do about it.'] },
-    ],
-  },
   'hris': {
     note: {
       ko: ['디자인 시안 화면.', '개발 중인 v2 디자인 시안을 그대로 찍었습니다. 실제 동작하는 앱 화면이 아니며, 이름·조직·날짜·숫자는 모두 가짜입니다.'],

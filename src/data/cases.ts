@@ -1,4 +1,4 @@
-// Plain-language copy for the home page's case files (HR-01 … HR-09).
+// Plain-language copy for the home page's case files (HR-01 … HR-06).
 // Kept out of src/content/projects because scripts/import-projects.mjs overwrites those files.
 // Array order = file number on the home page. `id` must match a file name in src/content/projects.
 // Facts here may only restate what the full write-ups already publish (KO confirmed 2026-10-07;
@@ -82,59 +82,19 @@ export const CASES: Case[] = [
     },
   },
   {
-    id: 'benefits-audit',
-    title: '맞지 않는 숫자를 찾아내는 감사 도구',
-    name: '자기계발비 정합성 감사',
-    cat: '감사',
-    catEn: 'Audit',
-    line: '구글시트로 운영하던 자기계발비에서 서로 맞지 않는 숫자를 찾아냅니다. 원본은 한 칸도 고치지 않았고, 결과는 웹앱으로 옮기는 근거가 됐습니다.',
-    flow: ['자기계발비 구글시트 (표 3개)', '규정 기준 8가지 검사 · 원본은 읽기만', '문제 행 · 이유 · 심각도 목록'],
-    problem: '자기계발비는 월·연 한도와 지원 항목이 정해진 제도인데, 운영은 구글시트로 하고 있었습니다. 표끼리 이름과 팀명으로만 이어져 있어서 동명이인이 있거나 팀명이 한 글자만 달라도 숫자가 조용히 틀어졌고, 틀렸는지 아무도 알 수 없었습니다.',
-    solution: '시트를 읽기만 하는 감사 도구를 만들었습니다. 규정에서 가져온 8가지 기준(동명이인, 한도 초과, 팀명 불일치, 날짜 오류 등)으로 검사하고, 문제가 있는 행과 이유를 심각도와 함께 별도 탭에 적습니다. 원본은 고치지 않습니다. 여러 사람이 매일 쓰는 문서를 스크립트가 몰래 고치면 아무도 그 시트를 믿을 수 없기 때문입니다.',
-    result: '드러난 건 몇 건의 실수가 아니라 시트라는 방식의 한계였습니다. 동명이인 문제는 시트로는 풀 수 없고 사람마다 고유번호가 필요했습니다. 이 진단을 근거로 자기계발비 관리를 사내 웹앱(HR/GA Hub)으로 옮겼습니다.',
-    en: {
-      title: "An audit tool that finds numbers that don't add up",
-      line: "It finds numbers that disagree with each other in a training allowance run on Google Sheets. It never changes a single cell, and its findings became the case for moving to the web app.",
-      flow: ["Training-allowance Google Sheet (3 tables)", "8 regulation-based checks · read-only", "Problem rows · reasons · severity"],
-      problem: "The training allowance has monthly and yearly limits and a fixed list of eligible items, but it was run on Google Sheets. The tables were linked only by names and team names, so two people with the same name, or a team name off by one character, quietly broke the numbers, and nobody could tell.",
-      solution: "I built an audit tool that only reads the sheet. It applies eight checks taken from the regulation (same-name people, limits exceeded, team-name mismatches, unreadable dates and more) and writes each problem row, its reason and its severity to a separate tab. It never edits the source: a script silently fixing a document that many people edit every day would leave nobody able to trust it.",
-      result: "What it exposed was not a handful of mistakes but the limit of the spreadsheet itself. Same-name people cannot be told apart in a sheet; each person needs a unique ID. On the strength of that diagnosis, the training allowance moved into the internal web app (HR/GA Hub).",
-    },
-  },
-  {
-    id: 'access-log',
-    title: '사람을 잘못 지목하지 않는 근태 분석',
-    name: '출입기록 이상패턴 분석',
-    cat: '분석',
-    catEn: 'Analysis',
-    line: '근태 시스템에 남지 않는 근무 중 외출을 출입 기록으로 살펴봤습니다. 결과가 특정인을 가리키는 자료라서, 잘못 잡힌 건을 걸러내는 데 가장 공을 들였습니다.',
-    flow: ['출입문 통과 기록 (석 달 치)', '짧은 이동 제거 · 60분 초과만 · 건물 안 기록 있으면 제외', '"확인이 필요한 건" 목록'],
-    problem: '근태 시스템은 출근과 퇴근만 기록합니다. 근무 중 장시간 자리를 비운 실태를 알려면 출입문 기록을 봐야 했는데, 그대로 세면 잠깐 나갔다 온 기록, 나간 것처럼 보이지만 실제로는 건물 안에 있던 경우까지 전부 외출로 잡혔습니다. 결과가 특정인을 가리키는 목록이라, 잘못 잡힌 한 건이 곧 한 사람에 대한 근거 없는 의심이 됩니다.',
-    solution: '5분 안에 다시 들어온 기록은 지우고 60분이 넘는 외출만 남겼습니다. 남은 건마다 같은 시간에 건물 안 다른 출입문을 지난 기록이 있는지 다시 확인해, 있으면 목록에서 뺐습니다. 몇 분부터 외출로 볼지는 회사가 정할 기준이라, 기준값을 한곳에 모아 실행할 때마다 보여주게 했습니다.',
-    result: '2026년 1~3월 석 달 치를 분석해 월별 보고서 3건과 통합 보고서 1건을 냈습니다. 목록 이름은 "위반자 명단"이 아니라 "확인이 필요한 건"으로 붙였습니다. 출입 기록은 이유를 담지 않기 때문에, 도구는 확인할 대상을 좁힐 뿐 판단은 사람이 합니다.',
-    en: {
-      title: "Attendance analysis that doesn't point at the wrong person",
-      line: "The attendance system doesn't record time away during the workday, so I looked at door access logs. Because the output points at specific people, most of the effort went into filtering out false hits.",
-      flow: ["Door access logs (three months)", "Drop short exits · keep 60+ minutes · drop if still inside", "\"Needs checking\" list"],
-      problem: "The attendance system records only clock-in and clock-out. Long absences during the day show up only in the door access logs, but counted as-is they flagged everything: a quick step outside, and even people who looked as if they had left but were still inside the building. The output points at individuals, so one wrong hit is an unfounded suspicion about one person.",
-      solution: "Re-entries within 5 minutes are discarded and only absences over 60 minutes are kept. For each remaining case it checks whether the same person passed another door inside the building during that time, and drops the case if so. How many minutes count as an absence is a company decision, so the thresholds sit in one place and are printed on every run.",
-      result: "It covered three months, January to March 2026, producing three monthly reports and one combined report. The list is titled \"needs checking\", not \"violators\". Access logs carry no reasons, so the tool only narrows down what to check; a person makes the call.",
-    },
-  },
-  {
     id: 'guide-redesign',
-    title: '46개 페이지가 지워질 뻔한 이관을 미리 막다',
-    name: '사내 안내서 리디자인',
+    title: '노션 사내 안내서, 46개 페이지 삭제를 미리 막다',
+    name: '노션 사내 안내서 리디자인',
     cat: '정보 구조',
     catEn: 'Information architecture',
-    line: '전 직원이 매일 여는 사내 안내서를 구조부터 다시 설계했습니다. 그대로 옮겼다면 하위 페이지 46개가 지워질 문제를 미리 찾아, 원본을 건드리지 않는 이관 방법을 만들었습니다.',
+    line: '전 직원이 매일 여는 노션(Notion) 사내 안내서를 구조부터 다시 설계했습니다. 그대로 옮겼다면 하위 페이지 46개가 지워질 문제를 미리 찾아, 원본을 건드리지 않는 이관 방법을 만들었습니다.',
     flow: ['8개 섹션 · 하위 페이지 46개', '새 레이아웃만 가져오고 페이지는 원본 그대로', '원본 무손상 이관 방법 (리허설 통과)'],
     problem: '사내 안내서는 신규 입사자가 처음 여는 문서이자, 모든 구성원이 규정과 사무실 이용법을 찾는 입구입니다. 그런데 8개 섹션 아래 46개 페이지가 평평하게 나열돼 있어 필요한 것을 찾으려면 전부 훑어야 했습니다. 사내 곳곳에서 링크된 문서라, 새로 만들다 주소가 바뀌면 그 링크가 모두 깨집니다.',
     solution: '인터뷰로 요구사항을 좁히고, 성격이 다른 시안 4개를 나란히 놓고 하나를 골랐습니다. 옮기기 전에 원본과 시안을 하나씩 대조하다가, 원본의 46개 항목이 링크가 아니라 페이지 그 자체라는 것을 발견했습니다. 시안을 그대로 붙였다면 46개 페이지가 한 번에 지워졌을 겁니다. 그래서 새 레이아웃만 가져오고 페이지는 원본 그대로 두는 방법으로 바꿨습니다.',
     result: '원본은 한 번도 건드리지 않았습니다. 페이지가 하나라도 지워지는 작업은 실행 자체가 거부되게 설정했고, 가짜 페이지로 만든 작은 리허설에서 이 방법이 통하는 것을 확인했습니다. 주소와 사이드바 구조는 그대로 유지됩니다. 지금은 실제 적용 승인을 기다리고 있습니다.',
     en: {
-      title: "Catching a migration that would have deleted 46 pages",
-      line: "I redesigned the company handbook every employee opens daily, starting from its structure. I caught in advance that moving it as drafted would delete 46 child pages, and built a migration that never touches the original.",
+      title: "Catching a Notion handbook migration that would have deleted 46 pages",
+      line: "I redesigned the company handbook in Notion that every employee opens daily, starting from its structure. I caught in advance that moving it as drafted would delete 46 child pages, and built a migration that never touches the original.",
       flow: ["8 sections · 46 child pages", "Take only the new layout · keep the original pages", "Non-destructive migration (rehearsal passed)"],
       problem: "The company handbook is the first document a new hire opens and where everyone looks up rules and office information. But its 46 pages were listed flat under 8 sections, so finding anything meant scanning all of it. It is linked from all over the company, so changing its addresses during a rebuild would break every one of those links.",
       solution: "I narrowed the requirements through interviews, then compared four different mock-ups side by side and picked one. Checking the original against the mock-up item by item before moving anything, I found that the 46 entries in the original were not links but the pages themselves. Pasting the mock-up in as drafted would have deleted all 46 pages at once, so I switched to taking only the new layout and keeping the original pages in place.",
@@ -162,26 +122,6 @@ export const CASES: Case[] = [
     },
   },
   {
-    id: 'skill-intelligence',
-    title: '누가 떠나면 무엇이 멈추는가',
-    name: 'Skill Intelligence',
-    cat: '분석 PoC',
-    catEn: 'Analysis PoC',
-    line: '기존 사내 문서만으로 직원별 스킬을 정리하고, 한 사람이 떠나면 어떤 일이 멈추는지 추적한 시범 분석(PoC)입니다. 수치는 모두 가상 데이터입니다.',
-    flow: ['팀 미션 · 직무기술서 · OKR 29건', 'AI로 스킬 추출 · 사람과 연결 · 연쇄 영향 추적', '이탈 위험 보고서 · 조건부 진행 권고'],
-    problem: '회사가 가진 인력 정보는 직급, 연차, 소속뿐입니다. 정작 알고 싶은 건 "이 사람이 내일 그만두면 무엇이 멈추는가"인데, 누가 무엇을 할 줄 아는지는 어디에도 정리돼 있지 않았습니다. 전 직원에게 스킬을 적어내라고 하면 응답률도 기준도 제각각이라 시작부터 무너집니다.',
-    solution: '이미 있는 팀 미션, 직무기술서, 팀 목표(OKR) 문서 29건에서 AI로 스킬을 뽑아 사람과 연결했습니다. 스킬끼리의 관계도 함께 기록해 "A를 할 사람이 없으면 B 업무가 멈추고, B에 기대던 C 보고도 못 한다"처럼 연쇄 영향을 따라갑니다. AI가 뽑은 결과는 본인과 팀장이 확인해 다시 반영하는 단계를 뒀습니다.',
-    result: '석 달 뒤 제 보고서를 스스로 다시 검증해, 다시 계산해도 나오지 않는 숫자를 찾아 정정했습니다. 같은 스킬이 다른 이름으로 중복돼 있던 것을 합치자 "한 명만 가진 스킬"이 101개에서 83개로 줄었습니다. 경영진에게는 전면 도입 대신 2~3개 팀의 실제 데이터로 정확도부터 재 보자며 조건부 진행을 권고했습니다.',
-    en: {
-      title: "If someone leaves, what stops?",
-      line: "A proof of concept (PoC) that mapped each employee's skills from existing internal documents alone and traced what stops when one person leaves. All figures are synthetic data.",
-      flow: ["29 team-mission, job-description and OKR documents", "AI skill extraction · match to people · trace knock-on effects", "Attrition-risk report · conditional go"],
-      problem: "All the company holds about its people is grade, tenure and team. What it really wants to know is \"if this person quit tomorrow, what would stop?\", yet who can do what was written down nowhere. Asking every employee to list their skills fails from the start: response rates and standards vary too much.",
-      solution: "Using AI, I pulled skills out of 29 existing documents (team missions, job descriptions and team goals, or OKRs) and linked them to people. Relationships between skills are recorded too, so it can follow knock-on effects such as \"with nobody left who can do A, task B stops, and report C that depends on B cannot be filed\". Each person and their team lead check what the AI extracted, and their answers are fed back in.",
-      result: "Three months later I re-audited my own report, found figures that could not be reproduced, and corrected them. Merging skills that were duplicates under different names cut the \"skills only one person has\" from 101 to 83. Instead of a full rollout, I recommended a conditional go to leadership: measure accuracy first on real data from two or three teams.",
-    },
-  },
-  {
     id: 'hris',
     title: '회사 규정대로 움직이는 인사 시스템',
     name: 'DSRV HRIS',
@@ -203,7 +143,7 @@ export const CASES: Case[] = [
   },
 ];
 
-// "HR-01" … "HR-09": file number by position in CASES. Used on the home page and the detail pages.
+// "HR-01" … "HR-06": file number by position in CASES. Used on the home page and the detail pages.
 export const fileNo = (id: string) => {
   const i = CASES.findIndex((c) => c.id === id);
   if (i < 0) throw new Error(`src/data/cases.ts has no entry for project "${id}" — add one so it gets a file number.`);
