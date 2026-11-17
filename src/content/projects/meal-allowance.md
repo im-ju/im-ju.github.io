@@ -1,7 +1,7 @@
 ---
 title: "식대 검증 자동화"
 titleEn: "Meal-allowance verification"
-order: 2
+order: 3
 module: "POLICY→CODE"
 period: "2026.03 – 운영 중"
 periodEn: "Mar 2026 – live"

@@ -1,7 +1,7 @@
 ---
 title: "면접 D-1 안내메일 자동화"
 titleEn: "Interview D-1 reminder drafts"
-order: 7
+order: 4
 module: "RECRUITING"
 period: "2026.04 – 운영 중"
 periodEn: "Apr 2026 – live"

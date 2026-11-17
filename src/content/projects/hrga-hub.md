@@ -1,7 +1,7 @@
 ---
 title: "DSRV HR/GA Hub"
 titleEn: "DSRV HR/GA Hub"
-order: 1
+order: 2
 module: "SYSTEMS"
 period: "2026.03 – 운영 중"
 periodEn: "Mar 2026 – live"

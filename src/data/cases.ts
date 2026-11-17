@@ -22,6 +22,26 @@ export interface Case extends Copy {
 
 export const CASES: Case[] = [
   {
+    id: 'hris',
+    title: '회사 규정대로 움직이는 인사 시스템',
+    name: 'DSRV HRIS',
+    cat: '사내 시스템 · PO',
+    catEn: 'Internal platform · PO',
+    line: '사내 인사 시스템(HRIS)을 PO로 맡아 진행하고 있습니다. 개발팀, 보안팀, 인프라팀에 협업을 요청해 와이어프레임부터 개발까지 이끌고 있고, 2026년 말 전사 테스트가 목표입니다.',
+    flow: ['기능별로 따로 운영하던 인사 시스템', 'PO로서 개발·보안·인프라팀과 협업', '2026년 말 전사 테스트'],
+    problem: '인사 업무가 기능마다 다른 시스템에서 따로 돌았고, 회사 규정은 외부 서비스의 기본 동작에 맞춰 사람이 보정해야 했습니다. 사내에서 직접 만들려면 인사 담당자 혼자서는 정할 수 없는 일이 많았습니다. 데이터베이스, 출입기록 연동, 보안 설정이 그렇습니다.',
+    solution: '제가 PO를 맡아 화면 설계(와이어프레임)부터 개발까지 직접 진행합니다. 데이터베이스 설정, 출입기록과 근태 연동, 보안 설정처럼 다른 팀의 판단이 필요한 부분은 개발팀, 보안팀, 인프라팀에 협업을 요청해 자문을 받고 결정합니다. 연차 발생, 근무 유형, 휴가 종류 같은 회사 규정은 출처와 함께 한 파일에 모아 그 값대로 동작하게 했습니다.',
+    result: '개발 중입니다. 지금은 가짜 데이터로 구성원, 근무, 휴가, 평가, 채용 흐름을 시연할 수 있는 단계이고, 2026년 말까지 전사 테스트를 해 보는 것이 목표입니다.',
+    en: {
+      title: "An HR system that runs on the company's own rules",
+      line: "I am the product owner of our in-house HR system (HRIS). I asked the development, security and infrastructure teams to work with me, and I am leading it from wireframes to build, aiming for a company-wide test by the end of 2026.",
+      flow: ["Separate HR systems, one per function", "PO working with development, security and infrastructure", "Company-wide test by end of 2026"],
+      problem: "HR work ran in a different system for each function, and company rules had to be patched by hand around an outside service's default behaviour. Building our own meant many calls an HR person cannot make alone: the database, the door-access link to attendance, security settings.",
+      solution: "As product owner I run it from wireframes to build. Where another team's judgement is needed, such as database setup, linking door-access records to attendance, or security settings, I ask the development, security and infrastructure teams for advice and decide with them. Company rules such as leave grants, work types and leave types sit in one file with their sources, and the system runs on those values.",
+      result: "In development. It can demo the people, attendance, leave, review and recruiting flows on fake data, and the goal is a company-wide test by the end of 2026.",
+    },
+  },
+  {
     id: 'hrga-hub',
     title: '흩어진 사내 도구를 하나로',
     name: 'HR/GA Hub',
@@ -119,26 +139,6 @@ export const CASES: Case[] = [
       problem: "The asset management regulation had not changed since November 2023. The leaver equipment return procedure was not laid out in steps, and the rules for compensating loss or damage were vague. There was no definition of \"obsolete equipment\" either, so every replacement request was judged case by case.",
       solution: "I read the regulation separately from three angles (legal and tax, information security, practice), found what needed fixing and applied the 15 most important items. Obsolescence is now defined as \"four years after purchase\", and compensation is never deducted from pay unilaterally; it can only be claimed by separate agreement. The regulation documents are generated from code rather than edited by hand, so the revised text and the revision history cannot drift apart.",
       result: "Approved by the CEO. Applying the new obsolescence standard and leadership's criteria to the asset register, I recommended 17 people for laptop replacement in priority order, and reported entries where the register did not match reality along the way.",
-    },
-  },
-  {
-    id: 'hris',
-    title: '회사 규정대로 움직이는 인사 시스템',
-    name: 'DSRV HRIS',
-    cat: '사내 시스템',
-    catEn: 'Internal platform',
-    line: '구성원, 근무, 휴가, 평가, 채용을 한 곳에서 다루는 사내 인사 시스템을 만들고 있습니다. 지금은 가짜 데이터로 돌아가는 시제품입니다.',
-    flow: ['기능별로 따로 운영하던 인사 시스템', '회사 규정을 설정값으로 옮긴 사내 시스템 하나', 'PC 웹 + 휴대폰 웹앱'],
-    problem: '인사 업무가 기능마다 다른 시스템에서 따로 돌았고, 회사 규정은 외부 서비스의 기본 동작에 맞춰 사람이 보정해야 했습니다.',
-    solution: '연차 발생, 근무 유형, 휴가 종류 같은 규칙을 출처와 함께 한 파일에 모으고, 그 값대로 움직이는 사내 시스템을 만들고 있습니다. PC에서는 웹으로, 휴대폰에서는 설치형 웹앱으로 씁니다.',
-    result: '개발 중입니다. 가짜 회사 데이터로 구성원·근무·휴가·평가·채용 흐름을 처음부터 끝까지 시연할 수 있는 단계이며, 실제 도입 여부와 시점은 아직 정해지지 않았습니다.',
-    en: {
-      title: "An HR system that runs on the company's own rules",
-      line: "I am building an in-house HR system for people, attendance, leave, reviews and recruiting in one place. For now it is a prototype running on fake data.",
-      flow: ["Separate HR systems, one per function", "One in-house system with company rules as settings", "Web on PC + web app on phones"],
-      problem: "HR work ran in a different system for each function, and company rules had to be patched by hand around an outside service's default behaviour.",
-      solution: "I am collecting rules such as leave grants, work types and leave types into one file with their sources, and building an in-house system that runs on those values. It is used in a browser on PC and as an installable web app on phones.",
-      result: "In development. The people, attendance, leave, review and recruiting flows can be demoed end to end on a fake company; whether and when it goes into real use has not been decided.",
     },
   },
 ];

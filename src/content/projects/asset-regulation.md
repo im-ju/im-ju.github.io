@@ -1,7 +1,7 @@
 ---
 title: "자산관리 규정 개정 + 교체 대상 선정"
 titleEn: "Asset-management regulation rewrite"
-order: 4
+order: 6
 module: "POLICY"
 period: "2026.03"
 periodEn: "Mar 2026"
