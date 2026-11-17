@@ -1,6 +1,6 @@
 ## Results
 
-I settled the new structure and tested the migration method in a rehearsal, without changing the original once. Applying it for real is waiting for approval.
+I settled the new structure and tested the migration method in a rehearsal, without changing the original once. After approval it went live with a company-wide announcement on 11 August 2026.
 
 - **46 pages that would have been deleted → 0.** I found and stopped the problem while planning the migration.
 - **1 of 4 mock-ups chosen.** The structure was picked after five interviews narrowed down the requirements.
@@ -38,4 +38,4 @@ But building a new one was not the end of it either. The document was already in
 
 **I did not rehearse on the original.** Once I knew a rehearsal could damage the original, I left it alone and tested only on dummy pages.
 
-**I did not apply it without approval.** The rehearsal passed, but everyone uses this document every day, so the real change happens only after approval.
+**I did not apply it without approval.** The rehearsal passed, but everyone uses this document every day, so the real change went in only after approval.

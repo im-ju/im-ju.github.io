@@ -3,9 +3,9 @@ title: "노션 사내 안내서 리디자인"
 titleEn: "Notion company handbook redesign"
 order: 5
 module: "INFO ARCH"
-period: "2026.08"
-periodEn: "Aug 2026"
-status: pending
+period: "2026.08 – 운영 중"
+periodEn: "Aug 2026 – live"
+status: live
 stack: ["Notion", "Notion API"]
 replaced: "46개 페이지가 평평하게 나열된 구조"
 replacedEn: "a flat list of 46 pages"
@@ -14,7 +14,7 @@ summaryEn: "I redesigned the company handbook in Notion that every employee open
 ---
 ## 결과
 
-새 구조를 확정하고 원본을 한 번도 고치지 않은 채 이관 방법을 리허설로 검증했습니다. 실제 적용은 승인을 기다리고 있습니다.
+새 구조를 확정하고 원본을 한 번도 고치지 않은 채 이관 방법을 리허설로 검증했습니다. 승인을 받아 2026년 8월 11일 전사 공지와 함께 적용했고 지금 운영 중입니다.
 
 - **지워질 뻔한 페이지 46개 → 0개.** 이관 계획을 세우는 단계에서 문제를 찾아 막았습니다.
 - **시안 4개 중 1개 확정.** 인터뷰 다섯 번으로 요구사항을 좁힌 뒤 고른 구조입니다.
@@ -52,4 +52,4 @@ summaryEn: "I redesigned the company handbook in Notion that every employee open
 
 **원본으로 리허설하지 않았습니다.** 리허설이 오히려 원본을 망가뜨릴 수 있다는 것을 안 뒤로, 원본에는 손대지 않고 가짜 페이지로만 시험했습니다.
 
-**승인 없이 적용하지 않았습니다.** 리허설은 통과했지만 전 직원이 매일 쓰는 문서라 실제 적용은 승인을 받은 뒤에 합니다.
+**승인 없이 적용하지 않았습니다.** 리허설은 통과했지만 전 직원이 매일 쓰는 문서라 승인을 받은 뒤에 실제로 적용했습니다.
