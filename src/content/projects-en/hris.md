@@ -2,7 +2,7 @@
 
 I am the product owner (PO). I decide what gets built and run it myself, from wireframes to build.
 
-For the parts an HR person cannot decide alone, I asked other teams to work with me. I did not go in with open questions: I first looked up the laws that apply, wrote them up, and brought that to each team.
+For the parts an HR person cannot decide alone, I asked other teams to work with me. I did not go in with open questions: I first looked up the relevant statutes and case law, wrote them up, and brought that to each team.
 
 - **Development team**: advice on system structure and database setup, and code review
 - **Security team**: sign-in, permissions and security settings
