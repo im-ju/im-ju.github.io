@@ -1,7 +1,8 @@
 ---
 import '../styles/global.css';
-import '../styles/site.css'; // clay world; must come after global.css (overrides its tokens)
+import '../styles/site.css'; // 흑백 테마. global.css의 토큰을 덮어쓰므로 반드시 그 뒤에 불러온다
 import { t, type Locale } from '../i18n';
+import Icon from '../components/Icon.astro';
 
 interface Props { locale: Locale; title?: string; description?: string; home?: boolean; noindex?: boolean; }
 const { locale, title, description, home = false, noindex = false } = Astro.props;
@@ -17,7 +18,7 @@ const ogImage = new URL(en ? '/og-en.png' : '/og-ko.png', Astro.site ?? 'https:/
 const navItems = Object.entries(s.nav); // [section id, label]
 ---
 <!doctype html>
-<html lang={s.htmlLang}>
+<html lang={s.htmlLang} class="no-js" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,8 +26,16 @@ const navItems = Object.entries(s.nav); // [section id, label]
     <meta name="description" content={desc} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="dark light" />
     <link rel="preload" href="/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin />
+    {/* 첫 화면이 그려지기 전에 테마를 정해야 밝은 테마를 고른 사람에게 어두운 화면이 번쩍이지 않는다 */}
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.remove('no-js'); d.classList.add('js');
+        try { if (localStorage.getItem('theme') === 'light') d.dataset.theme = 'light'; } catch (e) { /* 저장소가 막힌 브라우저: 기본(어두운) 테마 그대로 */ }
+      })();
+    </script>
     {noindex && <meta name="robots" content="noindex" />}
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={desc} />
@@ -46,13 +55,16 @@ const navItems = Object.entries(s.nav); // [section id, label]
   <body>
     <a class="skip" href="#main">{en ? 'Skip to content' : '본문으로 건너뛰기'}</a>
     <header class="topbar">
-      <div class="wrap topbar-in">
-        {/* 머리글은 분야만: role 앞부분("HR Operations")은 행정 처리 직무로 좁게 읽혀 2026-11-03 "HR"로 고정. role 값은 /print/에서 그대로 씀 */}
+      <div class="topbar-in">
+        {/* 머리글은 분야만: "HR Operations"는 행정 처리 직무로 좁게 읽혀 2026-11-03 "HR"로 고정. role 값은 /print/에서 그대로 씀 */}
         <a class="brand" href={prefix}>{s.hero.name}<span>HR · DSRV</span></a>
         <nav class="topnav" aria-label={en ? 'Sections' : '섹션'}>
-          {navItems.map(([id, label]) => <a href={navHref(id)}>{label}</a>)}
+          {navItems.map(([id, label]) => <a href={navHref(id)} data-spy={id}>{label}</a>)}
         </nav>
-        <a class="pill" href={s.langSwitchHref} lang={en ? 'ko' : 'en'} aria-label={en ? '한국어로 보기' : 'View in English'}>{s.langSwitch}</a>
+        <a class="lang" href={s.langSwitchHref} lang={en ? 'ko' : 'en'} aria-label={en ? '한국어로 보기' : 'View in English'}><Icon name="globe" size={18} />{s.langSwitch}</a>
+        <button type="button" class="theme" aria-label={s.home.themeToggle}>
+          <span class="when-dark"><Icon name="sun" size={20} /></span><span class="when-light"><Icon name="moon" size={20} /></span>
+        </button>
       </div>
     </header>
 
@@ -69,31 +81,68 @@ const navItems = Object.entries(s.nav); // [section id, label]
   </body>
 </html>
 
+<script>
+  const root = document.documentElement;
+  document.querySelector('.theme')?.addEventListener('click', () => {
+    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+    root.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch { /* 저장이 막혀도 이번 화면에서는 바뀐다 */ }
+  });
+
+  // 화면에 들어온 요소를 한 번만 등장시킨다 (.rv → .in)
+  const seen = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); seen.unobserve(e.target); }
+  }, { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.rv').forEach((el) => seen.observe(el));
+
+  // 지금 보고 있는 구역을 메뉴에 표시
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.topnav a[data-spy]')];
+  const targets = links.map((a) => document.getElementById(a.dataset.spy!)).filter((el): el is HTMLElement => !!el);
+  if (targets.length) {
+    const mark = () => {
+      const line = window.scrollY + window.innerHeight * 0.4;
+      let on = '';
+      for (const el of targets) if (el.getBoundingClientRect().top + window.scrollY <= line) on = el.id;
+      links.forEach((a) => (a.dataset.spy === on ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+    };
+    addEventListener('scroll', mark, { passive: true });
+    mark();
+  }
+</script>
+
 <style>
   .skip { position: absolute; left: -999px; top: 0.5rem; z-index: 100; background: var(--color-ink); color: var(--color-paper); padding: 0.5rem 0.8rem; border-radius: var(--radius-sm); font-size: var(--text-sm); }
   .skip:focus { left: 0.5rem; }
 
-  .topbar { position: sticky; top: 0; z-index: 40; background: var(--color-bar); border-bottom: 1px solid var(--color-rule); }
-  .topbar-in { display: flex; align-items: center; gap: var(--space-md); min-height: 60px; }
-  .brand { display: inline-flex; align-items: center; gap: 0.6rem; min-height: 44px; /* tap target ≥ 44px */ font-weight: 800; font-size: 1.15rem; letter-spacing: -0.03em; text-decoration: none; margin-right: auto; }
+  .topbar { position: sticky; top: 0; z-index: 40; height: var(--bar-h); background: var(--color-bar); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); border-bottom: 1px solid var(--color-rule); }
+  .topbar-in { display: flex; align-items: stretch; gap: 0.25rem; height: 100%; max-width: 82rem; margin-inline: auto; padding-inline: clamp(0.75rem, 3vw, 2rem); }
+  .brand { display: inline-flex; flex: none; align-items: center; gap: 0.6rem; padding-right: 0.75rem; font-weight: 700; font-size: 1.0625rem; letter-spacing: -0.02em; text-decoration: none; white-space: nowrap; }
   .brand span { font-weight: 500; font-size: var(--text-sm); letter-spacing: 0; color: var(--color-ink-3); }
-  .topnav { display: flex; gap: 0.25rem; }
-  .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.75rem; border-radius: var(--radius-sm); font-weight: 700; font-size: var(--text-sm); text-decoration: none; }
-  .topnav a:hover { background: var(--color-paper-3); }
-  .pill { display: inline-grid; place-items: center; min-height: 44px; min-width: 52px; padding: 0 0.85rem; border-radius: var(--radius-sm); border: 1.5px solid var(--color-ink); font-size: var(--text-sm); font-weight: 800; text-decoration: none; }
-  .pill:hover { background: var(--color-ink); color: var(--color-paper); }
+  .topnav { display: flex; margin-right: auto; }
+  .topnav a { position: relative; display: inline-flex; align-items: center; padding: 0 0.8rem; font-weight: 500; font-size: 0.9375rem; color: var(--color-ink-2); text-decoration: none; white-space: nowrap; transition: color var(--dur-base); }
+  .topnav a:hover, .topnav a[aria-current] { color: var(--color-ink); }
+  /* 보고 있는 구역 아래에 굵은 밑줄 */
+  .topnav a::after { content: ""; position: absolute; left: 0.4rem; right: 0.4rem; bottom: -1px; height: 2px; border-radius: 2px; background: var(--color-ink); transform: scaleX(0); transition: transform 0.3s var(--ease-spring); }
+  .topnav a[aria-current]::after { transform: scaleX(1); }
+  .lang { display: inline-flex; flex: none; align-items: center; gap: 0.35rem; padding: 0 0.7rem; white-space: nowrap; font-weight: 600; font-size: 0.9375rem; text-decoration: none; }
+  .theme { display: grid; flex: none; place-items: center; width: 44px; border: 0; background: none; color: var(--color-ink); cursor: pointer; }
+  .theme span { grid-area: 1 / 1; display: grid; transition: opacity 0.3s, transform 0.5s var(--ease-spring); }
+  :global([data-theme="light"]) .theme .when-dark, :global([data-theme="dark"]) .theme .when-light { opacity: 0; transform: rotate(-90deg) scale(0.4); }
+  .lang:hover, .theme:hover { color: var(--color-ink); background: var(--color-accent-soft); }
+  .lang, .theme { color: var(--color-ink-2); border-radius: 0; }
 
   .footer { border-top: 1px solid var(--color-rule); padding-block: var(--space-xl); }
   .footer-in { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); align-items: baseline; font-size: var(--text-sm); color: var(--color-ink-3); }
-  .footer-left { font-weight: 700; color: var(--color-ink); }
+  .footer-left { font-weight: 600; color: var(--color-ink); }
   .footer-note { flex: 1 1 320px; font-size: var(--text-xs); }
 
   @media (max-width: 640px) {
-    .topbar-in { gap: 0.25rem; }
-    .brand { flex: none; font-size: 1rem; white-space: nowrap; }
+    .brand { font-size: 1rem; padding-right: 0.25rem; }
     .brand span { display: none; }
-    .topnav { gap: 0; min-width: 0; overflow-x: auto; scrollbar-width: none; } /* below ~340px the links scroll instead of wrapping */
-    .topnav a { padding: 0 0.4rem; font-size: 0.8125rem; white-space: nowrap; }
-    .pill { min-width: 44px; padding: 0 0.6rem; }
+    .topnav { min-width: 0; overflow-x: auto; scrollbar-width: none; } /* 아주 좁은 화면에서는 줄바꿈 대신 옆으로 밀린다 */
+    .topnav a { padding: 0 0.45rem; font-size: 0.8125rem; }
+    .lang { padding: 0 0.4rem; font-size: 0.8125rem; }
+    .lang :global(svg) { display: none; }
+    .theme { width: 40px; }
   }
 </style>

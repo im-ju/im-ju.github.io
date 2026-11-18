@@ -1,0 +1,13 @@
+---
+// 노트북 데모 화면의 한 줄: [아이콘] 제목 / 설명 …… 오른쪽 조작부(slot).
+// 모양은 Stage.astro의 전역 스타일(.app .p-row)이 정한다.
+import type { ComponentProps } from 'astro/types';
+import Icon from '../Icon.astro';
+interface Props { icon?: ComponentProps<typeof Icon>['name']; title: string; sub?: string; at?: number; hideOnPhone?: boolean; }
+const { icon, title, sub, at, hideOnPhone = false } = Astro.props;
+---
+<div class:list={['p-row', { rvl: at !== undefined, 'm-hide': hideOnPhone }]} data-at={at}>
+  {icon && <span class="tile"><Icon name={icon} /></span>}
+  <div class="p-txt"><b>{title}</b>{sub && <span>{sub}</span>}</div>
+  <slot />
+</div>

@@ -1,5 +1,6 @@
 ---
-// Project detail body, shared by /work/[id]/ and /en/work/[id]/.
+// 프로젝트 상세 본문. /work/[id]/ 와 /en/work/[id]/ 가 같이 쓴다.
+// 순서: 머리(제목·요약·기간) → 한눈에 보기(흐름 + 문제·해결·결과, src/data/cases.ts) → 데모 화면 → 긴 글.
 // EN pages render src/content/projects-en/<id>.md when it exists, else fall back to the Korean body.
 import { render, getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { t, STATUS_LABEL, type Locale } from '../i18n';
@@ -11,35 +12,49 @@ import { PROJECT_SHOTS } from '../data/shots';
 interface Props { locale: Locale; entry: CollectionEntry<'projects'>; }
 const { locale, entry } = Astro.props;
 const s = t[locale].detail;
+const h = t[locale].home;
 const en = locale === 'en';
 const prefix = en ? '/en/' : '/';
 const d = entry.data;
 const enEntry = en ? await getEntry('projectsEn', entry.id) : undefined;
 const { Content } = await render(enEntry ?? entry);
 const bodyLang = enEntry ? 'en' : 'ko';
-// numbering and "next" follow the home page's file order (src/data/cases.ts)
+// 번호와 "다음"은 홈의 순서(src/data/cases.ts)를 따른다
 const idx = CASES.findIndex((c) => c.id === entry.id);
 const nextId = CASES[(idx + 1) % CASES.length].id;
 const next = (await getCollection('projects')).find((p) => p.id === nextId);
 if (idx < 0 || !next) throw new Error(`Work page for "${entry.id}": missing from src/data/cases.ts or next file "${nextId}" not found.`);
 const title = en ? d.titleEn : d.title;
+const copy = en ? CASES[idx].en : CASES[idx];
+const psr = [copy.problem, copy.solution, copy.result];
 ---
 <article class="wrap work">
-  <a class="back" href={`${prefix}#files`}><Icon name="arrow-left" size={18} />{s.back}</a>
+  {/* 홈으로 돌아가면 보던 프로젝트 단계가 다시 열린다 (#id는 Stage.astro가 읽는다) */}
+  <a class="back" href={`${prefix}#${entry.id}`}><Icon name="arrow-left" size={18} />{s.back}</a>
   <header class="work-head">
-    <h1 class="work-title">{title}</h1>
     <div class="work-top">
       <span class="work-id">{fileNo(entry.id)}</span>
       <span class="label">{en ? CASES[idx].catEn : CASES[idx].cat}</span>
       <span class="status" data-status={d.status}>{STATUS_LABEL[locale][d.status]}</span>
     </div>
+    <h1 class="work-title">{title}</h1>
     <p class="work-summary">{en ? d.summaryEn : d.summary}</p>
-    <dl class="record work-meta">
-      <dt>{s.period}</dt><dd>{en ? d.periodEn : d.period}</dd>
-      <dt>{s.stack}</dt><dd>{d.stack.join(' · ')}</dd>
-      <dt>{s.replaced}</dt><dd>{en ? d.replacedEn : d.replaced}</dd>
+    <dl class="work-meta">
+      <div><dt>{s.period}</dt><dd>{en ? d.periodEn : d.period}</dd></div>
+      <div><dt>{s.stack}</dt><dd>{d.stack.join(' · ')}</dd></div>
+      <div><dt>{s.replaced}</dt><dd>{en ? d.replacedEn : d.replaced}</dd></div>
     </dl>
   </header>
+
+  <section class="glance" aria-labelledby="glance-title">
+    <h2 id="glance-title" class="sec-label">{h.glance}</h2>
+    <ol class="flow" aria-label={h.flow}>
+      {copy.flow.map((x, i) => <li class="rv" style={`--rv:${i}`}><b>{['IN', 'DO', 'OUT'][i]}</b><span>{x}</span></li>)}
+    </ol>
+    <dl class="psr">
+      {psr.map((x, i) => <div class="rv" style={`--rv:${i}`}><dt>{h.psr[i]}</dt><dd>{x}</dd></div>)}
+    </dl>
+  </section>
 
   {en && !enEntry && (
     <p class="notice">
@@ -58,23 +73,40 @@ const title = en ? d.titleEn : d.title;
 </article>
 
 <style>
-  .work { padding-block: var(--space-xl) var(--space-2xl); }
-  /* 상세 머리(뒤로 가기 ~ 기간·스택) = 파랑 구역. 스카이 블루 위 회색 글자는 대비 부족 → 짙은 남색, 포커스는 검정 */
-  .back, .work-head { --color-ink-2: #0a2330; --color-ink-3: #0a2330; --color-rule: rgba(10, 35, 48, 0.22); --color-rule-strong: rgba(10, 35, 48, 0.45); --color-focus: var(--color-ink); }
-  .back { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; font-size: var(--text-sm); font-weight: 700; color: var(--color-ink-3); text-decoration: none; margin-bottom: var(--space-md); }
+  .work { padding-block: var(--space-lg) var(--space-3xl); }
+  .back { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; font-size: var(--text-sm); font-weight: 600; color: var(--color-ink-3); text-decoration: none; transition: color var(--dur-base); }
   .back:hover { color: var(--color-ink); }
-  .work-head {
-    display: grid; gap: var(--space-md); max-width: 44rem; padding-bottom: var(--space-xl); border-bottom: var(--rule); margin-bottom: var(--space-xl);
-    /* 가운데 폭 요소지만 파랑을 화면 양끝과 위(뒤로 가기 링크 뒤, 메뉴바 아래)까지 칠함. 글자는 이 칠 위에 그려짐 */
-    color: var(--color-ink); border-image: linear-gradient(var(--color-band) 0 0) fill 0 / / 100vmax 100vmax 0;
-  }
+  .work-head { display: grid; gap: var(--space-md); padding-block: var(--space-lg) var(--space-xl); }
   .work-top { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
-  .work-id { padding: 0.2rem 0.7rem; border-radius: 999px; background: var(--color-paper-2); color: var(--color-ink); font-weight: 800; font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
-  .work-title { font-size: clamp(2.2rem, 5vw, 3.75rem); line-height: 1.12; }
-  .work-summary { font-size: var(--text-lg); color: var(--color-ink-2); line-height: 1.5; }
-  .work-meta { margin-top: var(--space-sm); }
-  .notice { max-width: var(--measure); font-size: var(--text-sm); color: var(--color-ink-2); background: var(--color-paper-2); border: var(--rule); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); margin-bottom: var(--space-xl); }
-  .work-next { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: var(--rule); display: grid; gap: var(--space-2xs); }
-  .work-next a { display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; font-weight: 700; }
+  .work-id { padding: 0.2rem 0.7rem; border-radius: 999px; background: var(--color-ink); color: var(--color-paper); font-weight: 700; font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+  .work-title { max-width: 18ch; font-size: clamp(2.2rem, 5.4vw, 4rem); line-height: 1.08; letter-spacing: -0.04em; }
+  :global(html[lang="en"]) .work-title { max-width: 22ch; }
+  .work-summary { max-width: 46rem; font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--color-ink-2); line-height: 1.6; }
+  .work-meta { margin: var(--space-sm) 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 54rem; }
+  .work-meta div { padding: 0.9rem 1.1rem; border-radius: var(--radius-md); background: var(--color-panel); border: 1px solid var(--color-rule); }
+  .work-meta dt { font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); }
+  .work-meta dd { margin: 0.15rem 0 0; font-weight: 600; line-height: 1.45; }
+
+  .glance { padding-bottom: var(--space-2xl); margin-bottom: var(--space-2xl); border-bottom: 1px solid var(--color-rule); }
+  .glance .sec-label { margin-top: 0; }
+  /* 흐름: 들어온 것 → 한 일 → 나온 것. 칸 사이를 화살표로 잇는다 */
+  .flow { list-style: none; margin: 0 0 12px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .flow li { position: relative; display: grid; gap: 0.4rem; align-content: start; padding: 1.1rem 1.25rem; border-radius: var(--radius-md); background: var(--color-ink); color: var(--color-paper); }
+  .flow li + li::before { content: "→"; position: absolute; left: -12px; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--color-paper); color: var(--color-ink); font-size: 0.8125rem; font-weight: 700; z-index: 1; }
+  .flow b { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; opacity: 0.6; }
+  .flow span { font-weight: 600; line-height: 1.5; }
+  .psr { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .psr div { padding: 1.2rem 1.25rem; border-radius: var(--radius-md); background: var(--color-panel); border: 1px solid var(--color-rule); }
+  .psr dt { font-size: 0.8125rem; font-weight: 700; color: var(--color-ink-3); }
+  .psr dd { margin: 0.4rem 0 0; color: var(--color-ink-2); line-height: 1.7; }
+
+  .notice { max-width: var(--measure); font-size: var(--text-sm); color: var(--color-ink-2); background: var(--color-panel); border: 1px solid var(--color-rule); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); margin-bottom: var(--space-xl); }
+  .work-next { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--color-rule); display: grid; gap: var(--space-2xs); }
+  .work-next a { display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; font-weight: 700; font-size: 1.125rem; }
   .work-next a:hover { text-decoration: underline; }
+
+  @media (max-width: 760px) {
+    .work-meta, .flow, .psr { grid-template-columns: 1fr; }
+    .flow li + li::before { content: "↓"; left: 50%; top: -6px; }
+  }
 </style>

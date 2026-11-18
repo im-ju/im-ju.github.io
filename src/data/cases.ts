@@ -5,6 +5,7 @@
 // EN follows the wording of src/content/projects-en, added 2026-10-08).
 
 interface Copy {
+  short: string;    // ← EDIT: 2–3 word name shown as the giant headline in the home tour
   title: string;    // ← EDIT: folder headline (plain words)
   line: string;     // one-line summary (always visible)
   flow: [string, string, string]; // what came in / what it does / what comes out
@@ -23,6 +24,7 @@ export interface Case extends Copy {
 export const CASES: Case[] = [
   {
     id: 'hrga-hub',
+    short: 'HR/GA Hub',
     title: '흩어진 사내 도구를 하나로',
     name: 'HR/GA Hub',
     cat: '사내 시스템',
@@ -33,6 +35,7 @@ export const CASES: Case[] = [
     solution: '회사 Google 계정으로 로그인하는 웹앱 하나로 합쳤습니다. 회의실 현황, 사내 이벤트 조 편성, 구성원 디렉토리, 제휴식당, 자기계발비, 근속 알림까지 6개 기능이 들어 있습니다.',
     result: '2026년 3월부터 멈춤 없이 운영 중입니다. 사내 앱은 2개에서 1개로 줄었고, 자동 테스트 978개가 모두 통과합니다.',
     en: {
+      short: "HR/GA Hub",
       title: "Scattered internal tools, now one",
       line: "Meeting rooms, company events, the training allowance: tools and spreadsheets that lived in different places are now one web app you sign into with your company account.",
       flow: ["Calendar · a separate web app · Google Sheets · Excel", "One web app behind the company account", "6 features"],
@@ -43,6 +46,7 @@ export const CASES: Case[] = [
   },
   {
     id: 'meal-allowance',
+    short: '식대 검증',
     title: '식대 확인, 이틀에서 몇 분으로',
     name: '식대 검증 자동화',
     cat: '규정 → 코드',
@@ -53,6 +57,7 @@ export const CASES: Case[] = [
     solution: '복리후생·지출 규정의 지원 요건을 조항 단위로 규칙으로 옮기고 두 데이터를 자동으로 대조합니다. 판정할 수 없는 건은 그냥 통과시키지 않고 별도 확인 목록으로 모읍니다.',
     result: '2026년 3월부터 한 달도 빠짐없이 실행하고 있습니다. 확인은 몇 분, 예외 확인까지 30분 안팎이면 끝납니다. 결과는 실제 급여 차감에 쓰이고, 당사자에게 보여줄 차감 사유 문장까지 만들어집니다.',
     en: {
+      short: "Meal checks",
       title: "Meal-allowance checks: from two days to minutes",
       line: "Matching meal-card usage against attendance records used to be done by eye. Now rules taken from the regulation do the matching automatically.",
       flow: ["Meal-card usage + attendance records", "Automatic check, clause by clause", "Deduction reasons · manual-review list"],
@@ -63,6 +68,7 @@ export const CASES: Case[] = [
   },
   {
     id: 'interview-reminder',
+    short: '면접 안내메일',
     title: '면접 전날 안내메일, 빠뜨리지 않게',
     name: '면접 D-1 안내메일 자동화',
     cat: '채용',
@@ -73,6 +79,7 @@ export const CASES: Case[] = [
     solution: '매일 아침 공유 캘린더에서 다음 날 면접을 찾아 유형에 맞는 양식으로 Gmail 초안을 만듭니다. 발송은 자동화하지 않았습니다. 한 번 보낸 메일은 되돌릴 수 없기 때문입니다.',
     result: '담당자에게 남은 일은 초안을 확인하고 보내기를 누르는 것뿐입니다. 읽지 못한 일정은 경고로 요약 메일에 올리고, 같은 초안이 두 번 만들어지지 않게 막았습니다.',
     en: {
+      short: "Interview emails",
       title: "Interview reminders that never get missed",
       line: "It finds tomorrow's interviews in the calendar and prepares a reminder draft for each interview type. The send button is left to a person, on purpose.",
       flow: ["Tomorrow's interviews in the shared calendar", "Identify the type · pick the template", "Gmail draft (a person sends it)"],
@@ -83,6 +90,7 @@ export const CASES: Case[] = [
   },
   {
     id: 'benefits-audit',
+    short: '자기계발비 감사',
     title: '맞지 않는 숫자를 찾아내는 감사 도구',
     name: '자기계발비 정합성 감사',
     cat: '감사',
@@ -93,6 +101,7 @@ export const CASES: Case[] = [
     solution: '시트를 읽기만 하는 감사 도구를 만들었습니다. 규정에서 가져온 8가지 기준(동명이인, 한도 초과, 팀명 불일치, 날짜 오류 등)으로 검사하고, 문제가 있는 행과 이유를 심각도와 함께 별도 탭에 적습니다. 원본은 고치지 않습니다. 여러 사람이 매일 쓰는 문서를 스크립트가 몰래 고치면 아무도 그 시트를 믿을 수 없기 때문입니다.',
     result: '드러난 건 몇 건의 실수가 아니라 시트라는 방식의 한계였습니다. 동명이인 문제는 시트로는 풀 수 없고 사람마다 고유번호가 필요했습니다. 이 진단을 근거로 자기계발비 관리를 사내 웹앱(HR/GA Hub)으로 옮겼습니다.',
     en: {
+      short: "Allowance audit",
       title: "An audit tool that finds numbers that don't add up",
       line: "It finds numbers that disagree with each other in a training allowance run on Google Sheets. It never changes a single cell, and its findings became the case for moving to the web app.",
       flow: ["Training-allowance Google Sheet (3 tables)", "8 regulation-based checks · read-only", "Problem rows · reasons · severity"],
@@ -103,6 +112,7 @@ export const CASES: Case[] = [
   },
   {
     id: 'access-log',
+    short: '출입기록 분석',
     title: '사람을 잘못 지목하지 않는 근태 분석',
     name: '출입기록 이상패턴 분석',
     cat: '분석',
@@ -113,6 +123,7 @@ export const CASES: Case[] = [
     solution: '5분 안에 다시 들어온 기록은 지우고 60분이 넘는 외출만 남겼습니다. 남은 건마다 같은 시간에 건물 안 다른 출입문을 지난 기록이 있는지 다시 확인해, 있으면 목록에서 뺐습니다. 몇 분부터 외출로 볼지는 회사가 정할 기준이라, 기준값을 한곳에 모아 실행할 때마다 보여주게 했습니다.',
     result: '2026년 1~3월 석 달 치를 분석해 월별 보고서 3건과 통합 보고서 1건을 냈습니다. 목록 이름은 "위반자 명단"이 아니라 "확인이 필요한 건"으로 붙였습니다. 출입 기록은 이유를 담지 않기 때문에, 도구는 확인할 대상을 좁힐 뿐 판단은 사람이 합니다.',
     en: {
+      short: "Access logs",
       title: "Attendance analysis that doesn't point at the wrong person",
       line: "The attendance system doesn't record time away during the workday, so I looked at door access logs. Because the output points at specific people, most of the effort went into filtering out false hits.",
       flow: ["Door access logs (three months)", "Drop short exits · keep 60+ minutes · drop if still inside", "\"Needs checking\" list"],
@@ -123,6 +134,7 @@ export const CASES: Case[] = [
   },
   {
     id: 'guide-redesign',
+    short: '안내서 이관',
     title: '46개 페이지가 지워질 뻔한 이관을 미리 막다',
     name: '사내 안내서 리디자인',
     cat: '정보 구조',
@@ -133,6 +145,7 @@ export const CASES: Case[] = [
     solution: '인터뷰로 요구사항을 좁히고, 성격이 다른 시안 4개를 나란히 놓고 하나를 골랐습니다. 옮기기 전에 원본과 시안을 하나씩 대조하다가, 원본의 46개 항목이 링크가 아니라 페이지 그 자체라는 것을 발견했습니다. 시안을 그대로 붙였다면 46개 페이지가 한 번에 지워졌을 겁니다. 그래서 새 레이아웃만 가져오고 페이지는 원본 그대로 두는 방법으로 바꿨습니다.',
     result: '원본은 한 번도 건드리지 않았습니다. 페이지가 하나라도 지워지는 작업은 실행 자체가 거부되게 설정했고, 가짜 페이지로 만든 작은 리허설에서 이 방법이 통하는 것을 확인했습니다. 주소와 사이드바 구조는 그대로 유지됩니다. 지금은 실제 적용 승인을 기다리고 있습니다.',
     en: {
+      short: "Handbook move",
       title: "Catching a migration that would have deleted 46 pages",
       line: "I redesigned the company handbook every employee opens daily, starting from its structure. I caught in advance that moving it as drafted would delete 46 child pages, and built a migration that never touches the original.",
       flow: ["8 sections · 46 child pages", "Take only the new layout · keep the original pages", "Non-destructive migration (rehearsal passed)"],
@@ -143,6 +156,7 @@ export const CASES: Case[] = [
   },
   {
     id: 'asset-regulation',
+    short: '자산관리 규정',
     title: '2년 묵은 자산관리 규정 다시 쓰기',
     name: '자산관리 규정 개정',
     cat: '규정',
@@ -153,6 +167,7 @@ export const CASES: Case[] = [
     solution: '규정을 법·세무, 정보보안, 실무 세 관점으로 따로 읽어 고칠 곳을 찾고, 가장 중요한 15건을 반영했습니다. 노후화를 "구매 후 4년"으로 정의하고, 변상금은 급여에서 일방적으로 빼지 않고 별도 합의로만 청구하도록 명시했습니다. 규정 문서는 손으로 편집하지 않고 코드로 만들어, 개정본과 개정 이력이 서로 어긋나지 않게 했습니다.',
     result: '대표이사 승인을 받았습니다. 새 노후화 기준과 경영진이 정한 조건을 자산대장에 적용해 노트북 교체 대상 17명을 우선순위별로 추천했고, 그 과정에서 자산대장과 실제가 맞지 않는 건도 찾아 함께 보고했습니다.',
     en: {
+      short: "Asset policy",
       title: "Rewriting a two-year-old asset regulation",
       line: "I rewrote the regulation from three angles (legal and tax, information security, day-to-day practice) and got CEO approval. The new obsolescence standard then picked the equipment due for replacement.",
       flow: ["2023 regulation + asset register", "Three-angle review · 15 changes · obsolescence standard", "Approved regulation · 17 replacement picks"],
@@ -163,6 +178,7 @@ export const CASES: Case[] = [
   },
   {
     id: 'skill-intelligence',
+    short: 'Skill Intelligence',
     title: '누가 떠나면 무엇이 멈추는가',
     name: 'Skill Intelligence',
     cat: '분석 PoC',
@@ -173,6 +189,7 @@ export const CASES: Case[] = [
     solution: '이미 있는 팀 미션, 직무기술서, 팀 목표(OKR) 문서 29건에서 AI로 스킬을 뽑아 사람과 연결했습니다. 스킬끼리의 관계도 함께 기록해 "A를 할 사람이 없으면 B 업무가 멈추고, B에 기대던 C 보고도 못 한다"처럼 연쇄 영향을 따라갑니다. AI가 뽑은 결과는 본인과 팀장이 확인해 다시 반영하는 단계를 뒀습니다.',
     result: '석 달 뒤 제 보고서를 스스로 다시 검증해, 다시 계산해도 나오지 않는 숫자를 찾아 정정했습니다. 같은 스킬이 다른 이름으로 중복돼 있던 것을 합치자 "한 명만 가진 스킬"이 101개에서 83개로 줄었습니다. 경영진에게는 전면 도입 대신 2~3개 팀의 실제 데이터로 정확도부터 재 보자며 조건부 진행을 권고했습니다.',
     en: {
+      short: "Skill Intelligence",
       title: "If someone leaves, what stops?",
       line: "A proof of concept (PoC) that mapped each employee's skills from existing internal documents alone and traced what stops when one person leaves. All figures are synthetic data.",
       flow: ["29 team-mission, job-description and OKR documents", "AI skill extraction · match to people · trace knock-on effects", "Attrition-risk report · conditional go"],

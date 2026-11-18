@@ -1,63 +1,108 @@
-/* 2026-11 색 줄이기 (사용자 선택 "B"): 흰 바탕 + 스카이 블루는 파일 서랍(상세는 머리 부분) 한 구역만 + 핫핑크 포인트.
- * 기준: 바탕 · 보조 · 포인트 3색 (YouTube Shorts 6xkk6GuYY3c의 01 조합). 모양(둥근 카드, 폴더 탭, 그림자, 도장)은 2026-10 그대로.
- * Loaded by Base.astro AFTER global.css. /print/ imports global.css on its own and never loads this file,
- * so the application PDF keeps its look. Single light theme by decision (dark-mode toggle removed). */
-:root {
-  --color-band: #0593C6;           /* 스카이 블루(바탕색): 파일 서랍·상세 머리·연락 카드에만  ← 색 바꿀 때 여기 */
-  --color-point: #D83995;          /* 핫핑크(포인트): 폴더 탭, 주요 버튼, 시트 윗선·번호, 도장, 운영 중  ← 여기 */
-  --color-paper: #FCFFFF;          /* page ground (화이트, 보조색) */
-  --color-paper-2: #FCFFFF;        /* sheets, cards */
-  --color-paper-3: #e9f5fa;        /* memo / inset panels: 스카이 블루 9% */
-  --color-panel: #edf7fb;          /* problem · solution · result boxes: 스카이 블루 7% */
-  --color-ink: #0a0a0a;
-  --color-ink-2: #2a2f33;
-  --color-ink-3: #5a6268;          /* muted text, 6.2:1 on white */
-  --color-rule: rgba(10, 10, 10, 0.1);
-  --color-rule-strong: rgba(10, 10, 10, 0.22);
-  --color-bar: #FCFFFF;            /* opaque: text scrolling under a see-through bar read as clutter */
-  --color-accent: #0a0a0a;
-  --color-accent-ink: #0a0a0a;
-  --color-accent-soft: #e9f5fa;
-  --color-stamp: var(--color-point); /* rubber stamp, "live" status */
-  --color-focus: var(--color-point); /* 흰 바탕 위 4.2:1. 파랑 위에서는 검정으로 바꿈 (Home .files, Work .work-head) */
+/* 2026-11 리디자인: 흑백 한 가지 톤 + 고정된 노트북 화면이 스크롤에 따라 바뀌는 구성.
+ * Base.astro가 global.css 다음에 불러온다. /print/는 global.css만 쓰고 이 파일은 불러오지 않으므로 지원서용 PDF 모양은 그대로다.
+ * 어두운 테마가 기본. tokens.css의 :root[data-theme="dark"]보다 뒤에서 같은 우선순위로 덮어써야 해서 선택자를 같이 적는다. */
+:root, :root[data-theme="dark"] {
+  --bar-h: 52px;
+  --color-paper: #212121;          /* 바탕  ← 색 바꿀 때 여기 */
+  --color-paper-2: #2a2a2a;        /* 카드 */
+  --color-paper-3: #343434;        /* hover */
+  --color-panel: rgba(255, 255, 255, 0.05);
+  --color-ink: #ffffff;
+  --color-ink-2: rgba(255, 255, 255, 0.8);
+  --color-ink-3: rgba(255, 255, 255, 0.6);   /* 바탕 위 6.6:1 */
+  --color-rule: rgba(255, 255, 255, 0.12);
+  --color-rule-strong: rgba(255, 255, 255, 0.26);
+  --color-bar: rgba(33, 33, 33, 0.78);
+  --color-accent: #ffffff;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: rgba(255, 255, 255, 0.1);
+  --color-focus: #ffffff;
+  --btn-bg: rgba(255, 255, 255, 0.9);
+  --btn-ink: #111111;
+  --btn-bg-hover: #ffffff;
+  --btn2-bg: rgba(255, 255, 255, 0.09);
+  --btn2-line: rgba(255, 255, 255, 0.42);
+  --stage-l: 15%;                  /* 노트북 무대 바탕 밝기. 단계마다 조금씩 달라진다 (Stage.astro) */
+  --stage-swing: 1;
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
 
   --font-body: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   --font-display: var(--font-body);
-  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace; /* code blocks only */
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --text-base: 1rem;
-  --radius-sm: 12px;   /* buttons, controls */
-  --radius-md: 16px;   /* panels, list rows */
-  --radius-lg: 24px;   /* sheets, folders */
-  --track-display: -0.045em;
-  --shadow-sheet: 0 0 0 1px rgba(10, 10, 10, 0.08), 0 24px 48px -28px rgba(10, 10, 10, 0.35); /* 흰 바탕 위 흰 카드라 얇은 테두리선 */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --track-display: -0.035em;
+  --page-max: 70rem;
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --color-paper: #f5f5f7;
+  --color-paper-2: #ffffff;
+  --color-paper-3: #ebebee;
+  --color-panel: rgba(0, 0, 0, 0.04);
+  --color-ink: #111111;
+  --color-ink-2: rgba(0, 0, 0, 0.78);
+  --color-ink-3: rgba(0, 0, 0, 0.62);        /* 바탕 위 6.3:1 */
+  --color-rule: rgba(0, 0, 0, 0.1);
+  --color-rule-strong: rgba(0, 0, 0, 0.24);
+  --color-bar: rgba(245, 245, 247, 0.8);
+  --color-accent: #111111;
+  --color-accent-ink: #111111;
+  --color-accent-soft: rgba(0, 0, 0, 0.06);
+  --color-focus: #111111;
+  --btn-bg: #111111;
+  --btn-ink: #ffffff;
+  --btn-bg-hover: #000000;
+  --btn2-bg: rgba(0, 0, 0, 0.04);
+  --btn2-line: rgba(0, 0, 0, 0.32);
+  --stage-l: 94%;
+  --stage-swing: -0.45;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.05);
+  color-scheme: light;
 }
 
-html { color-scheme: light; scrollbar-color: #c4c9cc var(--color-paper); }
-body { font-size: var(--text-base); line-height: 1.7; }
-::selection { background: var(--color-point); color: #0a0a0a; }
-h1, h2, h3, h4 { font-weight: 800; letter-spacing: var(--track-display); text-wrap: balance; }
-h3, h4 { letter-spacing: -0.03em; }
-a { text-decoration-color: currentColor; text-decoration-thickness: 1.5px; text-underline-offset: 0.22em; }
-:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; border-radius: var(--radius-sm); }
+html { scroll-padding-top: calc(var(--bar-h) + 1rem); scrollbar-color: var(--color-rule-strong) var(--color-paper); }
+body { font-size: var(--text-base); line-height: 1.65; -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
+::selection { background: var(--color-ink); color: var(--color-paper); }
+h1, h2, h3, h4 { font-weight: 700; letter-spacing: var(--track-display); text-wrap: balance; }
+h3, h4 { letter-spacing: -0.02em; }
+a { text-decoration-color: var(--color-rule-strong); text-decoration-thickness: 1px; text-underline-offset: 0.22em; }
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; border-radius: var(--radius-sm); }
 
-/* the console-era mono labels become plain bold labels */
-.label, .record dt, .prose th { font-family: var(--font-body); text-transform: none; letter-spacing: 0; font-weight: 700; font-size: var(--text-sm); color: var(--color-ink-3); }
-.status { font-family: var(--font-body); font-weight: 700; font-size: var(--text-xs); letter-spacing: 0; color: var(--color-ink); border: 1.5px solid currentColor; border-radius: 999px; padding: 0.15rem 0.6rem; }
-.status::before { display: none; }
-.status[data-status="live"] { background: var(--color-point); border-color: var(--color-point); color: var(--color-ink); } /* 파랑 위라 테두리 글자 대신 채운 알약 */
-
+/* 알약 버튼: 채운 것(주) / 테두리(보조) */
 .btn {
-  min-height: 48px; padding: 0 1.25rem; border-radius: var(--radius-sm); border-width: 1.5px;
-  font-weight: 700; font-size: var(--text-base); justify-content: center;
-  background: var(--color-point); border-color: var(--color-point); color: var(--color-ink); /* 흰 글자는 핑크 위 4.25:1로 부족 → 검정 4.66:1 */
-  transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+  min-height: 44px; padding: 0 1.1rem; border-radius: 999px; border: 1px solid transparent; justify-content: center;
+  background: var(--btn-bg); color: var(--btn-ink); font-weight: 600; font-size: 0.9375rem; letter-spacing: -0.01em;
+  transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
-.btn:hover { background: var(--color-ink); border-color: var(--color-ink); color: #fff; }
-.btn.ghost:hover { background: var(--color-point); border-color: var(--color-point); color: var(--color-ink); }
-.btn.ghost { border-color: var(--color-ink); }
+.btn:hover { background: var(--btn-bg-hover); border-color: transparent; }
+.btn:active { transform: scale(0.97); }
+.btn.ghost { background: var(--btn2-bg); color: var(--color-ink); border-color: var(--btn2-line); }
+.btn.ghost:hover { background: var(--color-accent-soft); border-color: var(--color-ink); }
 
-/* long-form detail pages */
-.prose blockquote { border: 0; background: var(--color-paper-3); border-radius: var(--radius-md); padding: 1rem 1.25rem; color: var(--color-ink-2); }
-.prose pre { background: var(--color-paper-3); border: 0; border-radius: var(--radius-md); }
+/* 작은 꼬리표 */
+.eyebrow { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-3); }
+.label, .record dt, .prose th { font-family: var(--font-body); text-transform: none; letter-spacing: 0; font-weight: 600; font-size: var(--text-sm); color: var(--color-ink-3); }
+.status { font-family: var(--font-body); font-weight: 600; font-size: var(--text-xs); letter-spacing: 0; color: var(--color-ink-2); border: 1px solid var(--color-rule-strong); border-radius: 999px; padding: 0.15rem 0.6rem; }
+.status::before { width: 6px; height: 6px; background: var(--color-ink-3); box-shadow: none; }
+.status[data-status="live"] { color: var(--color-ink); border-color: var(--color-ink); }
+.status[data-status="live"]::before { background: var(--color-ink); box-shadow: none; animation: pulse 2.4s ease-in-out infinite; }
+.status[data-status="pending"]::before, .status[data-status="poc"]::before, .status[data-status="approved"]::before, .status[data-status="done"]::before { background: var(--color-ink-3); }
+@keyframes pulse { 50% { opacity: 0.35; } }
+
+/* 화면에 들어올 때 살짝 올라오는 등장. JS가 없으면(.no-js) 처음부터 보인다 */
+.js .rv { opacity: 0; transform: translateY(18px); transition: opacity 0.7s var(--ease-spring), transform 0.7s var(--ease-spring); transition-delay: calc(var(--rv, 0) * 70ms); }
+.js .rv.in { opacity: 1; transform: none; }
+
+/* 상세 페이지 본문 */
+.prose blockquote { border: 0; background: var(--color-panel); border-radius: var(--radius-md); padding: 1rem 1.25rem; color: var(--color-ink-2); }
+.prose pre { background: var(--color-panel); border: 0; border-radius: var(--radius-md); }
 .prose img { border-radius: var(--radius-md); }
+.prose strong { font-weight: 700; }
+
+/* 구역 머리의 작은 제목 (업무 원칙, 작업 파일 8건, 한눈에 보기 …) */
+.sec-label { margin: clamp(3rem, 8vh, 5rem) 0 1.4rem; font-size: 0.9375rem; font-weight: 600; letter-spacing: 0; color: var(--color-ink-3); }

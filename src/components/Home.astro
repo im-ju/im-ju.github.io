@@ -1,14 +1,15 @@
 ---
-// Home page body, shared by / (ko) and /en/. Case-file drawer: each project is a folder (HR-01 …) that opens
-// into a sheet under the row. Plain copy comes from src/data/cases.ts, metadata from the content collection,
-// UI strings from i18n.ts. Folders are real links to /work/[id]/ so the page still works without JavaScript.
+// 홈 본문. / (ko)와 /en/이 같이 쓴다.
+// 맨 위는 고정된 노트북 무대(Stage.astro), 그 아래로 소개 · 업무 원칙 · 프로젝트 한눈에 보기 · 인사기록 · 연락.
+// 쉬운 말 설명은 src/data/cases.ts, 기간·상태는 콘텐츠 컬렉션, 화면 문구는 i18n.ts에서 온다.
+import type { ComponentProps } from 'astro/types';
 import { getCollection } from 'astro:content';
 import { t, EMAIL, LINKEDIN, STATUS_LABEL, type Locale } from '../i18n';
 import { CASES, fileNo } from '../data/cases';
 import Icon from './Icon.astro';
-import ProjectShots from './ProjectShots.astro';
-import { PROJECT_SHOTS } from '../data/shots';
+import Stage from './Stage.astro';
 
+type IconName = ComponentProps<typeof Icon>['name'];
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
 const s = t[locale];
@@ -16,472 +17,254 @@ const h = s.home;
 const en = locale === 'en';
 const prefix = en ? '/en/' : '/';
 
-// Join plain copy with frontmatter. Any mismatch stops the build instead of silently dropping a file.
+// 프로젝트별 아이콘 ← 프로젝트를 추가하면 여기에도 한 줄
+const ICONS: Record<string, IconName> = {
+  'hrga-hub': 'grid', 'meal-allowance': 'receipt', 'interview-reminder': 'mail', 'benefits-audit': 'search',
+  'access-log': 'door', 'guide-redesign': 'scale', 'asset-regulation': 'file', 'skill-intelligence': 'chart',
+};
+
+// 쉬운 말 설명과 머리말 정보를 합친다. 하나라도 어긋나면 조용히 빠뜨리지 않고 빌드를 멈춘다.
 const entries = await getCollection('projects');
 const unlisted = entries.filter((e) => !CASES.some((c) => c.id === e.id)).map((e) => e.id);
 if (unlisted.length) throw new Error(`Add ${unlisted.join(', ')} to src/data/cases.ts so it appears on the home page.`);
-const files = CASES.map((c, i) => {
+const files = CASES.map((c) => {
   const e = entries.find((p) => p.id === c.id);
   if (!e) throw new Error(`src/data/cases.ts lists "${c.id}" but src/content/projects/${c.id}.md does not exist.`);
+  if (!ICONS[c.id]) throw new Error(`Home.astro has no icon for project "${c.id}". Add it to ICONS.`);
   const d = e.data;
+  const copy = en ? c.en : c;
   return {
-    ...c,
+    id: c.id,
     no: fileNo(c.id),
-    ...(en ? c.en : {}), // English plain copy: title, line, flow, problem, solution, result
+    short: copy.short,
+    title: copy.title,
+    line: copy.line,
     cat: en ? c.catEn : c.cat,
-    head: en ? d.titleEn : c.name,
-    period: (en ? d.periodEn : d.period).replace(/\s*(운영 중|live)$/, ''), // the status stamp already says "live"
+    period: (en ? d.periodEn : d.period).replace(/\s*[–-]\s*(운영 중|live)$/, ' –'), // 상태 꼬리표가 이미 "운영 중"이라고 말한다
     status: STATUS_LABEL[locale][d.status],
-    live: d.status === 'live',
+    statusKey: d.status,
+    // 무대 아래 한 줄: 운영 중인 것은 기간에 이미 "– 운영 중"이 들어 있어 상태를 또 붙이지 않는다
+    caption: [en ? c.catEn : c.cat, en ? d.periodEn : d.period, ...(d.status === 'live' ? [] : [STATUS_LABEL[locale][d.status]])].join(' · '),
     href: `${prefix}work/${c.id}/`,
+    icon: ICONS[c.id],
   };
 });
-const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Location'); // decided set: 소속·기간·언어·학위
+const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Location'); // 정해 둔 항목: 소속·기간·언어·학위
+const principleIcons: IconName[] = ['file', 'search', 'lock'];
 ---
-<section class="hero wrap" aria-labelledby="hero-title">
-  <h1 id="hero-title" class="hero-h1">{h.h1.map((l, i) => <>{i > 0 && <br />}{l}</>)}</h1>
-  {h.en && <p class="hero-en" lang="en">{h.en}</p>}
-  <p class="hero-desc">{h.desc}</p>
-  <div class="hero-cta">
-    <a class="btn" href="#files">{h.ctaFiles}</a>
-    <a class="btn ghost" href="#contact">{h.ctaContact}</a>
-  </div>
+<Stage locale={locale} files={files} />
+
+<section id="about" class="about wrap" aria-labelledby="about-title">
+  <p class="eyebrow rv">{h.aboutEyebrow}</p>
+  <h2 id="about-title" class="big rv">{s.hero.statement}</h2>
+  <p class="lede rv">{s.hero.sub}</p>
+
+  <h3 class="sec-label rv">{h.principlesTitle}</h3>
+  <ol class="steps">
+    {h.principles.map(([head, body], i) => (
+      <li class="rv" style={`--rv:${i}`}>
+        <div class="step-top"><span class="tile"><Icon name={principleIcons[i]} size={20} /></span><span class="num">{i + 1}</span></div>
+        <b>{head}</b>
+        <p>{body}</p>
+      </li>
+    ))}
+  </ol>
 </section>
 
-<section id="files" class="files" data-mode="simple" data-view="slider" aria-labelledby="files-title">
-  <div class="wrap">
-    <div class="files-head">
-      <div>
-        <h2 id="files-title">{h.filesTitle(files.length)}</h2>
-        <p>{h.filesLede}</p>
-      </div>
-      <div class="ctrl">
-        <div class="seg" role="group" aria-label={h.amount}>
-          <button type="button" data-set-mode="simple" aria-pressed="true">{h.simple}</button>
-          <button type="button" data-set-mode="detail" aria-pressed="false">{h.detail}</button>
-        </div>
-        <div class="seg" role="group" aria-label={h.view}>
-          <button type="button" data-set-view="slider" aria-pressed="true">{h.slider}</button>
-          <button type="button" data-set-view="list" aria-pressed="false">{h.list}</button>
-        </div>
-        <div class="arrows">
-          <button type="button" data-dir="-1" aria-label={h.prev}><Icon name="arrow-left" /></button>
-          <button type="button" data-dir="1" aria-label={h.next}><Icon name="arrow-right" /></button>
-        </div>
-      </div>
-    </div>
-
-    <ol class="drawer">
-      {files.map((f) => (
-        <li class="folder" data-file={f.id}>
-          <a class="folder-btn" href={f.href} aria-controls={`sheet-${f.id}`}>
-            <span class="tab">{f.no}</span>
-            <span class="face">
-              <span class="ftitle">{f.title}</span>
-              <span class="fline">{f.line}</span>
-              <span class="foot"><span class="period">{f.cat} · {f.period}</span><span class:list={['pill', { live: f.live }]}>{f.status}</span></span>
-            </span>
-          </a>
-        </li>
-      ))}
-    </ol>
-
-    <!-- One sheet per file; the script shows one at a time and moves it under its folder (list view) or the drawer (slider view). -->
-    <div class="sheets">
-      {files.map((f) => (
-        <article class="sheet" id={`sheet-${f.id}`} aria-labelledby={`sheet-${f.id}-title`} hidden>
-          <header class="sheet-head">
-            <span><b>{f.no}</b> · {f.head}</span>
-            <button type="button" class="sheet-close" aria-label={h.close}><Icon name="close" /></button>
-          </header>
-          <div class="sheet-trow">
-            <h3 id={`sheet-${f.id}-title`} tabindex="-1">{f.title}</h3>
-            <span class="stamp">{f.status}</span>
-          </div>
-          <p class="sheet-meta">{f.cat} · {f.period}</p>
-          <p class="sheet-line">{f.line}</p>
-          <ol class="flow" aria-label={h.flow}>
-            {f.flow.map((x, i) => <li><b>{['IN', 'DO', 'OUT'][i]}</b><span>{x}</span></li>)}
-          </ol>
-          <button type="button" class="more-btn" aria-expanded="false" aria-controls={`more-${f.id}`}>
-            <span class="when-closed">{h.more}</span><span class="when-open">{h.less}</span><Icon name="chevron-down" />
-          </button>
-          <div class="more" id={`more-${f.id}`}>
-            <div>
-              <dl class="psr">
-                <div><dt>{h.psr[0]}</dt><dd>{f.problem}</dd></div>
-                <div><dt>{h.psr[1]}</dt><dd>{f.solution}</dd></div>
-                <div><dt>{h.psr[2]}</dt><dd>{f.result}</dd></div>
-              </dl>
-              {PROJECT_SHOTS[f.id] && <ProjectShots id={f.id} locale={locale} variant="card" />}
-            </div>
-          </div>
-          <a class="full" href={f.href}>{h.full}<Icon name="arrow-right" size={18} /></a>
-        </article>
-      ))}
-    </div>
-  </div>
-</section>
-
-<section class="principles wrap" aria-labelledby="principles-title">
-  <div class="memo">
-    <h2 id="principles-title">{h.principlesTitle}</h2>
-    <ol>
-      {h.principles.map(([head, body]) => <li><b>{head}</b><span>{body}</span></li>)}
-    </ol>
-  </div>
+<section id="index" class="index wrap" aria-labelledby="index-title">
+  <h2 id="index-title" class="sec-label rv">{h.filesTitle(files.length)}</h2>
+  <ul class="cards">
+    {files.map((f, i) => (
+      <li class="rv" style={`--rv:${i % 2}`}>
+        <a class="card" href={f.href}>
+          <span class="card-top">
+            <span class="tile"><Icon name={f.icon} size={18} /></span>
+            <span class="no">{f.no}</span>
+            <span class="status" data-status={f.statusKey}>{f.status}</span>
+          </span>
+          <b class="card-title">{f.title}</b>
+          <span class="card-line">{f.line}</span>
+          <span class="card-foot">{f.cat} · {f.period}<Icon name="arrow-right" size={16} /></span>
+        </a>
+      </li>
+    ))}
+  </ul>
 </section>
 
 <section id="record" class="record-sec wrap" aria-labelledby="record-title">
-  <h2 id="record-title">{h.recordTitle}</h2>
-  <div class="card">
+  <h2 id="record-title" class="sec-label rv">{h.recordTitle}</h2>
+  <div class="who rv">
     <img class="photo" src="/juyoung.jpg" width="800" height="800" alt={h.photoAlt} loading="lazy" />
-    <div class="who">
+    <div class="who-body">
       <p class="who-name">{s.hero.name}<span>{s.hero.role}</span></p>
-      <p class="who-sub">{s.hero.sub}</p>
       <dl class="fields">
         {record.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
       </dl>
     </div>
-    <div class="log">
-      <h3>{h.logTitle}</h3>
-      <ol>
-        {s.log.entries.map(([when, head, body]) => (
-          <li><span class="when">{when}</span><b>{head}</b><span class="what">{body}</span></li>
-        ))}
-      </ol>
-    </div>
+  </div>
+
+  <h2 class="sec-label rv">{h.logTitle}</h2>
+  <div class="acc-list">
+    {s.log.entries.map(([when, head, body], i) => (
+      <details class="acc rv" name="log" open={i === 0}>
+        <summary><span class="when">{when}</span><b>{head}</b><Icon name="chevron-down" size={18} /></summary>
+        <p>{body}</p>
+      </details>
+    ))}
   </div>
 </section>
 
 <section id="contact" class="contact wrap" aria-labelledby="contact-title">
-  <h2 id="contact-title">{h.contactTitle}</h2>
-  <p class="contact-lede">{s.contact.lede}</p>
-  <div class="contact-card">
-    <a class="mail" href={`mailto:${EMAIL}`}>{EMAIL}</a>
-    <div class="contact-actions">
-      <button type="button" class="btn" data-copy={EMAIL} data-done={h.copied} data-fail={h.copyFailed}>{h.copy}</button>
-      <a class="btn ghost" href={LINKEDIN} target="_blank" rel="noopener">LinkedIn<Icon name="arrow-right" size={18} /></a>
-    </div>
-    <p class="copy-status" role="status"></p>
+  <canvas class="motif" width="560" height="200" aria-hidden="true"></canvas>
+  <h2 id="contact-title" class="big rv">{h.contactTitle}</h2>
+  <p class="contact-lede rv">{s.contact.lede}</p>
+  <div class="contact-actions rv">
+    <button type="button" class="btn" data-copy={EMAIL} data-label={h.copy} data-done={h.copied} data-fail={h.copyFailed}>{h.copy}</button>
+    <a class="btn ghost" href={`mailto:${EMAIL}`}>{h.mail}</a>
+    <a class="btn ghost" href={LINKEDIN} target="_blank" rel="noopener">LinkedIn<Icon name="arrow-right" size={16} /></a>
   </div>
+  <p class="contact-mail rv"><a href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
+  <p class="copy-status" role="status"></p>
 </section>
 
 <script>
-  const root = document.getElementById('files');
-  if (root) {
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const drawer = root.querySelector<HTMLElement>('.drawer')!;
-    const sheets = root.querySelector<HTMLElement>('.sheets')!;
-    const links = [...root.querySelectorAll<HTMLAnchorElement>('.folder-btn')];
-    let openId: string | null = null;
-
-    // folders are links (no-JS fallback); with JS they act as disclosure buttons
-    links.forEach((a) => { a.setAttribute('role', 'button'); a.setAttribute('aria-expanded', 'false'); });
-    const idOf = (a: Element) => a.closest<HTMLElement>('.folder')!.dataset.file!;
-    const sheetOf = (id: string) => document.getElementById(`sheet-${id}`)!;
-    const folderOf = (id: string) => drawer.querySelector<HTMLElement>(`.folder[data-file="${id}"]`)!;
-
-    function setMore(sheet: HTMLElement, on: boolean) {
-      sheet.classList.toggle('open', on);
-      sheet.querySelector('.more-btn')?.setAttribute('aria-expanded', String(on));
+  // 이메일 복사. 실패하면 조용히 넘어가지 않고 직접 선택하라고 알려준다.
+  const copyBtn = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const copyStatus = document.querySelector<HTMLElement>('.copy-status');
+  copyBtn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(copyBtn.dataset.copy!);
+      copyBtn.textContent = `${copyBtn.dataset.done!} ✓`;
+      if (copyStatus) copyStatus.textContent = copyBtn.dataset.done!;
+      setTimeout(() => { copyBtn.textContent = copyBtn.dataset.label!; if (copyStatus) copyStatus.textContent = ''; }, 2200);
+    } catch {
+      if (copyStatus) copyStatus.textContent = copyBtn.dataset.fail!;
     }
-    function place(sheet: HTMLElement, id: string) {
-      // list view: the sheet sits under its own row; slider view: under the whole drawer
-      if (root!.dataset.view === 'list') folderOf(id).append(sheet); else sheets.append(sheet);
-    }
-    function mark(id: string | null) {
-      openId = id;
-      links.forEach((a) => {
-        const on = idOf(a) === id;
-        a.setAttribute('aria-expanded', String(on));
-        a.parentElement!.classList.toggle('on', on);
-      });
-    }
-    function close(returnFocus: boolean) {
-      if (!openId) return;
-      const id = openId;
-      const sheet = sheetOf(id);
-      sheet.hidden = true;
-      sheets.append(sheet);
-      mark(null);
-      if (returnFocus) folderOf(id).querySelector<HTMLElement>('.folder-btn')!.focus();
-    }
-    function open(id: string) {
-      if (openId === id) { close(true); return; }
-      close(false);
-      const sheet = sheetOf(id);
-      place(sheet, id);
-      sheet.hidden = false;
-      setMore(sheet, root!.dataset.mode === 'detail');
-      sheet.classList.remove('anim');
-      void sheet.offsetWidth; // restart the pull-out animation
-      sheet.classList.add('anim');
-      mark(id);
-      sheet.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
-      sheet.querySelector<HTMLElement>('h3')!.focus({ preventScroll: true });
-    }
-
-    root.addEventListener('click', (e) => {
-      const ev = e as MouseEvent;
-      const target = ev.target as Element;
-      const folder = target.closest('.folder-btn');
-      if (folder) {
-        if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0) return; // let "open in new tab" work
-        e.preventDefault();
-        open(idOf(folder));
-        return;
-      }
-      if (target.closest('.sheet-close')) { close(true); return; }
-      const more = target.closest('.more-btn');
-      if (more) { const sheet = more.closest<HTMLElement>('.sheet')!; setMore(sheet, !sheet.classList.contains('open')); return; }
-      const mode = target.closest<HTMLElement>('[data-set-mode]');
-      if (mode) {
-        root.dataset.mode = mode.dataset.setMode;
-        root.querySelectorAll('[data-set-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b === mode)));
-        if (openId) setMore(sheetOf(openId), root.dataset.mode === 'detail');
-        return;
-      }
-      const view = target.closest<HTMLElement>('[data-set-view]');
-      if (view) {
-        root.dataset.view = view.dataset.setView;
-        root.querySelectorAll('[data-set-view]').forEach((b) => b.setAttribute('aria-pressed', String(b === view)));
-        if (openId) place(sheetOf(openId), openId);
-        return;
-      }
-      const arrow = target.closest<HTMLElement>('[data-dir]');
-      if (arrow) {
-        const step = drawer.querySelector('.folder')!.getBoundingClientRect().width + 24;
-        drawer.scrollBy({ left: Number(arrow.dataset.dir) * step, behavior: reduce ? 'auto' : 'smooth' });
-      }
-    });
-    root.addEventListener('keydown', (e) => {
-      const target = e.target as Element;
-      if (e.key === ' ' && target.matches('.folder-btn')) { e.preventDefault(); open(idOf(target)); }
-      if (e.key === 'Escape' && openId) close(true);
-    });
-  }
-
-  // copy email; on failure say so instead of pretending it worked
-  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) => {
-    const label = b.textContent;
-    const status = b.closest('.contact-card')?.querySelector('.copy-status');
-    b.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(b.dataset.copy!);
-        b.textContent = b.dataset.done!;
-        if (status) status.textContent = '';
-        setTimeout(() => { b.textContent = label; }, 1800);
-      } catch {
-        if (status) status.textContent = b.dataset.fail!;
-      }
-    });
   });
+
+  // 연락 구역의 그림: 흩어진 점(사람)이 줄 맞춘 격자(시스템)로 모였다가 다시 흩어진다.
+  const cv = document.querySelector<HTMLCanvasElement>('.motif');
+  const ctx = cv?.getContext('2d');
+  if (cv && ctx) {
+    const W = 560, H = 200, COLS = 14, ROWS = 5, GAP = 24; // ← 점 개수(COLS×ROWS)와 간격
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
+    let seed = 11; // 고정된 씨앗: 새로 고쳐도 같은 자리에서 흩어진다
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const dots = Array.from({ length: COLS * ROWS }, (_, k) => ({
+      sx: 14 + rnd() * (W - 28), sy: 14 + rnd() * (H - 28),
+      gx: W / 2 + ((k % COLS) - (COLS - 1) / 2) * GAP, gy: H / 2 + (Math.floor(k / COLS) - (ROWS - 1) / 2) * GAP,
+      ph: rnd() * Math.PI * 2,
+    }));
+    const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    const draw = (p: number, now: number) => {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = getComputedStyle(cv).color;
+      for (const d of dots) {
+        const wob = (1 - p) * 5;
+        const x = d.sx + (d.gx - d.sx) * p + Math.cos(now / 900 + d.ph) * wob;
+        const y = d.sy + (d.gy - d.sy) * p + Math.sin(now / 1100 + d.ph) * wob;
+        ctx.globalAlpha = 0.3 + 0.7 * p;
+        ctx.beginPath(); ctx.arc(x, y, 2.2 + p * 1.4, 0, Math.PI * 2); ctx.fill();
+      }
+    };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      draw(1, 0);
+      new MutationObserver(() => draw(1, 0)).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    } else {
+      const LOOP = 7600; // ← 한 바퀴 시간(밀리초)
+      let visible = false;
+      const frame = (now: number) => {
+        const u = (now % LOOP) / LOOP; // 모이기 → 멈춤 → 흩어지기 → 멈춤
+        draw(u < 0.34 ? ease(u / 0.34) : u < 0.62 ? 1 : u < 0.9 ? 1 - ease((u - 0.62) / 0.28) : 0, now);
+        if (visible) requestAnimationFrame(frame);
+      };
+      new IntersectionObserver(([e]) => {
+        const was = visible; visible = e.isIntersecting;
+        if (visible && !was) requestAnimationFrame(frame);
+      }).observe(cv);
+    }
+  }
 </script>
 
 <style>
-  /* keep anchor targets and opened sheets clear of the sticky top bar */
-  section[id], .sheet { scroll-margin-top: 76px; }
+  section { scroll-margin-top: var(--bar-h); }
+  .tile { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--color-ink); color: var(--color-paper); }
+  .big { font-size: clamp(2rem, 4.6vw, 3.6rem); line-height: 1.08; letter-spacing: -0.04em; }
 
-  /* ── hero ─────────────────────────────────────────── */
-  .hero { padding-block: clamp(2.5rem, 6vw, 5.5rem) clamp(1.5rem, 3vw, 2.5rem); }
-  .hero-h1 { font-size: clamp(2.6rem, 6.4vw, 5.75rem); line-height: 1.08; max-width: 12em; }
-  .hero-en { margin-top: 1rem; font-size: clamp(1.15rem, 2vw, 1.5rem); font-weight: 600; letter-spacing: -0.02em; color: var(--color-ink-3); }
-  .hero-desc { margin-top: 1.25rem; font-size: clamp(1.05rem, 1.4vw, 1.2rem); line-height: 1.75; max-width: 34em; }
-  .hero-cta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.75rem; }
+  .about { padding-block: clamp(4rem, 12vh, 8rem) clamp(2rem, 6vh, 4rem); }
+  .about .big { max-width: 20ch; margin-top: 0.9rem; }
+  :global(html[lang="en"]) .about .big { max-width: 26ch; }
+  .lede { max-width: 44rem; margin-top: 1.5rem; font-size: clamp(1.05rem, 1.6vw, 1.3rem); line-height: 1.6; color: var(--color-ink-2); }
 
-  /* ── files: head + controls ───────────────────────── */
-  .files {
-    padding-block: clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2.5rem);
-    /* 파일 서랍 = 사이트에서 유일한 파랑 구역. 스카이 블루 위 회색 글자는 대비 부족 → 짙은 남색(4.6:1), 포커스는 검정(핑크는 1.2:1) */
-    --color-paper: var(--color-band); --color-paper-3: #44aed4;
-    --color-ink-2: #0a2330; --color-ink-3: #0a2330;
-    --color-rule: rgba(10, 35, 48, 0.22); --color-rule-strong: rgba(10, 35, 48, 0.45);
-    --color-focus: var(--color-ink);
-    background: var(--color-band); color: var(--color-ink);
-  }
-  .files-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem 1.5rem; }
-  .files-head h2 { font-size: clamp(1.9rem, 3.4vw, 2.75rem); }
-  .files-head p { margin-top: 0.3rem; color: var(--color-ink-3); }
-  .ctrl { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
-  .seg { display: inline-flex; border: 1.5px solid var(--color-ink); border-radius: var(--radius-sm); overflow: hidden; }
-  .seg button { min-height: 44px; border: 0; background: transparent; padding: 0 1rem; font: inherit; font-weight: 700; font-size: var(--text-sm); color: var(--color-ink); cursor: pointer; transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out); }
-  .seg button:hover { background: var(--color-paper-3); }
-  .seg button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-paper); }
-  .seg button:focus-visible { outline-offset: -4px; }
-  .arrows { display: flex; gap: 0.4rem; }
-  .arrows button { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid var(--color-ink); border-radius: var(--radius-sm); background: transparent; color: var(--color-ink); cursor: pointer; }
-  .arrows button:hover { background: var(--color-ink); color: var(--color-paper); }
-  .files[data-view="list"] .arrows { display: none; }
+  /* 업무 원칙: 번호가 선으로 이어진 세 단계 */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem 1.5rem; }
+  .steps li { position: relative; }
+  .step-top { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.1rem; }
+  .step-top::after { content: ""; flex: 1; height: 1px; margin-right: -1.5rem; background: var(--color-rule-strong); }
+  .steps li:last-child .step-top::after { margin-right: 0; background: linear-gradient(to right, var(--color-rule-strong), transparent); }
+  .num { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--color-rule-strong); font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
+  .steps b { display: block; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.4; text-wrap: balance; }
+  .steps p { margin-top: 0.5rem; color: var(--color-ink-3); line-height: 1.65; }
 
-  /* ── drawer: slider view (default) ────────────────── */
-  /* the strip bleeds to both viewport edges while the first folder stays aligned with the text column */
-  .drawer {
-    --bleed: max(clamp(1rem, 4vw, 2.5rem), calc((100vw - var(--page-max)) / 2 + clamp(1rem, 4vw, 2.5rem))); /* = .wrap's left inset; no % so scroll-padding means the same */
-    list-style: none; margin: 0 calc(-1 * var(--bleed)); padding: 2rem var(--bleed) 2.25rem;
-    display: flex; gap: 1.5rem; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
-    scroll-padding-inline: var(--bleed); scrollbar-width: thin; scrollbar-color: var(--color-rule-strong) transparent;
-  }
-  .folder { flex: 0 0 clamp(16rem, 24vw, 18.5rem); scroll-snap-align: start; }
-  .folder-btn {
-    position: relative; display: block; height: 100%; padding-top: 2.1rem; color: var(--color-ink); text-decoration: none;
-    transition: transform 400ms var(--ease-out);
-  }
-  .folder-btn:hover, .folder.on .folder-btn { transform: translateY(-10px); }
-  .folder-btn:focus-visible { outline: none; }
-  .folder-btn:focus-visible .face { outline: 3px solid var(--color-focus); outline-offset: 4px; }
-  .tab {
-    position: absolute; top: 0; left: 1.1rem; height: 2.25rem; padding: 0 0.9rem; display: flex; align-items: center;
-    background: var(--color-point); color: var(--color-ink); font-weight: 800; font-size: var(--text-sm); letter-spacing: 0.02em;
-    border-radius: var(--radius-sm) var(--radius-sm) 0 0; font-variant-numeric: tabular-nums;
-  }
-  .face {
-    display: flex; flex-direction: column; gap: 0.75rem; height: 100%; min-height: 15rem; padding: 1.4rem 1.25rem 1.1rem;
-    background: var(--color-paper-2); border-radius: 6px var(--radius-lg) var(--radius-lg) var(--radius-lg);
-    box-shadow: 0 18px 36px -24px rgba(10, 10, 10, 0.45);
-  }
-  .folder.on .face { outline: 3px solid var(--color-ink); outline-offset: 4px; }
-  .ftitle { font-size: 1.5rem; font-weight: 800; line-height: 1.28; letter-spacing: -0.04em; text-wrap: balance; }
-  .fline { font-size: 0.95rem; line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-  .files[data-mode="detail"] .fline { -webkit-line-clamp: 9; }
-  .files[data-mode="detail"] .face { min-height: 21rem; }
-  .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
-  .pill { border: 1.5px solid currentColor; padding: 0.1rem 0.6rem; border-radius: 999px; font-weight: 700; font-size: var(--text-xs); white-space: nowrap; }
+  /* 프로젝트 한눈에 보기 */
+  .index { padding-block: clamp(2rem, 6vh, 4rem); }
+  .cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .card { display: flex; flex-direction: column; gap: 0.6rem; height: 100%; padding: 1.4rem 1.5rem 1.2rem; border-radius: var(--radius-lg); background: var(--color-panel); border: 1px solid var(--color-rule); box-shadow: var(--shadow-card); text-decoration: none; transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), transform 0.4s var(--ease-spring); }
+  .card:hover { background: var(--color-accent-soft); border-color: var(--color-rule-strong); transform: translateY(-3px); }
+  .card-top { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.3rem; }
+  .card-top .tile { width: 34px; height: 34px; border-radius: 10px; background: var(--color-accent-soft); color: var(--color-ink); transition: background-color var(--dur-base), color var(--dur-base); }
+  .card:hover .tile { background: var(--color-ink); color: var(--color-paper); }
+  .no { font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); font-variant-numeric: tabular-nums; margin-right: auto; }
+  .card-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1.35; text-wrap: balance; }
+  .card-line { color: var(--color-ink-3); line-height: 1.6; }
+  .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: auto; padding-top: 0.6rem; font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); }
+  .card-foot :global(svg) { transition: transform 0.4s var(--ease-spring); }
+  .card:hover .card-foot :global(svg) { transform: translateX(4px); color: var(--color-ink); }
 
-  /* ── drawer: list view (same markup, re-laid as rows) ── */
-  .files[data-view="list"] .drawer { display: grid; gap: 0.75rem; overflow: visible; padding: 1.5rem 0 0; margin: 0; }
-  .files[data-view="list"] .folder-btn {
-    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 1rem; align-items: center;
-    padding: 1rem 1.25rem; background: var(--color-paper-2); border-radius: var(--radius-md); height: auto;
-  }
-  .files[data-view="list"] .folder-btn:hover, .files[data-view="list"] .folder.on .folder-btn { transform: translateX(6px); }
-  .files[data-view="list"] .folder.on .folder-btn { outline: 3px solid var(--color-ink); outline-offset: 3px; }
-  .files[data-view="list"] .folder-btn:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-  .files[data-view="list"] .face { display: contents; min-height: 0; }
-  .files[data-view="list"] .folder.on .face, .files[data-view="list"] .folder-btn:focus-visible .face { outline: none; }
-  .files[data-view="list"] .tab { position: static; grid-column: 1; grid-row: 1 / span 3; align-self: start; height: auto; padding: 0.3rem 0.7rem; border-radius: 999px; }
-  .files[data-view="list"] .ftitle { grid-column: 2; grid-row: 1; font-size: 1.2rem; }
-  .files[data-view="list"] .period { grid-column: 2; grid-row: 2; }
-  .files[data-view="list"] .fline { display: none; grid-column: 2; grid-row: 3; margin-top: 0.4rem; -webkit-line-clamp: unset; }
-  .files[data-view="list"][data-mode="detail"] .fline { display: block; }
-  .files[data-view="list"] .foot { display: contents; }
-  .files[data-view="list"] .pill { grid-column: 3; grid-row: 1 / span 2; }
-  .files[data-view="list"] .sheet { margin-top: 0.75rem; }
+  /* 인사기록 */
+  .record-sec { padding-block: clamp(2rem, 6vh, 4rem); }
+  .who { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 1.75rem; align-items: center; padding: 1.5rem; border-radius: var(--radius-lg); background: var(--color-panel); border: 1px solid var(--color-rule); box-shadow: var(--shadow-card); }
+  .photo { width: 148px; height: 148px; border-radius: 18px; object-fit: cover; }
+  .who-name { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; }
+  .who-name span { display: block; margin-top: 0.2rem; font-size: 0.9375rem; font-weight: 500; letter-spacing: 0; color: var(--color-ink-3); }
+  .fields { margin: 1.1rem 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem 1.5rem; }
+  .fields dt { font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); }
+  .fields dd { margin: 0.1rem 0 0; line-height: 1.5; }
 
-  /* ── sheet ────────────────────────────────────────── */
-  .sheet {
-    position: relative; margin: 0.5rem 0 0; padding: clamp(1.4rem, 3vw, 2.5rem);
-    background: var(--color-paper-2); color: var(--color-ink); border-radius: var(--radius-lg);
-    box-shadow: inset 0 8px 0 var(--color-point), var(--shadow-sheet); /* 윗선 = 폴더 탭과 같은 핑크: 어느 파일에서 나왔는지 */
-    /* 흰 시트는 파랑 서랍 안에 있으므로 회색 글자·핑크 포커스로 되돌림 (:root 값과 같게) */
-    --color-ink-2: #2a2f33; --color-ink-3: #5a6268;
-    --color-rule: rgba(10, 10, 10, 0.1); --color-rule-strong: rgba(10, 10, 10, 0.22);
-    --color-focus: var(--color-point);
-  }
-  .sheet.anim { animation: pull 550ms var(--ease-out); }
-  @keyframes pull { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1.5px solid var(--color-ink); font-size: var(--text-sm); }
-  .sheet-head b { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--color-point); color: var(--color-ink); font-variant-numeric: tabular-nums; }
-  .sheet-close { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid var(--color-ink); border-radius: var(--radius-sm); background: transparent; color: var(--color-ink); cursor: pointer; }
-  .sheet-close:hover { background: var(--color-ink); color: var(--color-paper); }
-  .sheet-trow { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem 1.5rem; margin-top: 1.4rem; }
-  .sheet h3 { font-size: clamp(1.6rem, 3.2vw, 2.4rem); line-height: 1.22; letter-spacing: -0.04em; }
-  .sheet h3:focus { outline: none; }
-  .stamp {
-    flex: none; margin-top: 0.25rem; padding: 0.35rem 0.9rem; border: 3px solid var(--color-stamp); border-radius: var(--radius-sm);
-    color: var(--color-stamp); font-weight: 800; font-size: 1.2rem; white-space: nowrap; /* 1.2rem(19.2px) 굵은 글씨 = 큰 글자 기준 3:1 → 흰 시트 위 핑크 4.23:1 통과 */ transform: rotate(-8deg); mix-blend-mode: multiply;
-  }
-  .sheet.anim .stamp { animation: stamp 500ms 300ms cubic-bezier(0.2, 1.5, 0.4, 1) both; }
-  @keyframes stamp { from { transform: rotate(-8deg) scale(1.7); opacity: 0; } to { transform: rotate(-8deg) scale(1); opacity: 1; } }
-  .sheet-meta { margin-top: 0.5rem; font-size: var(--text-sm); color: var(--color-ink-3); }
-  .sheet-line { margin-top: 1rem; font-size: 1.075rem; line-height: 1.75; max-width: 40em; }
-  .flow { list-style: none; margin: 1.25rem 0 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: var(--text-sm); }
-  .flow li { display: flex; align-items: center; gap: 0.5rem; }
-  .flow li + li::before { content: ""; width: 1.1rem; height: 1.5px; background: var(--color-ink); }
-  .flow b { flex: none; padding: 0.1rem 0.55rem; border-radius: 999px; background: var(--color-ink); color: var(--color-paper); font-size: var(--text-xs); letter-spacing: 0.04em; }
-  .more-btn {
-    display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.4rem; min-height: 44px; padding: 0 1rem;
-    border: 0; border-radius: var(--radius-sm); background: var(--color-ink); color: var(--color-paper); font: inherit; font-weight: 700; font-size: 0.95rem; cursor: pointer;
-  }
-  .more-btn:hover { background: var(--color-point); color: var(--color-ink); }
-  .more-btn :global(svg) { transition: transform 350ms var(--ease-out); }
-  .sheet.open .more-btn :global(svg) { transform: rotate(180deg); }
-  .when-open, .sheet.open .when-closed { display: none; }
-  .sheet.open .when-open { display: inline; }
-  .more { display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden; transition: grid-template-rows 550ms var(--ease-out), opacity 400ms, visibility 0s 550ms; }
-  .more > div { overflow: hidden; min-height: 0; }
-  .sheet.open .more { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition: grid-template-rows 550ms var(--ease-out), opacity 400ms, visibility 0s; }
-  .psr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin: 1.4rem 0 0; }
-  .psr div { padding: 1rem 1.1rem; background: var(--color-panel); border-radius: var(--radius-md); }
-  .psr dt { font-weight: 800; padding-bottom: 0.5rem; margin-bottom: 0.6rem; border-bottom: 1px dashed var(--color-rule-strong); }
-  .psr dd { margin: 0; font-size: 0.97rem; line-height: 1.75; }
-  .full { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.4rem; font-weight: 700; text-decoration-color: var(--color-point); }
-  .full:hover { color: var(--color-stamp); }
+  /* 이력 로그: 하나씩 펼쳐지는 줄 */
+  .acc-list { display: grid; gap: 10px; max-width: 54rem; }
+  .acc { border-radius: var(--radius-md); background: var(--color-panel); border: 1px solid var(--color-rule); box-shadow: var(--shadow-card); interpolate-size: allow-keywords; transition: background-color var(--dur-base); }
+  .acc:hover, .acc[open] { background: var(--color-accent-soft); }
+  .acc summary { display: flex; align-items: center; gap: 1rem; min-height: 56px; padding: 0.6rem 1.2rem; cursor: pointer; list-style: none; }
+  .acc summary::-webkit-details-marker { display: none; }
+  .acc summary b { flex: 1; font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.015em; }
+  .acc summary :global(svg) { flex: none; color: var(--color-ink-3); transition: transform 0.4s var(--ease-spring); }
+  .acc[open] summary :global(svg) { transform: rotate(180deg); }
+  .when { flex: none; width: 4.6rem; font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); font-variant-numeric: tabular-nums; }
+  .acc p { padding: 0 1.2rem 1.1rem calc(1.2rem + 4.6rem + 1rem); color: var(--color-ink-2); line-height: 1.7; }
+  .acc::details-content { block-size: 0; overflow: clip; transition: block-size 0.45s var(--ease-spring), content-visibility 0.45s allow-discrete; }
+  .acc[open]::details-content { block-size: auto; }
 
-  /* ── principles memo ──────────────────────────────── */
-  .principles { padding-block: clamp(1rem, 3vw, 2rem); }
-  .memo { padding: clamp(1.5rem, 4vw, 3rem); background: var(--color-paper-3); border-radius: var(--radius-lg); }
-  .memo h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
-  .memo ol { margin: 1.5rem 0 0; padding-left: 1.4em; display: grid; gap: 1.25rem; }
-  .memo li { padding-left: 0.25rem; }
-  .memo li::marker { font-weight: 800; }
-  .memo b { display: block; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.03em; }
-  .memo span { display: block; margin-top: 0.25rem; color: var(--color-ink-2); max-width: 40em; }
-
-  /* ── record card ──────────────────────────────────── */
-  .record-sec { padding-block: clamp(3rem, 6vw, 4.5rem) 0; }
-  .record-sec > h2 { font-size: clamp(1.9rem, 3.4vw, 2.75rem); }
-  .card {
-    display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 1.5rem 2rem; margin-top: 1.5rem; padding: clamp(1.4rem, 3vw, 2.5rem);
-    background: var(--color-paper-2); border-radius: var(--radius-lg); box-shadow: var(--shadow-sheet);
-  }
-  .photo { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; object-position: top; border-radius: var(--radius-md); }
-  .who-name { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.2; }
-  .who-name span { display: block; margin-top: 0.35rem; font-size: var(--text-base); font-weight: 600; letter-spacing: 0; color: var(--color-ink-3); }
-  .who-sub { margin-top: 1rem; max-width: 40em; }
-  .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin: 1.25rem 0 0; }
-  .fields div { padding: 0.75rem 1rem; background: var(--color-panel); border-radius: var(--radius-md); }
-  .fields dt { font-size: var(--text-xs); font-weight: 700; color: var(--color-ink-3); }
-  .fields dd { margin: 0.15rem 0 0; font-weight: 600; font-size: 0.95rem; }
-  .log { grid-column: 1 / -1; border-top: 1.5px solid var(--color-ink); padding-top: 1.25rem; }
-  .log h3 { font-size: 1.35rem; }
-  .log ol { list-style: none; margin: 0.75rem 0 0; padding: 0; }
-  .log li { display: grid; grid-template-columns: 5.5rem 11rem minmax(0, 1fr); gap: 0.25rem 1.25rem; padding-block: 0.85rem; border-bottom: 1px solid var(--color-rule); font-size: 0.95rem; }
-  .log li:last-child { border-bottom: 0; }
-  .when { color: var(--color-ink-3); font-variant-numeric: tabular-nums; }
-  .what { color: var(--color-ink-2); }
-
-  /* ── contact ──────────────────────────────────────── */
-  .contact { padding-block: clamp(3.5rem, 7vw, 5.5rem); }
-  .contact h2 { font-size: clamp(1.9rem, 3.8vw, 3rem); max-width: 16em; }
-  .contact-lede { margin-top: 0.75rem; color: var(--color-ink-2); max-width: 40em; }
-  .contact-card { display: inline-grid; gap: 1rem; max-width: 100%; margin-top: 1.5rem; padding: clamp(1.25rem, 3vw, 2rem); background: var(--color-band); color: var(--color-ink); border-radius: var(--radius-lg); }
-  .mail { font-size: clamp(1.3rem, 3.2vw, 2rem); font-weight: 800; letter-spacing: -0.03em; overflow-wrap: anywhere; }
-  .contact-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-  .copy-status:empty { display: none; }
-  .copy-status { font-size: var(--text-sm); }
+  /* 연락 */
+  .contact { display: flex; flex-direction: column; align-items: center; text-align: center; padding-block: clamp(3rem, 10vh, 6rem) clamp(4rem, 12vh, 7rem); }
+  .motif { width: min(560px, 100%); height: auto; color: var(--color-ink); margin-bottom: 1rem; }
+  .contact-lede { max-width: 36rem; margin-top: 1rem; color: var(--color-ink-2); }
+  .contact-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 1.75rem; }
+  .contact-mail { margin-top: 0.9rem; font-size: 0.875rem; font-weight: 600; color: var(--color-ink-3); }
+  .contact-mail a { text-decoration: none; }
+  .contact-mail a:hover { color: var(--color-ink); text-decoration: underline; }
+  .copy-status { min-height: 1.5rem; margin-top: 0.4rem; font-size: 0.875rem; color: var(--color-ink-2); }
 
   @media (max-width: 760px) {
-    .psr { grid-template-columns: 1fr; }
-    .sheet-trow { flex-wrap: wrap; }
-    .flow { flex-direction: column; align-items: flex-start; }
-    .flow li + li::before { display: none; }
-    .card { grid-template-columns: minmax(0, 7rem) minmax(0, 1fr); }
-    .who-sub, .fields { grid-column: 1 / -1; }
-    .who { display: contents; }
-    .fields { grid-template-columns: 1fr; margin-top: 0; }
-    .who-sub { margin-top: 0; }
-    .log li { grid-template-columns: 5rem minmax(0, 1fr); }
-    .log .what { grid-column: 2; }
-  }
-  @media (max-width: 560px) {
-    .folder { flex-basis: 78vw; }
-    .arrows { display: none; } /* swiping does the same on a phone; keeps the controls on one row */
-    .files[data-view="list"] .folder-btn { grid-template-columns: auto minmax(0, 1fr); }
-    .files[data-view="list"] .pill { grid-column: 2; grid-row: 4; justify-self: start; margin-top: 0.4rem; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .folder-btn, .more, .more-btn :global(svg) { transition: none; }
-    .sheet.anim, .sheet.anim .stamp { animation: none; }
+    .steps { grid-template-columns: 1fr; gap: 1.75rem; }
+    .step-top::after { margin-right: 0; }
+    .cards { grid-template-columns: 1fr; }
+    .who { grid-template-columns: 1fr; gap: 1.1rem; }
+    .photo { width: 112px; height: 112px; }
+    .fields { grid-template-columns: 1fr; }
+    .when { width: 3.9rem; }
+    .acc summary { gap: 0.6rem; padding-inline: 1rem; }
+    .acc p { padding: 0 1rem 1rem; }
   }
 </style>

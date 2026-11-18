@@ -1,0 +1,644 @@
+---
+// 홈 첫 구역: 화면에 고정된 노트북. 스크롤할 때마다 제목과 노트북 안 화면이 다음 프로젝트로 바뀐다.
+// 0단계 = 소개, 1…N단계 = src/data/cases.ts 순서대로의 프로젝트.
+// 노트북 안 화면은 실제 사내 화면이 아니라 직접 그린 예시다: 이름·시간·건수는 가상이고,
+// 숫자는 이미 공개한 글에 있는 것(6개 기능, 8가지 검사, 46개 페이지, 15건, 17명, 29건)만 쓴다.
+import type { ComponentProps } from 'astro/types';
+import { t, type Locale } from '../i18n';
+import Icon from './Icon.astro';
+import Row from './demo/Row.astro';
+
+type IconName = ComponentProps<typeof Icon>['name'];
+interface StageFile { id: string; short: string; title: string; caption: string; href: string; icon: IconName; }
+interface Props { locale: Locale; files: StageFile[]; }
+const { locale, files } = Astro.props;
+const s = t[locale];
+const h = s.home;
+const tr = h.tour;
+const en = locale === 'en';
+const L = (ko: string, enText: string) => (en ? enText : ko);
+const N = files.length + 1;
+
+// 데모 화면 순서는 프로젝트 id로 찾는다. 프로젝트를 추가했는데 화면을 안 그렸으면 빌드에서 멈춘다.
+const PANES = ['hrga-hub', 'meal-allowance', 'interview-reminder', 'benefits-audit', 'access-log', 'guide-redesign', 'asset-regulation', 'skill-intelligence'];
+const missing = files.filter((f) => !PANES.includes(f.id)).map((f) => f.id);
+if (missing.length) throw new Error(`Stage.astro has no demo screen for: ${missing.join(', ')}. Add a <div class="pane"> for it.`);
+const step = (id: string) => {
+  const i = files.findIndex((f) => f.id === id);
+  if (i < 0) throw new Error(`Stage.astro draws a demo for "${id}" but src/data/cases.ts does not list it.`);
+  return i + 1;
+};
+const file = (id: string) => files[step(id) - 1];
+
+// 소개 화면의 인사기록 줄: [아이콘, 항목, 값, 보조 설명]
+const fieldIcons: IconName[] = ['building', 'calendar', 'chat', 'cap'];
+const record = s.hero.fields
+  .filter(([k]) => k !== '근무지' && k !== 'Location')
+  .map(([k, v], i) => { const [main, ...rest] = v.split(', '); return { icon: fieldIcons[i], key: k, value: main, sub: rest.join(', ') }; });
+
+// 히트맵 칸의 진하기(가상 데이터). 4팀 × 12칸.
+const heat = [
+  8, 22, 8, 40, 22, 8, 64, 22, 8, 22, 40, 8,
+  22, 64, 40, 22, 90, 40, 22, 8, 64, 40, 22, 22,
+  40, 22, 90, 64, 40, 90, 22, 64, 40, 90, 64, 22,
+  8, 40, 22, 8, 22, 40, 8, 22, 64, 8, 22, 40,
+]; // ← 0(옅음)~100(진함), 한 줄이 한 팀
+---
+<section id="files" class="tour" data-steps={N} data-ids={['', ...files.map((f) => f.id)].join(',')} style={`--n:${N}`} aria-label={tr.rail}>
+  <div class="pin">
+    <div class="shade" aria-hidden="true"></div>
+    <div class="col">
+      <nav class="mode" aria-label={L('보기 방식', 'View')}>
+        <a href="#files" aria-current="true">{tr.pill[0]}</a>
+        <a href="#index">{tr.pill[1]}</a>
+      </nav>
+
+      <div class="titles">
+        <div class="t-item on" data-i="0">
+          <h1>{h.h1.join(' ')}</h1>
+          <p class:list={{ 'has-short': !!h.en }}><span class="full">{h.desc}</span>{h.en && <span class="short" lang="en">{h.en}</span>}</p>
+        </div>
+        {files.map((f, i) => (
+          <div class="t-item" data-i={i + 1}>
+            <h2>{f.short}</h2>
+            <p>{f.title}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="device">
+        {/* 화면 안은 장식 겸 마우스용 바로가기. 키보드·스크린리더는 아래 점 레일로 같은 일을 한다 */}
+        <div class="lid" aria-hidden="true">
+          <div class="screen">
+            <div class="app">
+              <aside class="side">
+                <div class="traffic"><i></i><i></i><i></i></div>
+                <div class="s-search"><Icon name="search" /><span>{tr.search}</span></div>
+                <div class="s-nav">
+                  <span class="s-hl"></span>
+                  <button type="button" class="side-item on" data-i="0" data-go="0" tabindex="-1"><span class="tile"><Icon name="home" /></span><span class="nm">{L('홈', 'Home')}</span></button>
+                  <span class="s-label">{h.filesTitle(files.length)}</span>
+                  {files.map((f, i) => (
+                    <button type="button" class="side-item" data-i={i + 1} data-go={i + 1} tabindex="-1"><span class="tile"><Icon name={f.icon} /></span><span class="nm">{f.short}</span></button>
+                  ))}
+                </div>
+                <div class="s-status"><i class="dot"></i><div><b>{tr.employed}</b><span>{L('DSRV · 인사총무팀', 'DSRV · HR & GA')}</span></div></div>
+              </aside>
+
+              <div class="main">
+                {/* 0 · 소개 */}
+                <div class="pane on" data-i="0">
+                  <header class="p-head">
+                    <img class="p-photo" src="/juyoung.jpg" width="800" height="800" alt="" />
+                    <div><b>{s.hero.name}</b><span class="chip"><i class="dot live"></i>{tr.employed}</span></div>
+                  </header>
+                  <p class="p-label">{h.recordTitle}</p>
+                  <div class="p-list">
+                    {record.map((r, i) => (
+                      <Row icon={r.icon} title={r.key} sub={r.sub || undefined} at={150 + i * 110} hideOnPhone={i > 1}><span class="p-val">{r.value}</span></Row>
+                    ))}
+                  </div>
+                  <p class="p-label">{L('자동화 설정', 'Automation')}</p>
+                  <div class="p-list">
+                    <Row icon="check" title={L('확인 업무 자동화', 'Automate the checking')} sub={L('손으로 하던 대조는 규칙이 대신합니다', 'Rules do the matching people did by hand')} at={650}><span class="tg" data-init="off" data-flip="1300"></span></Row>
+                    <Row icon="lock" title={L('발송 · 삭제 자동화', 'Automate sending and deleting')} sub={L('되돌릴 수 없는 일은 사람이 결정합니다', 'What cannot be undone is decided by a person')} at={760}><span class="tg" data-init="off"></span></Row>
+                  </div>
+                </div>
+
+                {/* HR/GA Hub */}
+                <div class="pane" data-i={step('hrga-hub')}>
+                  <header class="p-head"><span class="tile"><Icon name="grid" /></span><div><b>HR/GA Hub</b><span class="sub">{L('회사 계정 하나로 들어가는 사내 웹앱', 'One internal web app behind the company account')}</span></div></header>
+                  <div class="sg m-hide"><span class="on">{L('회의실', 'Rooms')}</span><span>{L('이벤트', 'Events')}</span><span>{L('자기계발비', 'Training')}</span></div>
+                  <p class="p-label m-hide">{L('오늘 회의실', 'Meeting rooms today')}</p>
+                  <div class="p-list">
+                    <Row icon="users" title={L('회의실 A', 'Room A')} sub={L('6인 · 10:00 – 11:00', '6 seats · 10:00 – 11:00')} at={150}><span class="chip dark">{L('사용 중', 'In use')}</span></Row>
+                    <Row icon="users" title={L('회의실 B', 'Room B')} sub={L('4인 · 11:30부터', '4 seats · from 11:30')} at={260}><span class="chip">{L('곧 시작', 'Starting soon')}</span></Row>
+                    <Row icon="users" title={L('회의실 C', 'Room C')} sub={L('10인 · 비어 있음', '10 seats · free')} at={370}>
+                      <span class="swap" data-at="1900"><span class="pbtn">{L('예약', 'Book')}</span><span class="chip line">{L('예약됨', 'Booked')} ✓</span></span>
+                    </Row>
+                  </div>
+                  <p class="p-label m-hide">{L('기능 6개', '6 features')}</p>
+                  <div class="chips">
+                    {[L('회의실', 'Meeting rooms'), L('사내 이벤트', 'Company events'), L('구성원 디렉토리', 'Member directory'), L('제휴식당', 'Partner restaurants'), L('자기계발비', 'Training allowance'), L('근속 알림', 'Anniversary alerts')].map((c, i) => (
+                      <span class="chip rvl" data-at={700 + i * 130}>{c}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 식대 검증 */}
+                <div class="pane" data-i={step('meal-allowance')}>
+                  <header class="p-head"><span class="tile"><Icon name="receipt" /></span><div><b>{file('meal-allowance').short}</b><span class="sub">{L('식권 사용 내역과 근태 기록을 규칙으로 대조', 'Meal-card usage checked against attendance, by rule')}</span></div></header>
+                  <p class="p-label">{L('식권 사용 ↔ 근태 기록', 'Meal card ↔ attendance')}</p>
+                  <div class="p-list">
+                    <Row icon="user" title={L('직원 A · 석식', 'Employee A · dinner')} sub={L('퇴근 기록과 대조', 'Matched with clock-out')} at={150}><span class="chip rvl" data-at="900">{L('요건 충족', 'Eligible')} ✓</span></Row>
+                    <Row icon="user" title={L('직원 B · 석식', 'Employee B · dinner')} sub={L('퇴근 기록과 대조', 'Matched with clock-out')} at={260}><span class="chip dark rvl" data-at="1500">{L('차감', 'Deduct')}</span></Row>
+                    <Row icon="user" title={L('직원 C · 석식', 'Employee C · dinner')} sub={L('근태 기록 없음', 'No attendance record')} at={370}><span class="chip line rvl" data-at="2100">{L('별도 확인', 'Manual review')}</span></Row>
+                  </div>
+                  <p class="p-label m-hide">{L('차감 사유 문장', 'Deduction reason')}</p>
+                  <div class="typebox"><span data-type={L('직원 B: 석식을 이용한 날의 근무 종료 시각이 지원 요건보다 이릅니다.', 'Employee B: on the day dinner was used, work ended earlier than the rule requires.')} data-delay="2500"></span><i class="caret"></i></div>
+                  <div class="p-list m-hide">
+                    <Row icon="check" title={L('대조 진행', 'Matching')}><span class="bar" data-at="500" style="--to:100%"><i></i></span><span class="p-val">3 / 3</span></Row>
+                  </div>
+                </div>
+
+                {/* 면접 안내메일 */}
+                <div class="pane" data-i={step('interview-reminder')}>
+                  <header class="p-head"><span class="tile"><Icon name="mail" /></span><div><b>{file('interview-reminder').short}</b><span class="sub">{L('초안까지만 자동, 보내기는 사람이', 'Drafts are automatic; a person presses send')}</span></div></header>
+                  <div class="p-list">
+                    <Row icon="calendar" title={L('직무 면접 · 후보자 A', 'Role interview · Candidate A')} sub={L('공유 캘린더 · 내일 14:00', 'Shared calendar · tomorrow 14:00')} at={150}><span class="chip rvl" data-at="800">{L('유형: 직무', 'Type: role')}</span></Row>
+                  </div>
+                  <p class="p-label">{L('안내메일 초안', 'Reminder draft')}</p>
+                  <div class="typebox tall"><span data-type={L('안녕하세요, 후보자 A님. 내일 14:00 직무 면접 안내드립니다. 장소와 준비물은 아래와 같습니다.', 'Hello Candidate A. This is a reminder of your role interview tomorrow at 14:00. The location and what to bring are below.')} data-delay="1100"></span><i class="caret"></i>
+                    <span class="chip dark rvl saved" data-at="4300">{L('임시보관함에 저장됨', 'Saved to Drafts')} ✓</span>
+                  </div>
+                  <p class="p-label m-hide">{L('설정', 'Settings')}</p>
+                  <div class="p-list m-hide">
+                    <Row icon="pen" title={L('초안 자동 작성', 'Write drafts automatically')} sub={L('매일 아침 내일 면접을 찾습니다', "Every morning it finds tomorrow's interviews")}><span class="tg on" data-init="on"></span></Row>
+                    <Row icon="lock" title={L('자동 발송', 'Send automatically')} sub={L('보낸 메일은 되돌릴 수 없어 사람이 누릅니다', 'A sent email cannot be taken back, so a person sends it')}><span class="tg" data-init="off"></span></Row>
+                  </div>
+                </div>
+
+                {/* 자기계발비 감사 */}
+                <div class="pane" data-i={step('benefits-audit')}>
+                  <header class="p-head"><span class="tile"><Icon name="search" /></span><div><b>{file('benefits-audit').short}</b><span class="sub">{L('시트를 읽기만 하고, 맞지 않는 숫자를 찾습니다', 'Reads the sheet, never edits it, and finds what does not add up')}</span></div></header>
+                  <div class="p-list">
+                    <Row icon="shield" title={L('검사 8가지', '8 checks')} sub={L('규정에서 가져온 기준', 'Taken from the regulation')}><span class="bar" data-at="300" style="--to:100%"><i></i></span><span class="p-val"><span data-count="8">8</span> / 8</span></Row>
+                  </div>
+                  <p class="p-label m-hide">{L('찾은 문제 · 예시', 'Findings · sample')}</p>
+                  <div class="p-list">
+                    <Row icon="users" title={L('동명이인', 'Same name, two people')} sub={L('표가 이름으로만 이어져 있음', 'Tables linked by name only')} at={1300}><span class="chip dark">{L('높음', 'High')}</span></Row>
+                    <Row icon="pen" title={L('팀명 불일치', 'Team-name mismatch')} sub={L('한 글자 차이', 'Off by one character')} at={1700}><span class="chip">{L('중간', 'Medium')}</span></Row>
+                    <Row icon="chart" title={L('한도 초과', 'Limit exceeded')} sub={L('월 · 연 한도 기준', 'Monthly and yearly limits')} at={2100}><span class="chip dark">{L('높음', 'High')}</span></Row>
+                  </div>
+                  <div class="p-list m-hide">
+                    <Row icon="lock" title={L('원본 시트 수정', 'Edit the original sheet')} sub={L('읽기 전용 · 한 칸도 고치지 않습니다', 'Read-only · not a single cell is changed')}><span class="tg" data-init="off"></span></Row>
+                  </div>
+                </div>
+
+                {/* 출입기록 분석 */}
+                <div class="pane" data-i={step('access-log')}>
+                  <header class="p-head"><span class="tile"><Icon name="door" /></span><div><b>{file('access-log').short}</b><span class="sub">{L('잘못 잡힌 건을 걸러내는 데 가장 공을 들였습니다', 'Most of the work went into filtering out false hits')}</span></div></header>
+                  <p class="p-label m-hide">{L('걸러내기', 'Filters')}</p>
+                  <div class="p-list">
+                    <Row icon="door" title={L('출입문 통과 기록', 'Door access logs')} sub={L('석 달 치', 'Three months')}><span class="bar wide" data-at="300" style="--to:100%"><i></i></span></Row>
+                    <Row icon="filter" title={L('짧은 이동 제거', 'Drop short exits')}><span class="bar wide" data-at="900" style="--to:58%"><i></i></span></Row>
+                    <Row icon="clock" title={L('60분 초과만', 'Keep 60+ minutes')}><span class="bar wide" data-at="1500" style="--to:26%"><i></i></span></Row>
+                    <Row icon="building" title={L('건물 안 기록 있으면 제외', 'Drop if still inside')}><span class="bar wide" data-at="2100" style="--to:10%"><i></i></span></Row>
+                  </div>
+                  <div class="p-list">
+                    <Row icon="user" title={L('확인이 필요한 건', 'Needs checking')} sub={L('판단은 사람이 합니다', 'A person makes the call')} at={2700}><span class="chip dark">{L('목록', 'List')}</span></Row>
+                  </div>
+                </div>
+
+                {/* 안내서 이관 */}
+                <div class="pane" data-i={step('guide-redesign')}>
+                  <header class="p-head"><span class="tile"><Icon name="scale" /></span><div><b>{file('guide-redesign').short}</b><span class="sub">{L('원본을 건드리지 않는 이관 리허설', 'A migration rehearsal that never touches the original')}</span></div></header>
+                  <div class="p-list">
+                    <Row icon="list" title={L('섹션', 'Sections')}><span class="p-val">{L('8개 유지', '8 kept')}</span></Row>
+                    <Row icon="file" title={L('하위 페이지', 'Child pages')}><span class="p-val"><span data-count="46" data-delay="2000">46</span> / 46 {L('유지', 'kept')}</span></Row>
+                  </div>
+                  <p class="p-label m-hide">{L('리허설', 'Rehearsal')}</p>
+                  <div class="term">
+                    <p><b>$</b> <span data-type="migrate --rehearsal" data-delay="400"></span><i class="caret"></i></p>
+                    <p class="rvl" data-at="1500">layout   {L('새 레이아웃만 가져옴', 'new layout only')} … ok</p>
+                    <p class="rvl" data-at="2000">pages    46 / 46 {L('보존', 'preserved')}</p>
+                    <p class="rvl" data-at="2900">source   {L('변경 없음', 'unchanged')}</p>
+                    <p class="rvl" data-at="3500"><b>✔ {L('리허설 통과', 'rehearsal passed')}</b></p>
+                  </div>
+                  <div class="p-list m-hide">
+                    <Row icon="lock" title={L('원본 페이지', 'Original pages')} sub={L('이관 중에도 그대로 둡니다', 'Left as they are during the move')} at={3900}><span class="chip dark">{L('변경 없음', 'Unchanged')}</span></Row>
+                  </div>
+                </div>
+
+                {/* 자산관리 규정 */}
+                <div class="pane" data-i={step('asset-regulation')}>
+                  <header class="p-head"><span class="tile"><Icon name="file" /></span><div><b>{file('asset-regulation').short}</b><span class="sub">{L('세 관점으로 다시 쓰고 대표이사 승인', 'Rewritten from three angles, approved by the CEO')}</span></div></header>
+                  <div class="sg cycle m-hide"><span>{L('법 · 세무', 'Legal & tax')}</span><span>{L('정보보안', 'Security')}</span><span>{L('실무', 'Practice')}</span></div>
+                  <div class="p-list">
+                    <Row icon="pen" title={L('개정 반영', 'Changes made')} at={300}><span class="p-val"><span data-count="15" data-delay="500">15</span>{L('건', '')}</span></Row>
+                    <Row icon="clock" title={L('노후화 기준', 'Obsolescence standard')} at={500}><span class="chip">{L('신설', 'New')}</span></Row>
+                    <Row icon="users" title={L('교체 대상 추천', 'Replacement picks')} at={700}><span class="p-val"><span data-count="17" data-delay="900">17</span>{L('명', '')}</span></Row>
+                    <Row icon="check-circle" title={L('대표이사 결재', 'CEO sign-off')} at={900}><span class="chip dark rvl" data-at="2600">{L('승인', 'Approved')}</span></Row>
+                  </div>
+                  <div class="stamp" data-at="2600"><b>{L('승인', 'OK')}</b></div>
+                </div>
+
+                {/* Skill Intelligence */}
+                <div class="pane" data-i={step('skill-intelligence')}>
+                  <header class="p-head"><span class="tile"><Icon name="chart" /></span><div><b>Skill Intelligence</b><span class="sub">{L('한 사람이 떠나면 무엇이 멈추는지 추적', 'Tracing what stops when one person leaves')}</span></div></header>
+                  <div class="p-list m-hide">
+                    <Row icon="file" title={L('분석한 사내 문서', 'Internal documents analysed')}><span class="p-val"><span data-count="29" data-delay="300">29</span>{L('건', '')}</span></Row>
+                  </div>
+                  <p class="p-label">{L('팀 리스크 히트맵 · 가상 데이터', 'Team risk heatmap · synthetic data')}</p>
+                  <div class="heat" data-at="700">
+                    {['A', 'B', 'C', 'D'].map((team, r) => (
+                      <>
+                        <span class="heat-l">{L('팀', 'Team')} {team}</span>
+                        {heat.slice(r * 12, r * 12 + 12).map((v, c) => <i style={`--v:${v};--d:${(r * 12 + c) * 22}ms`}></i>)}
+                      </>
+                    ))}
+                  </div>
+                  <div class="p-list">
+                    <Row icon="check-circle" title={L('권고', 'Recommendation')} sub={L('시범 분석(PoC) 결과', 'Outcome of the PoC')} at={2200}><span class="chip dark">{L('조건부 진행', 'Conditional go')}</span></Row>
+                  </div>
+                </div>
+
+                <span class="sample">{tr.sample}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="base" aria-hidden="true"></div>
+
+        <div class="controls">
+          <nav class="rail" aria-label={tr.rail}>
+            <button type="button" data-i="0" data-go="0" aria-label={tr.intro} aria-current="step"><i></i><span class="tip" aria-hidden="true">{tr.intro}</span></button>
+            {files.map((f, i) => (
+              <button type="button" data-i={i + 1} data-go={i + 1} aria-label={f.short}><i></i><span class="tip" aria-hidden="true">{f.short}</span></button>
+            ))}
+          </nav>
+          <button type="button" class="play" aria-pressed="false" aria-label={tr.play} data-play={tr.play} data-pause={tr.pause}>
+            <span class="i-play"><Icon name="play" size={14} /></span><span class="i-pause"><Icon name="pause" size={14} /></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="acts">
+        <div class="act on" data-i="0">
+          <div class="act-btns">
+            <button type="button" class="btn" data-go="1">{tr.start}</button>
+            <a class="btn ghost" href="#contact">{h.ctaContact}</a>
+          </div>
+          <p class="cap">{tr.caption}</p>
+        </div>
+        {files.map((f, i) => (
+          <div class="act" data-i={i + 1}>
+            <div class="act-btns">
+              <a class="btn" href={f.href}>{h.full}</a>
+              {i + 2 < N
+                ? <button type="button" class="btn ghost" data-go={i + 2}>{tr.next}<Icon name="arrow-right" size={16} /></button>
+                : <a class="btn ghost" href="#index">{tr.pill[1]}</a>}
+            </div>
+            <p class="cap">{f.caption}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const tour = document.querySelector<HTMLElement>('.tour');
+  if (tour) {
+    const pin = tour.querySelector<HTMLElement>('.pin')!;
+    const N = Number(tour.dataset.steps);
+    const ids = tour.dataset.ids!.split(','); // ids[0] = '' (소개)
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const all = <T extends HTMLElement>(sel: string) => [...tour.querySelectorAll<T>(sel)];
+    const stacked = all('.t-item, .pane, .act');       // 한 번에 하나만 보이는 것들
+    const marks = all('.rail button, .side-item');     // 현재 단계를 표시하는 것들
+    const hl = tour.querySelector<HTMLElement>('.s-hl')!;
+    const play = tour.querySelector<HTMLButtonElement>('.play')!;
+    // 단계마다 무대 바탕 밝기를 조금씩 바꾼다 (참고: 어두운 테마 기준 %, 밝은 테마는 site.css의 --stage-swing이 뒤집어 줄인다)
+    const SHADES = [0, -8, -3, 6, -6, 3, -9, 5, -2]; // ← 단계별 밝기 차이
+
+    let cur = -1;
+    let timers: number[] = [];
+    const later = (fn: () => void, ms: number) => { timers.push(window.setTimeout(fn, ms)); };
+    const stopTimeline = () => { timers.forEach(clearTimeout); timers = []; };
+
+    // 화면 하나의 움직임: data-at(등장 시각), data-type(타자), data-flip(토글 뒤집기), data-count(숫자 올라가기)
+    function reset(pane: HTMLElement) {
+      pane.querySelectorAll<HTMLElement>('[data-at]').forEach((el) => el.classList.remove('show'));
+      pane.querySelectorAll<HTMLElement>('[data-type]').forEach((el) => { el.textContent = ''; });
+      pane.querySelectorAll<HTMLElement>('[data-init]').forEach((el) => el.classList.toggle('on', el.dataset.init === 'on'));
+      pane.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => { el.textContent = '0'; });
+    }
+    function finish(pane: HTMLElement) {
+      pane.querySelectorAll<HTMLElement>('[data-at]').forEach((el) => el.classList.add('show'));
+      pane.querySelectorAll<HTMLElement>('[data-type]').forEach((el) => { el.textContent = el.dataset.type!; });
+      pane.querySelectorAll<HTMLElement>('[data-flip]').forEach((el) => el.classList.toggle('on', el.dataset.init !== 'on'));
+      pane.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => { el.textContent = el.dataset.count!; });
+    }
+    function run(pane: HTMLElement) {
+      stopTimeline();
+      if (reduce) { finish(pane); return; }
+      reset(pane);
+      let end = 0;
+      pane.querySelectorAll<HTMLElement>('[data-at]').forEach((el) => {
+        const at = Number(el.dataset.at); end = Math.max(end, at + 600);
+        later(() => el.classList.add('show'), at);
+      });
+      pane.querySelectorAll<HTMLElement>('[data-flip]').forEach((el) => {
+        const at = Number(el.dataset.flip); end = Math.max(end, at + 600);
+        later(() => el.classList.toggle('on'), at);
+      });
+      pane.querySelectorAll<HTMLElement>('[data-type]').forEach((el) => {
+        const text = el.dataset.type!; const at = Number(el.dataset.delay ?? 0); const speed = 30;
+        end = Math.max(end, at + text.length * speed + 400);
+        for (let k = 1; k <= text.length; k++) later(() => { el.textContent = text.slice(0, k); }, at + k * speed);
+      });
+      pane.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
+        const to = Number(el.dataset.count); const at = Number(el.dataset.delay ?? 0); const frames = 18;
+        end = Math.max(end, at + 900);
+        for (let k = 1; k <= frames; k++) later(() => { el.textContent = String(Math.round((to * k) / frames)); }, at + k * 45);
+      });
+      later(() => { if (!document.hidden) run(pane); else later(() => run(pane), 3000); }, end + 4200); // 다 보여준 뒤 잠시 멈췄다가 처음부터 다시
+    }
+
+    function placeHighlight() {
+      const item = tour!.querySelector<HTMLElement>('.side-item.on');
+      if (item) { hl.style.setProperty('--y', `${item.offsetTop}px`); hl.style.setProperty('--h', `${item.offsetHeight}px`); }
+    }
+
+    function setStep(i: number) {
+      if (i === cur) return;
+      cur = i;
+      tour!.dataset.step = String(i);
+      tour!.style.setProperty('--dl-raw', `${SHADES[i % SHADES.length]}%`);
+      stacked.forEach((el) => { const on = Number(el.dataset.i) === i; el.classList.toggle('on', on); el.inert = !on; });
+      marks.forEach((el) => {
+        const on = Number(el.dataset.i) === i;
+        el.classList.toggle('on', on);
+        if (el.closest('.rail')) on ? el.setAttribute('aria-current', 'step') : el.removeAttribute('aria-current');
+      });
+      placeHighlight();
+      const pane = tour!.querySelector<HTMLElement>(`.pane[data-i="${i}"]`);
+      if (pane) run(pane);
+    }
+
+    // 스크롤 위치 → 단계. 고정 구간 전체를 (N-1)등분한다.
+    const range = () => tour.offsetHeight - pin.offsetHeight;
+    const top = () => tour.getBoundingClientRect().top + scrollY - parseFloat(getComputedStyle(pin).top || '0'); // 고정이 시작되는 스크롤 위치
+    const stepAt = () => Math.max(0, Math.min(N - 1, Math.round(((scrollY - top()) / range()) * (N - 1))));
+    const inTour = () => scrollY < top() + range() + pin.offsetHeight * 0.5;
+    function goTo(i: number, smooth = true) {
+      const n = Math.max(0, Math.min(N - 1, i));
+      scrollTo({ top: top() + (range() * n) / (N - 1), behavior: smooth && !reduce ? 'smooth' : 'instant' });
+    }
+
+    let ticking = false;
+    let idle = 0;
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; setStep(stepAt()); }); }
+      // 스크롤이 멈추면 주소 끝에 지금 프로젝트를 적어 둔다 → 그 주소를 보내면 같은 화면이 열린다
+      clearTimeout(idle);
+      idle = window.setTimeout(() => {
+        const isStepHash = ids.includes(location.hash.slice(1)) && location.hash.length > 1;
+        if (inTour()) history.replaceState(null, '', cur > 0 ? `#${ids[cur]}` : location.pathname + location.search);
+        else if (isStepHash) history.replaceState(null, '', location.pathname + location.search);
+      }, 350);
+    }, { passive: true });
+    addEventListener('resize', () => { placeHighlight(); setStep(stepAt()); });
+
+    tour.addEventListener('click', (e) => {
+      const go = (e.target as HTMLElement).closest<HTMLElement>('[data-go]');
+      if (go) { stopAuto(); goTo(Number(go.dataset.go)); }
+    });
+    tour.querySelector('.rail')!.addEventListener('keydown', (e) => {
+      const k = (e as KeyboardEvent).key;
+      const d = k === 'ArrowDown' || k === 'ArrowRight' ? 1 : k === 'ArrowUp' || k === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      const n = Math.max(0, Math.min(N - 1, cur + d));
+      goTo(n);
+      tour.querySelector<HTMLElement>(`.rail button[data-i="${n}"]`)?.focus();
+    });
+
+    // 자동 넘기기: 누르면 일정 간격으로 다음 단계로. 사용자가 직접 스크롤하면 멈춘다.
+    const AUTO_MS = 5200; // ← 한 단계에 머무는 시간(밀리초)
+    let auto = 0;
+    function stopAuto() {
+      if (!auto) return;
+      clearInterval(auto); auto = 0;
+      play.setAttribute('aria-pressed', 'false'); play.setAttribute('aria-label', play.dataset.play!);
+    }
+    function startAuto() {
+      play.setAttribute('aria-pressed', 'true'); play.setAttribute('aria-label', play.dataset.pause!);
+      if (cur >= N - 1) goTo(0); else goTo(cur + 1);
+      auto = window.setInterval(() => { if (cur >= N - 1) stopAuto(); else goTo(cur + 1); }, AUTO_MS);
+    }
+    play.addEventListener('click', (e) => { e.stopPropagation(); auto ? stopAuto() : startAuto(); });
+    ['wheel', 'touchstart'].forEach((ev) => addEventListener(ev, stopAuto, { passive: true }));
+    addEventListener('keydown', (e) => { if (e.target !== play && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'].includes(e.key)) stopAuto(); });
+
+    // 주소가 #프로젝트id로 끝나면 그 단계에서 시작
+    const want = ids.indexOf(location.hash.slice(1));
+    if (location.hash.length > 1 && want > 0) goTo(want, false);
+    setStep(want > 0 ? want : stepAt());
+    document.fonts?.ready.then(placeHighlight);
+  }
+</script>
+
+<style>
+  @property --dl-raw { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
+
+  .tour {
+    position: relative;
+    --step: 72vh; --step: 72svh;       /* ← 한 단계를 넘기는 데 필요한 스크롤 길이 */
+    --pin-h: calc(100vh - var(--bar-h));
+    --dev-w: clamp(340px, min(760px, 100vw - 240px, (100vh - var(--bar-h) - 360px) * 1.5), 760px);
+    --title: clamp(2.3rem, min(5.4vw, 8.2vh), 4.25rem);
+    --dl-raw: 0%;
+    height: calc(var(--pin-h) + (var(--n) - 1) * var(--step));
+    transition: --dl-raw 0.9s ease;
+  }
+  @supports (height: 100svh) {
+    .tour { --pin-h: calc(100svh - var(--bar-h)); --dev-w: clamp(340px, min(760px, 100vw - 240px, (100svh - var(--bar-h) - 360px) * 1.5), 760px); --title: clamp(2.3rem, min(5.4vw, 8.2svh), 4.25rem); }
+  }
+  /* JS가 없으면 단계를 넘길 수 없으니 고정하지 않고 첫 화면만 보여준다. 프로젝트는 아래 "한눈에 보기"에 전부 있다 */
+  :global(.no-js) .tour { height: auto; }
+  :global(.no-js) .tour .controls, :global(.no-js) .tour .act [data-go] { display: none; }
+
+  .pin { position: sticky; top: var(--bar-h); height: var(--pin-h); overflow: hidden; display: grid; }
+  :global(.no-js) .pin { position: relative; top: 0; }
+  .shade {
+    --l: calc(var(--stage-l) + var(--dl-raw) * var(--stage-swing));
+    grid-area: 1 / 1;
+    background:
+      linear-gradient(to bottom, transparent 82%, var(--color-paper)),
+      radial-gradient(120% 70% at 50% 0%, hsl(0 0% calc(var(--l) + 5%)), hsl(0 0% var(--l)) 70%);
+  }
+  .col { grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 0; padding: 12px 16px 16px; text-align: center; }
+
+  .mode { display: inline-flex; flex: none; padding: 3px; border-radius: 999px; background: var(--btn2-bg); border: 1px solid var(--color-rule-strong); box-shadow: var(--shadow-card); }
+  .mode a { display: inline-flex; align-items: center; height: 30px; padding: 0 14px; border-radius: 999px; font-size: 0.875rem; font-weight: 600; color: var(--color-ink-2); text-decoration: none; transition: color var(--dur-base), background-color var(--dur-base); }
+  .mode a:hover { color: var(--color-ink); }
+  .mode a[aria-current] { background: var(--btn-bg); color: var(--btn-ink); }
+
+  /* 제목·버튼 묶음은 전부 같은 칸에 겹쳐 두고 하나만 보여준다 → 단계가 바뀌어도 아래 요소가 출렁이지 않는다 */
+  .titles, .acts { display: grid; width: 100%; flex: none; }
+  .titles { margin-top: clamp(0.7rem, 2.2vh, 1.2rem); }
+  .t-item, .act { grid-area: 1 / 1; align-self: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, transform 0.5s var(--ease-spring), filter 0.3s, visibility 0s 0.3s; }
+  .t-item { transform: translateY(0.5rem) scale(0.985); filter: blur(6px); }
+  .t-item.on, .act.on { opacity: 1; visibility: visible; transform: none; filter: none; transition-delay: 0.1s, 0.1s, 0.1s, 0s; }
+  .t-item h1, .t-item h2 { font-size: var(--title); line-height: 1.06; letter-spacing: -0.04em; }
+  .t-item p { max-width: 46rem; margin: 0.85rem auto 0; font-size: clamp(1rem, min(1.7vw, 2.6vh), 1.3rem); line-height: 1.45; letter-spacing: -0.015em; color: var(--color-ink-2); text-wrap: balance; }
+  .t-item .short { display: none; }
+
+  /* ── 노트북 ── 안쪽 치수는 전부 em이라 노트북 폭에 비례해 같이 줄어든다 */
+  .device { position: relative; flex: none; width: var(--dev-w); margin-top: clamp(0.8rem, 2.4vh, 1.35rem); font-size: calc(var(--dev-w) / 76); }
+  .lid { padding: 1.1em 1.1em 1.5em; border-radius: 1.9em 1.9em 0.3em 0.3em; background: #0a0a0b; box-shadow: inset 0 0 0 0.12em #3a3a3e, 0 0 0 0.1em rgba(255, 255, 255, 0.08), 0 3.5em 6em -2.5em rgba(0, 0, 0, 0.65); }
+  .screen { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 0.9em 0.9em 0.2em 0.2em; background: #fff; container-type: inline-size; }
+  .base { position: relative; height: 1.7em; margin: 0 -6.5%; border-radius: 0.3em 0.3em 1.6em 1.6em / 0.3em 0.3em 1.2em 1.2em; background: linear-gradient(#e6e7ea, #c9cbcf 45%, #9a9ca2); box-shadow: 0 1.6em 2.4em -1em rgba(0, 0, 0, 0.5); }
+  .base::before { content: ""; position: absolute; left: 50%; top: 0; width: 13%; height: 0.55em; transform: translateX(-50%); border-radius: 0 0 0.6em 0.6em; background: #b3b5ba; }
+
+  /* ── 점 레일 + 재생 버튼 ── */
+  .controls { position: absolute; left: calc(100% + clamp(56px, 6vw, 120px)); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 1rem; }
+  .rail { display: flex; flex: none; flex-direction: column; padding: 8px 0; border-radius: 20px; background: var(--btn2-bg); border: 1px solid var(--color-rule-strong); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .rail button { position: relative; display: grid; place-items: center; width: 32px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .rail button i { width: 4px; height: 4px; border-radius: 4px; background: var(--color-ink-3); transition: width 0.4s var(--ease-spring), height 0.4s var(--ease-spring), background-color 0.2s; }
+  .rail button:hover i { background: var(--color-ink); }
+  .rail button[aria-current] i { height: 18px; background: var(--color-ink); }
+  .tip { position: absolute; right: calc(100% + 10px); top: 50%; padding: 3px 8px; border-radius: 7px; background: var(--color-ink); color: var(--color-paper); font-size: 0.75rem; font-weight: 600; white-space: nowrap; opacity: 0; transform: translate(4px, -50%); pointer-events: none; transition: opacity 0.16s, transform 0.2s var(--ease-spring); }
+  .rail button:hover .tip, .rail button:focus-visible .tip { opacity: 1; transform: translate(0, -50%); }
+  .play { display: grid; flex: none; place-items: center; width: 32px; height: 32px; padding: 0; border-radius: 50%; border: 1px solid var(--color-rule-strong); background: var(--btn2-bg); color: var(--color-ink); cursor: pointer; transition: background-color var(--dur-base), transform var(--dur-fast); }
+  .play:hover { background: var(--color-accent-soft); }
+  .play:active { transform: scale(0.92); }
+  .play span { grid-area: 1 / 1; display: grid; transition: opacity 0.2s, transform 0.3s var(--ease-spring); }
+  .play :global(svg) { fill: currentColor; }
+  .play[aria-pressed="false"] .i-pause, .play[aria-pressed="true"] .i-play { opacity: 0; transform: scale(0.4); }
+
+  .acts { margin-top: clamp(0.9rem, 2.4vh, 1.35rem); }
+  .act { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .act-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .cap { font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); }
+
+  @media (min-width: 721px) and (max-height: 640px) { .mode, .cap { display: none; } }
+
+  /* ── 휴대폰 ── 왼쪽 메뉴를 빼고 화면을 4:5에 가깝게 키운다. 점 레일은 노트북 아래 가로로 */
+  @media (max-width: 720px) {
+    .tour { --dev-w: max(240px, min(100vw - 32px, (100vh - var(--bar-h) - 334px) * 1.2)); --title: clamp(2rem, 9.6vw, 3rem); }
+    @supports (height: 100svh) { .tour { --dev-w: max(240px, min(100vw - 32px, (100svh - var(--bar-h) - 334px) * 1.2)); } }
+    .col { padding: 10px 16px 12px; }
+    .mode { display: none; }
+    .titles { margin-top: 0; }
+    .t-item p { margin-top: 0.6rem; font-size: 0.9375rem; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+    .t-item p.has-short .full { display: none; }
+    .t-item p.has-short .short { display: inline; }
+    .device { margin-top: 14px; }
+    .screen { aspect-ratio: 5 / 4; }
+    .base { margin: 0 -3.5%; }
+    .controls { position: relative; left: 50%; top: auto; width: max-content; transform: translateX(-50%); flex-direction: row; margin-top: 14px; }
+    .rail { flex-direction: row; padding: 0 8px; }
+    .rail button { width: min(28px, calc((100vw - 110px) / var(--n))); height: 40px; } /* 아주 좁은 화면에서도 재생 버튼까지 한 줄에 */
+    .rail button[aria-current] i { width: 18px; height: 4px; }
+    .tip { display: none; }
+    .play { width: 40px; height: 40px; }
+    .acts { margin-top: 14px; }
+    .act { gap: 6px; }
+  }
+  @media (max-width: 720px) and (max-height: 600px) { .cap { display: none; } }
+  @media (max-width: 720px) and (min-height: 780px) { .mode { display: inline-flex; margin-bottom: 14px; } }
+</style>
+
+<style is:global>
+  /* 노트북 화면 안의 가짜 앱. Row.astro가 그리는 줄에도 적용돼야 해서 전역으로 두고 .app 아래로만 한정한다.
+     1em = 화면 폭의 1/72 (휴대폰은 1/44). 테마와 상관없이 항상 밝은 화면이다. */
+  .app { position: absolute; inset: 0; display: grid; grid-template-columns: 20em minmax(0, 1fr); font-size: calc(100cqw / 72); line-height: 1.35; letter-spacing: -0.01em; text-align: left; color: #111; background: #fff; }
+  .app b { font-weight: 600; }
+  .app svg { width: 1.4em; height: 1.4em; stroke-width: 2; flex: none; }
+  .app .tile { display: grid; place-items: center; flex: none; width: 2.3em; height: 2.3em; border-radius: 0.65em; background: #111; color: #fff; }
+  .app .dot { display: inline-block; width: 0.7em; height: 0.7em; margin: 0; border-radius: 50%; background: #111; vertical-align: middle; }
+  .app .dot.live { animation: pulse 2.4s ease-in-out infinite; }
+
+  .app .side { display: flex; flex-direction: column; min-height: 0; padding: 1.3em 1.1em 1.1em; background: #f1f1f2; border-right: 0.1em solid #e2e2e5; }
+  .app .traffic { display: flex; gap: 0.8em; padding: 0.2em 0.4em 1.1em; }
+  .app .traffic i { width: 1.2em; height: 1.2em; border-radius: 50%; background: #d8d8dc; }
+  .app .s-search { display: flex; align-items: center; justify-content: center; gap: 0.5em; height: 3em; margin-bottom: 0.9em; border-radius: 0.9em; background: #e3e3e6; color: #6b6d73; }
+  .app .s-search span { font-size: 1.25em; }
+  .app .s-nav { position: relative; flex: 1; min-height: 0; }
+  .app .s-hl { position: absolute; left: 0; right: 0; top: 0; height: var(--h, 3.1em); border-radius: 0.9em; background: #111; transform: translateY(var(--y, 0)); transition: transform 0.5s var(--ease-spring); }
+  .app .side-item { position: relative; display: flex; align-items: center; gap: 0.9em; width: 100%; height: 3.1em; padding: 0 0.6em; border: 0; border-radius: 0.9em; background: none; color: #111; font: inherit; letter-spacing: inherit; text-align: left; cursor: pointer; transition: color 0.3s; }
+  .app .side-item .nm { font-size: 1.3em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .app .side-item .tile { width: 2.1em; height: 2.1em; transition: background-color 0.3s; }
+  .app .side-item:hover:not(.on) { background: #e6e6e9; }
+  .app .side-item.on { color: #fff; }
+  .app .side-item.on .tile { background: transparent; }
+  .app .s-label { display: block; padding: 0.9em 0.5em 0.35em; font-size: 1.1em; color: #6b6d73; }
+  .app .s-status { display: flex; align-items: center; gap: 0.8em; padding: 0.8em 1em; border-radius: 1em; background: #fff; border: 0.1em solid #e4e4e7; }
+  .app .s-status b { display: block; font-size: 1.2em; }
+  .app .s-status span { display: block; font-size: 1.05em; color: #63656b; }
+
+  .app .main { position: relative; overflow: hidden; }
+  .app .main::after { content: ""; position: absolute; inset: auto 0 0 0; height: 3em; background: linear-gradient(rgba(255, 255, 255, 0), #fff); pointer-events: none; }
+  .app .pane { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 1.1em; padding: 2.4em 2.6em 0; opacity: 0; visibility: hidden; transform: translateY(1.4em); transition: opacity 0.3s, transform 0.55s var(--ease-spring), visibility 0s 0.3s; }
+  .app .pane.on { opacity: 1; visibility: visible; transform: none; transition-delay: 0.12s, 0.12s, 0s; }
+  .app .p-head { display: flex; align-items: center; gap: 1.3em; }
+  .app .p-head .tile { width: 4.4em; height: 4.4em; border-radius: 1.2em; }
+  .app .p-head .tile svg { width: 2.4em; height: 2.4em; }
+  .app .p-head b { display: block; font-size: 2.2em; font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; }
+  .app .p-head > div { min-width: 0; }
+  .app .p-head .sub { display: block; font-size: 1.2em; color: #63656b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .app .p-head .chip { display: inline-flex; align-items: center; gap: 0.5em; margin-top: 0.3em; }
+  .app .p-photo { width: 5.2em; height: 5.2em; border-radius: 50%; object-fit: cover; flex: none; }
+  .app .p-label { margin: 0.2em 0 -0.4em 0.2em; font-size: 1.2em; color: #63656b; }
+  .app .p-list { flex: none; border-radius: 1.3em; background: #f3f3f5; border: 0.1em solid #ececef; overflow: hidden; }
+  .app .p-row { position: relative; display: flex; align-items: center; gap: 1.1em; min-height: 4.6em; padding: 0.7em 1.4em; }
+  .app .p-row + .p-row::before { content: ""; position: absolute; left: 4.8em; right: 0; top: 0; height: 0.1em; background: #e1e1e5; }
+  .app .p-txt { flex: 1; min-width: 0; }
+  .app .p-txt b { display: block; font-size: 1.35em; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .app .p-txt span { display: block; font-size: 1.1em; color: #63656b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .app .p-val { flex: none; font-size: 1.25em; color: #5f6167; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .app .tg { position: relative; flex: none; width: 3.9em; height: 2.3em; border-radius: 2em; background: #dadade; transition: background-color 0.3s; }
+  .app .tg::after { content: ""; position: absolute; top: 0.25em; left: 0.25em; width: 1.8em; height: 1.8em; border-radius: 50%; background: #fff; box-shadow: 0 0.1em 0.3em rgba(0, 0, 0, 0.25); transition: transform 0.4s var(--ease-spring); }
+  .app .tg.on { background: #111; }
+  .app .tg.on::after { transform: translateX(1.6em); }
+  .app .sg { display: inline-flex; align-self: flex-start; flex: none; padding: 0.25em; border-radius: 2em; background: #e6e6ea; }
+  .app .sg span { padding: 0.35em 1em; border-radius: 2em; font-size: 1.15em; color: #55575d; }
+  .app .sg span.on { background: #111; color: #fff; }
+  /* 세 관점을 차례로 짚는다 */
+  .app .pane.on .sg.cycle span { animation: seg 6s infinite; }
+  .app .pane.on .sg.cycle span:nth-child(2) { animation-delay: 2s; }
+  .app .pane.on .sg.cycle span:nth-child(3) { animation-delay: 4s; }
+  @keyframes seg { 0%, 30% { background: #111; color: #fff; } 36%, 100% { background: transparent; color: #55575d; } }
+  .app .bar { flex: none; width: 11em; height: 0.55em; border-radius: 0.5em; background: #dcdce0; overflow: hidden; }
+  .app .bar.wide { width: 20em; }
+  .app .bar i { display: block; width: 0; height: 100%; border-radius: inherit; background: #111; transition: width 1.1s var(--ease-spring); }
+  .app .bar.show i { width: var(--to); }
+  .app .chip { flex: none; padding: 0.25em 0.8em; border-radius: 2em; background: #e4e4e8; color: #2b2c30; font-size: 1.1em; white-space: nowrap; }
+  .app .chip.dark { background: #111; color: #fff; }
+  .app .chip.line { background: #fff; box-shadow: inset 0 0 0 0.1em #111; }
+  .app .chips { display: flex; flex-wrap: wrap; gap: 0.6em; }
+  .app .chips .chip { padding: 0.45em 1em; font-size: 1.2em; }
+  .app .pbtn { padding: 0.4em 1.1em; border-radius: 2em; background: #111; color: #fff; font-size: 1.15em; white-space: nowrap; }
+
+  /* 시간에 맞춰 나타나는 요소 (.show는 Stage의 스크립트가 붙인다) */
+  .app .rvl { opacity: 0; transform: translateY(0.8em) scale(0.98); transition: opacity 0.4s, transform 0.55s var(--ease-spring); }
+  .app .rvl.show { opacity: 1; transform: none; }
+  .app .swap { display: inline-grid; place-items: center end; flex: none; }
+  .app .swap > * { grid-area: 1 / 1; transition: opacity 0.25s, transform 0.4s var(--ease-spring); }
+  .app .swap > :last-child, .app .swap.show > :first-child { opacity: 0; transform: scale(0.7); }
+  .app .swap.show > :last-child { opacity: 1; transform: none; }
+
+  .app .typebox { position: relative; flex: none; min-height: 5.6em; padding: 1.1em 1.4em; border-radius: 1.3em; background: #fff; box-shadow: 0 0 0 0.1em #e6e6ea, 0 1em 2.4em -1em rgba(0, 0, 0, 0.25); }
+  .app .typebox.tall { min-height: 9.4em; }
+  .app .typebox > span[data-type] { font-size: 1.35em; line-height: 1.5; }
+  .app .typebox .saved { position: absolute; right: 1.2em; bottom: 1.1em; }
+  .app .caret { display: inline-block; width: 0.12em; height: 1.6em; margin-left: 0.15em; background: currentColor; vertical-align: -0.3em; animation: caret 1s steps(1) infinite; }
+  @keyframes caret { 50% { opacity: 0; } }
+  .app .term { flex: none; padding: 1.2em 1.5em; border-radius: 1.2em; background: #0d0d0e; color: #e9e9ec; font-family: var(--font-mono); letter-spacing: 0; }
+  .app .term p { margin: 0; font-size: 1.15em; line-height: 1.75; white-space: pre; }
+  .app .term b { font-weight: 700; color: #fff; }
+  .app .stamp { position: absolute; right: 12em; bottom: 3em; display: grid; place-items: center; width: 9.5em; height: 9.5em; border-radius: 50%; border: 0.4em solid #111; background: rgba(255, 255, 255, 0.82); opacity: 0; transform: rotate(-14deg) scale(1.7); transition: opacity 0.2s, transform 0.5s cubic-bezier(0.3, 1.5, 0.5, 1); }
+  .app .stamp.show { opacity: 1; transform: rotate(-14deg) scale(1); }
+  .app .stamp b { font-size: 2.4em; font-weight: 800; letter-spacing: 0.04em; }
+  .app .heat { flex: none; display: grid; grid-template-columns: 5em repeat(12, minmax(0, 1fr)); gap: 0.45em; align-items: center; }
+  .app .heat-l { font-size: 1.1em; color: #63656b; }
+  .app .heat i { aspect-ratio: 1; border-radius: 0.45em; background: #ececef; transform: scale(0.6); transition: background-color 0.5s var(--d), transform 0.5s var(--ease-spring) var(--d); }
+  .app .heat.show i { background: color-mix(in srgb, #111 calc(var(--v) * 1%), #ececef); transform: none; }
+  .app .sample { position: absolute; right: 2.2em; top: 2.2em; z-index: 2; padding: 0.3em 0.9em; border-radius: 2em; background: rgba(255, 255, 255, 0.92); box-shadow: 0 0 0 0.1em #e2e2e6; color: #6b6d73; font-size: 1em; transition: opacity 0.3s; }
+  .tour[data-step="0"] .app .sample, .tour:not([data-step]) .app .sample { opacity: 0; }
+
+  @media (max-width: 720px) {
+    .app { grid-template-columns: minmax(0, 1fr); font-size: calc(100cqw / 44); }
+    .app .side, .app .m-hide { display: none; }
+    .app .pane { padding: 2em 2em 0; gap: 1em; }
+    .app .bar.wide { width: 14em; }
+    .app .sample { top: auto; right: 1.2em; bottom: 1em; font-size: 1.05em; }
+    .app .p-row { min-height: 4.2em; padding-block: 0.5em; }
+    .app .stamp { right: auto; left: 50%; bottom: 4.2em; width: 6.6em; height: 6.6em; border-width: 0.3em; }
+    .app .stamp b { font-size: 1.7em; }
+  }
+</style>
