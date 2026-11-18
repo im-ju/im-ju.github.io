@@ -92,6 +92,8 @@ a { text-decoration-color: var(--color-rule-strong); text-decoration-thickness: 
 .status[data-status="live"] { color: var(--color-ink); border-color: var(--color-ink); }
 .status[data-status="live"]::before { background: var(--color-ink); box-shadow: none; animation: pulse 2.4s ease-in-out infinite; }
 .status[data-status="pending"]::before, .status[data-status="poc"]::before, .status[data-status="approved"]::before, .status[data-status="done"]::before { background: var(--color-ink-3); }
+/* 개발 중: 아직 채워지지 않은 빈 고리 */
+.status[data-status="wip"]::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--color-ink-2); }
 @keyframes pulse { 50% { opacity: 0.35; } }
 
 /* 화면에 들어올 때 살짝 올라오는 등장. JS가 없으면(.no-js) 처음부터 보인다 */

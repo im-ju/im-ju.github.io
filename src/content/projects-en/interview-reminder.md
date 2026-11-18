@@ -16,7 +16,7 @@ It was not hard, but it could never be missed. A missed email hurts the candidat
 
 **I had it prepare drafts every morning.** I wrote a small program that runs inside Google's work tools (Google Apps Script). Every morning it reads the next day's events in the shared calendar, uses each title to tell whether it is an interview and of what type, finds the candidate's name and email in the event description, and creates a Gmail draft from the right template. When it is done, it sends a summary email saying how many drafts it made.
 
-**It shows the events it could not read.** If it cannot find the candidate's name or email in the description, it does not just skip the event; it lists it as a warning, with the reason, in the morning summary. If it simply skipped, the summary would say "3 drafts created" and nobody would know there were actually 4 interviews. A missing case looks like success, so it has to be visible. On days with warnings, the summary's subject line gets "needs checking", so a normal morning and a problem morning look different in the inbox.
+**It shows the events it could not read.** If it cannot find the candidate's name or email in the description, it lists the event as a warning, with the reason, in the morning summary. If it simply skipped, the summary would say "3 drafts created" and nobody would know there were actually 4 interviews. On days with warnings, the summary's subject line gets "needs checking", so a normal morning and a problem morning look different in the inbox.
 
 **The same draft is never created twice.** Sometimes the program runs twice, or the same event appears twice in the calendar. Before creating a draft, it checks whether a draft with the same subject and recipient already exists, and if so, it does not create another.
 
@@ -36,4 +36,4 @@ It was not hard, but it could never be missed. A missed email hurts the candidat
 - The calendar is filled in by hand. There are always events whose time changed, that were cancelled, or whose description is incomplete.
 - When the input is not 100% reliable and the result cannot be undone, the final human check must not be removed.
 
-What I automated is the writing; what I left to a person is the decision to send. Almost all of the repetitive burden was in the writing, so it captures most of the benefit without taking on the risk.
+Almost all of the repetitive work was in the writing, so automating only that captured most of the benefit without the risk of a wrong send.

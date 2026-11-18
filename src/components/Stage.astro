@@ -2,7 +2,7 @@
 // 홈 첫 구역: 화면에 고정된 노트북. 스크롤할 때마다 제목과 노트북 안 화면이 다음 프로젝트로 바뀐다.
 // 0단계 = 소개, 1…N단계 = src/data/cases.ts 순서대로의 프로젝트.
 // 노트북 안 화면은 실제 사내 화면이 아니라 직접 그린 예시다: 이름·시간·건수는 가상이고,
-// 숫자는 이미 공개한 글에 있는 것(6개 기능, 8가지 검사, 46개 페이지, 15건, 17명, 29건)만 쓴다.
+// 숫자는 이미 공개한 글에 있는 것(6개 기능, 46개 페이지, 15건, 17명)만 쓴다.
 import type { ComponentProps } from 'astro/types';
 import { t, type Locale } from '../i18n';
 import Icon from './Icon.astro';
@@ -20,7 +20,7 @@ const L = (ko: string, enText: string) => (en ? enText : ko);
 const N = files.length + 1;
 
 // 데모 화면 순서는 프로젝트 id로 찾는다. 프로젝트를 추가했는데 화면을 안 그렸으면 빌드에서 멈춘다.
-const PANES = ['hrga-hub', 'meal-allowance', 'interview-reminder', 'benefits-audit', 'access-log', 'guide-redesign', 'asset-regulation', 'skill-intelligence'];
+const PANES = ['hris', 'hrga-hub', 'meal-allowance', 'interview-reminder', 'guide-redesign', 'asset-regulation'];
 const missing = files.filter((f) => !PANES.includes(f.id)).map((f) => f.id);
 if (missing.length) throw new Error(`Stage.astro has no demo screen for: ${missing.join(', ')}. Add a <div class="pane"> for it.`);
 const step = (id: string) => {
@@ -36,13 +36,6 @@ const record = s.hero.fields
   .filter(([k]) => k !== '근무지' && k !== 'Location')
   .map(([k, v], i) => { const [main, ...rest] = v.split(', '); return { icon: fieldIcons[i], key: k, value: main, sub: rest.join(', ') }; });
 
-// 히트맵 칸의 진하기(가상 데이터). 4팀 × 12칸.
-const heat = [
-  8, 22, 8, 40, 22, 8, 64, 22, 8, 22, 40, 8,
-  22, 64, 40, 22, 90, 40, 22, 8, 64, 40, 22, 22,
-  40, 22, 90, 64, 40, 90, 22, 64, 40, 90, 64, 22,
-  8, 40, 22, 8, 22, 40, 8, 22, 64, 8, 22, 40,
-]; // ← 0(옅음)~100(진함), 한 줄이 한 팀
 ---
 <section id="files" class="tour" data-steps={N} data-ids={['', ...files.map((f) => f.id)].join(',')} style={`--n:${N}`} aria-label={tr.rail}>
   <div class="pin">
@@ -105,6 +98,28 @@ const heat = [
                   </div>
                 </div>
 
+                {/* 사내 HRIS: 개발 중인 시스템의 홈 화면을 본뜬 예시. 근무시간·요청은 가상, 단계와 범위는 프로젝트 글 그대로 */}
+                <div class="pane" data-i={step('hris')}>
+                  <header class="p-head"><span class="tile"><Icon name="users" /></span><div><b>{file('hris').short}</b><span class="sub">{L('PO로 와이어프레임부터 개발까지 이끌고 있습니다', 'Leading it as product owner, from wireframes to build')}</span></div></header>
+                  <div class="sg m-hide"><span>{L('와이어프레임', 'Wireframes')}</span><span class="on">{L('개발 중', 'In development')}</span><span>{L('전사 테스트 · 2026년 말 목표', 'Company-wide test · goal: end of 2026')}</span></div>
+                  <p class="p-label">{L('오늘', 'Today')}</p>
+                  <div class="p-list">
+                    <Row icon="clock" title={L('이번 주 근무', 'Hours this week')} sub={L('출퇴근 · 외근 · 원격 근무', 'Office · field · remote')} at={150}><span class="bar" data-at="500" style="--to:70%"><i></i></span><span class="p-val">28 / 40{L('시간', 'h')}</span></Row>
+                    <Row icon="calendar" title={L('직원 A · 연차', 'Employee A · annual leave')} sub={L('같은 기간에 팀원 휴가 1건', 'One teammate is off on the same days')} at={260}>
+                      <span class="swap" data-at="1900"><span class="pbtn">{L('승인', 'Approve')}</span><span class="chip line">{L('승인됨', 'Approved')} ✓</span></span>
+                    </Row>
+                    <Row icon="home" title={L('직원 B · 원격 근무', 'Employee B · remote work')} sub={L('내일', 'Tomorrow')} at={370}><span class="chip">{L('승인 대기', 'Waiting')}</span></Row>
+                  </div>
+                  <div class="p-list m-hide">
+                    <Row icon="file" title={L('회사 규정이 곧 설정값', 'Company rules are the settings')} sub={L('연차 발생 · 근무 유형 · 휴가 종류를 출처와 함께 한 파일에', 'Leave grants, work types and leave types in one file, with sources')} at={700}><span class="tg on" data-init="on"></span></Row>
+                  </div>
+                  <div class="chips">
+                    {[L('구성원 · 조직도', 'People & org chart'), L('근무', 'Attendance'), L('휴가', 'Leave'), L('평가 · 채용', 'Reviews & recruiting'), L('승인 정책 · 권한', 'Approval policy & permissions')].map((c, i) => (
+                      <span class="chip rvl" data-at={900 + i * 130}>{c}</span>
+                    ))}
+                  </div>
+                </div>
+
                 {/* HR/GA Hub */}
                 <div class="pane" data-i={step('hrga-hub')}>
                   <header class="p-head"><span class="tile"><Icon name="grid" /></span><div><b>HR/GA Hub</b><span class="sub">{L('회사 계정 하나로 들어가는 사내 웹앱', 'One internal web app behind the company account')}</span></div></header>
@@ -158,38 +173,6 @@ const heat = [
                   </div>
                 </div>
 
-                {/* 자기계발비 감사 */}
-                <div class="pane" data-i={step('benefits-audit')}>
-                  <header class="p-head"><span class="tile"><Icon name="search" /></span><div><b>{file('benefits-audit').short}</b><span class="sub">{L('시트를 읽기만 하고, 맞지 않는 숫자를 찾습니다', 'Reads the sheet, never edits it, and finds what does not add up')}</span></div></header>
-                  <div class="p-list">
-                    <Row icon="shield" title={L('검사 8가지', '8 checks')} sub={L('규정에서 가져온 기준', 'Taken from the regulation')}><span class="bar" data-at="300" style="--to:100%"><i></i></span><span class="p-val"><span data-count="8">8</span> / 8</span></Row>
-                  </div>
-                  <p class="p-label m-hide">{L('찾은 문제 · 예시', 'Findings · sample')}</p>
-                  <div class="p-list">
-                    <Row icon="users" title={L('동명이인', 'Same name, two people')} sub={L('표가 이름으로만 이어져 있음', 'Tables linked by name only')} at={1300}><span class="chip dark">{L('높음', 'High')}</span></Row>
-                    <Row icon="pen" title={L('팀명 불일치', 'Team-name mismatch')} sub={L('한 글자 차이', 'Off by one character')} at={1700}><span class="chip">{L('중간', 'Medium')}</span></Row>
-                    <Row icon="chart" title={L('한도 초과', 'Limit exceeded')} sub={L('월 · 연 한도 기준', 'Monthly and yearly limits')} at={2100}><span class="chip dark">{L('높음', 'High')}</span></Row>
-                  </div>
-                  <div class="p-list m-hide">
-                    <Row icon="lock" title={L('원본 시트 수정', 'Edit the original sheet')} sub={L('읽기 전용 · 한 칸도 고치지 않습니다', 'Read-only · not a single cell is changed')}><span class="tg" data-init="off"></span></Row>
-                  </div>
-                </div>
-
-                {/* 출입기록 분석 */}
-                <div class="pane" data-i={step('access-log')}>
-                  <header class="p-head"><span class="tile"><Icon name="door" /></span><div><b>{file('access-log').short}</b><span class="sub">{L('잘못 잡힌 건을 걸러내는 데 가장 공을 들였습니다', 'Most of the work went into filtering out false hits')}</span></div></header>
-                  <p class="p-label m-hide">{L('걸러내기', 'Filters')}</p>
-                  <div class="p-list">
-                    <Row icon="door" title={L('출입문 통과 기록', 'Door access logs')} sub={L('석 달 치', 'Three months')}><span class="bar wide" data-at="300" style="--to:100%"><i></i></span></Row>
-                    <Row icon="filter" title={L('짧은 이동 제거', 'Drop short exits')}><span class="bar wide" data-at="900" style="--to:58%"><i></i></span></Row>
-                    <Row icon="clock" title={L('60분 초과만', 'Keep 60+ minutes')}><span class="bar wide" data-at="1500" style="--to:26%"><i></i></span></Row>
-                    <Row icon="building" title={L('건물 안 기록 있으면 제외', 'Drop if still inside')}><span class="bar wide" data-at="2100" style="--to:10%"><i></i></span></Row>
-                  </div>
-                  <div class="p-list">
-                    <Row icon="user" title={L('확인이 필요한 건', 'Needs checking')} sub={L('판단은 사람이 합니다', 'A person makes the call')} at={2700}><span class="chip dark">{L('목록', 'List')}</span></Row>
-                  </div>
-                </div>
-
                 {/* 안내서 이관 */}
                 <div class="pane" data-i={step('guide-redesign')}>
                   <header class="p-head"><span class="tile"><Icon name="scale" /></span><div><b>{file('guide-redesign').short}</b><span class="sub">{L('원본을 건드리지 않는 이관 리허설', 'A migration rehearsal that never touches the original')}</span></div></header>
@@ -221,26 +204,6 @@ const heat = [
                     <Row icon="check-circle" title={L('대표이사 결재', 'CEO sign-off')} at={900}><span class="chip dark rvl" data-at="2600">{L('승인', 'Approved')}</span></Row>
                   </div>
                   <div class="stamp" data-at="2600"><b>{L('승인', 'OK')}</b></div>
-                </div>
-
-                {/* Skill Intelligence */}
-                <div class="pane" data-i={step('skill-intelligence')}>
-                  <header class="p-head"><span class="tile"><Icon name="chart" /></span><div><b>Skill Intelligence</b><span class="sub">{L('한 사람이 떠나면 무엇이 멈추는지 추적', 'Tracing what stops when one person leaves')}</span></div></header>
-                  <div class="p-list m-hide">
-                    <Row icon="file" title={L('분석한 사내 문서', 'Internal documents analysed')}><span class="p-val"><span data-count="29" data-delay="300">29</span>{L('건', '')}</span></Row>
-                  </div>
-                  <p class="p-label">{L('팀 리스크 히트맵 · 가상 데이터', 'Team risk heatmap · synthetic data')}</p>
-                  <div class="heat" data-at="700">
-                    {['A', 'B', 'C', 'D'].map((team, r) => (
-                      <>
-                        <span class="heat-l">{L('팀', 'Team')} {team}</span>
-                        {heat.slice(r * 12, r * 12 + 12).map((v, c) => <i style={`--v:${v};--d:${(r * 12 + c) * 22}ms`}></i>)}
-                      </>
-                    ))}
-                  </div>
-                  <div class="p-list">
-                    <Row icon="check-circle" title={L('권고', 'Recommendation')} sub={L('시범 분석(PoC) 결과', 'Outcome of the PoC')} at={2200}><span class="chip dark">{L('조건부 진행', 'Conditional go')}</span></Row>
-                  </div>
                 </div>
 
                 <span class="sample">{tr.sample}</span>
@@ -624,10 +587,6 @@ const heat = [
   .app .stamp { position: absolute; right: 12em; bottom: 3em; display: grid; place-items: center; width: 9.5em; height: 9.5em; border-radius: 50%; border: 0.4em solid #111; background: rgba(255, 255, 255, 0.82); opacity: 0; transform: rotate(-14deg) scale(1.7); transition: opacity 0.2s, transform 0.5s cubic-bezier(0.3, 1.5, 0.5, 1); }
   .app .stamp.show { opacity: 1; transform: rotate(-14deg) scale(1); }
   .app .stamp b { font-size: 2.4em; font-weight: 800; letter-spacing: 0.04em; }
-  .app .heat { flex: none; display: grid; grid-template-columns: 5em repeat(12, minmax(0, 1fr)); gap: 0.45em; align-items: center; }
-  .app .heat-l { font-size: 1.1em; color: #63656b; }
-  .app .heat i { aspect-ratio: 1; border-radius: 0.45em; background: #ececef; transform: scale(0.6); transition: background-color 0.5s var(--d), transform 0.5s var(--ease-spring) var(--d); }
-  .app .heat.show i { background: color-mix(in srgb, #111 calc(var(--v) * 1%), #ececef); transform: none; }
   .app .sample { position: absolute; right: 2.2em; top: 2.2em; z-index: 2; padding: 0.3em 0.9em; border-radius: 2em; background: rgba(255, 255, 255, 0.92); box-shadow: 0 0 0 0.1em #e2e2e6; color: #6b6d73; font-size: 1em; transition: opacity 0.3s; }
   .tour[data-step="0"] .app .sample, .tour:not([data-step]) .app .sample { opacity: 0; }
 

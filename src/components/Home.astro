@@ -19,8 +19,8 @@ const prefix = en ? '/en/' : '/';
 
 // 프로젝트별 아이콘 ← 프로젝트를 추가하면 여기에도 한 줄
 const ICONS: Record<string, IconName> = {
-  'hrga-hub': 'grid', 'meal-allowance': 'receipt', 'interview-reminder': 'mail', 'benefits-audit': 'search',
-  'access-log': 'door', 'guide-redesign': 'scale', 'asset-regulation': 'file', 'skill-intelligence': 'chart',
+  'hris': 'users', 'hrga-hub': 'grid', 'meal-allowance': 'receipt', 'interview-reminder': 'mail',
+  'guide-redesign': 'scale', 'asset-regulation': 'file',
 };
 
 // 쉬운 말 설명과 머리말 정보를 합친다. 하나라도 어긋나면 조용히 빠뜨리지 않고 빌드를 멈춘다.
@@ -33,6 +33,10 @@ const files = CASES.map((c) => {
   if (!ICONS[c.id]) throw new Error(`Home.astro has no icon for project "${c.id}". Add it to ICONS.`);
   const d = e.data;
   const copy = en ? c.en : c;
+  // 기간이 "2026.03 – 운영 중", "2026.10 – 개발 중"처럼 상태로 끝나면 상태를 두 번 말하지 않는다
+  const status = STATUS_LABEL[locale][d.status];
+  const span = en ? d.periodEn : d.period;
+  const open = span.endsWith(status);
   return {
     id: c.id,
     no: fileNo(c.id),
@@ -40,11 +44,10 @@ const files = CASES.map((c) => {
     title: copy.title,
     line: copy.line,
     cat: en ? c.catEn : c.cat,
-    period: (en ? d.periodEn : d.period).replace(/\s*[–-]\s*(운영 중|live)$/, ' –'), // 상태 꼬리표가 이미 "운영 중"이라고 말한다
-    status: STATUS_LABEL[locale][d.status],
+    period: open ? span.slice(0, -status.length).trimEnd() : span, // 카드: 상태 꼬리표가 옆에 따로 있다 → "2026.03 –"
+    status,
     statusKey: d.status,
-    // 무대 아래 한 줄: 운영 중인 것은 기간에 이미 "– 운영 중"이 들어 있어 상태를 또 붙이지 않는다
-    caption: [en ? c.catEn : c.cat, en ? d.periodEn : d.period, ...(d.status === 'live' ? [] : [STATUS_LABEL[locale][d.status]])].join(' · '),
+    caption: [en ? c.catEn : c.cat, span, ...(open ? [] : [status])].join(' · '), // 무대 아래 한 줄
     href: `${prefix}work/${c.id}/`,
     icon: ICONS[c.id],
   };

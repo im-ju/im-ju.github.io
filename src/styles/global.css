@@ -50,7 +50,7 @@ kbd {
 .status[data-status="live"]::before { background: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-soft); }
 /* unread-style blue dot used next to fresh items */
 .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); vertical-align: super; margin-left: 0.35em; }
-.status[data-status="pending"]::before, .status[data-status="poc"]::before { background: var(--color-warn); }
+.status[data-status="pending"]::before, .status[data-status="poc"]::before, .status[data-status="wip"]::before { background: var(--color-warn); }
 .status[data-status="approved"]::before, .status[data-status="done"]::before { background: var(--color-ink-2); }
 
 /* ── buttons ───────────────────────────────────────────── */
