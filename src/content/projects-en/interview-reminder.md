@@ -8,7 +8,7 @@ Writing reminder emails the day before interviews has shrunk to "check the draft
 
 ## The problem
 
-When an interview is booked, the candidate gets an email the day before with the location, the time, what to bring and who to contact. The content is fixed, but each interview type has its own template, and there can be several interviews in one day.
+When an interview is booked, the candidate gets a reminder email the day before with the location, the time, what to bring and who to contact. This is not the first email that announces the interview; it is the one sent again the day before. The content is fixed, but each interview type has its own template, and there can be several interviews in one day.
 
 It was not hard, but it could never be missed. A missed email hurts the candidate experience right away. And a person checking the calendar every day tends to fail on exactly the busiest day.
 

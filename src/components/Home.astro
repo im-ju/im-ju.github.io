@@ -17,11 +17,43 @@ const h = s.home;
 const en = locale === 'en';
 const prefix = en ? '/en/' : '/';
 
+// 이력 로그에서 처음 펼쳐 둘 줄 (i18n.ts의 home.logOpen). 그 날짜의 줄이 없으면 빌드를 멈춘다.
+const logOpen = s.log.entries.findIndex(([when]) => when === h.logOpen);
+if (logOpen < 0) throw new Error(`Home.astro: no log entry dated "${h.logOpen}". Fix home.logOpen or log.entries in src/i18n.ts.`);
+
 // 프로젝트별 아이콘 ← 프로젝트를 추가하면 여기에도 한 줄
 const ICONS: Record<string, IconName> = {
   'hris': 'users', 'hrga-hub': 'grid', 'meal-allowance': 'receipt', 'interview-reminder': 'mail',
   'guide-redesign': 'scale', 'asset-regulation': 'file',
 };
+
+// 연락 구역 점 그림: 흩어진 점이 모여 이 글자가 된다. 글꼴에 없는 글자거나 캔버스보다 넓으면 빌드를 멈춘다.
+const MOTIF_TEXT = 'JUYOUNG YOU'; // ← 점으로 쓸 글자 (아래 DOT_FONT에 있는 대문자와 빈칸만)
+const MOTIF = { w: 560, h: 200, pitch: 9 }; // ← 캔버스 크기와 점 사이 간격(px)
+// 가로 5 × 세로 7칸 점 글꼴. 1 = 점이 놓이는 자리 ← 다른 글자를 쓰려면 여기에 추가
+const DOT_FONT: Record<string, string[]> = {
+  J: ['00111', '00010', '00010', '00010', '00010', '10010', '01100'],
+  U: ['10001', '10001', '10001', '10001', '10001', '10001', '01110'],
+  Y: ['10001', '10001', '01010', '00100', '00100', '00100', '00100'],
+  O: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+  N: ['10001', '10001', '11001', '10101', '10011', '10001', '10001'],
+  G: ['01110', '10001', '10000', '10111', '10001', '10001', '01110'],
+};
+const motifCells: [number, number][] = [];
+let motifCol = 0;
+for (const ch of MOTIF_TEXT) {
+  if (ch === ' ') { motifCol += 2; continue; } // 낱말 사이는 글자 사이(1칸)보다 2칸 더 띈다
+  const glyph = DOT_FONT[ch];
+  if (!glyph) throw new Error(`Home.astro: MOTIF_TEXT contains "${ch}", which DOT_FONT does not define. Add its 5x7 pattern or change the text.`);
+  glyph.forEach((row, r) => [...row].forEach((v, c) => { if (v === '1') motifCells.push([motifCol + c, r]); }));
+  motifCol += 6;
+}
+const motifSpan = (motifCol - 2) * MOTIF.pitch;
+if (!motifCells.length) throw new Error('Home.astro: MOTIF_TEXT is empty, so the contact motif has no dots to draw.');
+if (motifSpan > MOTIF.w - 12) throw new Error(`Home.astro: "${MOTIF_TEXT}" needs ${motifSpan}px but the motif canvas allows ${MOTIF.w - 12}px. Shorten the text or lower MOTIF.pitch.`);
+const motifDots = motifCells
+  .map(([c, r]) => `${(MOTIF.w - motifSpan) / 2 + c * MOTIF.pitch},${(MOTIF.h - 6 * MOTIF.pitch) / 2 + r * MOTIF.pitch}`)
+  .join(' ');
 
 // 쉬운 말 설명과 머리말 정보를 합친다. 하나라도 어긋나면 조용히 빠뜨리지 않고 빌드를 멈춘다.
 const entries = await getCollection('projects');
@@ -109,7 +141,7 @@ const principleIcons: IconName[] = ['file', 'search', 'lock'];
   <h2 class="sec-label rv">{h.logTitle}</h2>
   <div class="acc-list">
     {s.log.entries.map(([when, head, body], i) => (
-      <details class="acc rv" name="log" open={i === 0}>
+      <details class="acc rv" name="log" open={i === logOpen}>
         <summary><span class="when">{when}</span><b>{head}</b><Icon name="chevron-down" size={18} /></summary>
         <p>{body}</p>
       </details>
@@ -118,7 +150,7 @@ const principleIcons: IconName[] = ['file', 'search', 'lock'];
 </section>
 
 <section id="contact" class="contact wrap" aria-labelledby="contact-title">
-  <canvas class="motif" width="560" height="200" aria-hidden="true"></canvas>
+  <canvas class="motif" width={MOTIF.w} height={MOTIF.h} data-dots={motifDots} aria-hidden="true"></canvas>
   <h2 id="contact-title" class="big rv">{h.contactTitle}</h2>
   <p class="contact-lede rv">{s.contact.lede}</p>
   <div class="contact-actions rv">
@@ -145,46 +177,50 @@ const principleIcons: IconName[] = ['file', 'search', 'lock'];
     }
   });
 
-  // 연락 구역의 그림: 흩어진 점(사람)이 줄 맞춘 격자(시스템)로 모였다가 다시 흩어진다.
+  // 연락 구역의 그림: 흩어진 점(사람)이 모여 이름이 됐다가 다시 흩어진다.
+  // 글자·크기·간격은 이 파일 맨 위의 MOTIF_TEXT / MOTIF에서 정하고, 점 자리는 태그의 data-dots로 넘어온다.
   const cv = document.querySelector<HTMLCanvasElement>('.motif');
   const ctx = cv?.getContext('2d');
   if (cv && ctx) {
-    const W = 560, H = 200, COLS = 14, ROWS = 5, GAP = 24; // ← 점 개수(COLS×ROWS)와 간격
+    const W = cv.width, H = cv.height;
+    const R = 3; // ← 다 모였을 때 점 반지름(px)
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
     let seed = 11; // 고정된 씨앗: 새로 고쳐도 같은 자리에서 흩어진다
     const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    const dots = Array.from({ length: COLS * ROWS }, (_, k) => ({
-      sx: 14 + rnd() * (W - 28), sy: 14 + rnd() * (H - 28),
-      gx: W / 2 + ((k % COLS) - (COLS - 1) / 2) * GAP, gy: H / 2 + (Math.floor(k / COLS) - (ROWS - 1) / 2) * GAP,
-      ph: rnd() * Math.PI * 2,
-    }));
+    const dots = cv.dataset.dots!.split(' ').map((s) => {
+      const [gx, gy] = s.split(',').map(Number);
+      return { sx: 14 + rnd() * (W - 28), sy: 14 + rnd() * (H - 28), gx, gy, ph: rnd() * Math.PI * 2 };
+    });
     const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
     const draw = (p: number, now: number) => {
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = getComputedStyle(cv).color;
+      ctx.globalAlpha = 0.3 + 0.7 * p;
+      const wob = (1 - p) * 5, r = 2.2 + p * (R - 2.2);
       for (const d of dots) {
-        const wob = (1 - p) * 5;
         const x = d.sx + (d.gx - d.sx) * p + Math.cos(now / 900 + d.ph) * wob;
         const y = d.sy + (d.gy - d.sy) * p + Math.sin(now / 1100 + d.ph) * wob;
-        ctx.globalAlpha = 0.3 + 0.7 * p;
-        ctx.beginPath(); ctx.arc(x, y, 2.2 + p * 1.4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
       }
     };
+    const still = () => draw(1, 0);
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      draw(1, 0);
-      new MutationObserver(() => draw(1, 0)).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      still();
+      new MutationObserver(still).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     } else {
       const LOOP = 7600; // ← 한 바퀴 시간(밀리초)
-      let visible = false;
+      let visible = false, t0 = 0, raf = 0;
       const frame = (now: number) => {
-        const u = (now % LOOP) / LOOP; // 모이기 → 멈춤 → 흩어지기 → 멈춤
+        const t = Math.max(0, now - t0); // 화면에 들어온 순간부터 센다: 늘 흩어진 상태에서 시작해 모인다
+        const u = (t % LOOP) / LOOP; // 모이기 → 멈춤 → 흩어지기 → 멈춤
         draw(u < 0.34 ? ease(u / 0.34) : u < 0.62 ? 1 : u < 0.9 ? 1 - ease((u - 0.62) / 0.28) : 0, now);
-        if (visible) requestAnimationFrame(frame);
+        if (visible) raf = requestAnimationFrame(frame);
       };
       new IntersectionObserver(([e]) => {
         const was = visible; visible = e.isIntersecting;
-        if (visible && !was) requestAnimationFrame(frame);
+        // 예약된 프레임을 지우고 새로 시작한다: 빠르게 들락거려도 그리기가 두 겹으로 돌지 않는다
+        if (visible && !was) { t0 = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame); }
       }).observe(cv);
     }
   }

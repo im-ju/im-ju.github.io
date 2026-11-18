@@ -25,7 +25,7 @@ export const t = {
       name: '유주영',
       role: 'HR Operations · People Systems',
       statement: '제도가 없으면 만들고 만든 제도가 지켜지는지 코드로 확인하는 HR 담당자입니다.',
-      sub: '블록체인 인프라 기업 DSRV 인사총무팀. 조직이 50명 미만에서 90명으로 커지는 동안 HR 시스템 전환 2회, 20개 이상 포지션 채용 단독 운영, 사내 규정을 조문 단위로 코드화한 웹 서비스 운영.',
+      sub: '블록체인 인프라 기업 DSRV 인사총무팀. 조직이 50명 미만에서 90명으로 커지는 동안 HR 시스템 전환 2회, 20개 이상 포지션 채용 운영, 사내 규정을 조문 단위로 코드화한 웹 서비스 운영.',
       fields: [
         ['소속', 'DSRV · 인사총무팀 매니저'],
         ['기간', '2024.12 – 재직 중'],
@@ -50,7 +50,7 @@ export const t = {
       articles: [
         ['제1조', '규정은 사람의 기억이 아니라 코드로 옮긴다', '식대 지원 요건, 자기계발비 한도, 자산 내용연수는 전부 문서에 적혀 있었지만 매번 사람이 해석했다. 해석을 코드로 고정하면 판정이 일관되고 규정이 바뀌었을 때 고칠 자리가 한 곳이 된다.'],
         ['제2조', '조용한 실패를 찾아 시끄럽게 만든다', '이 일들의 진짜 위험은 에러가 아니었다. 틀렸는데 정상처럼 보이는 것이었다. 근태 누락은 차감 0원으로, 파싱 실패는 "3건 생성" 성공 메시지로 위장한다. 전부 별도 확인 대상으로 승격하거나 경보를 붙였다.'],
-        ['제3조', '자동화의 경계를 먼저 정한다', '면접 안내메일은 작성만 자동, 발송은 사람. 식대 검증은 판정할 수 없는 건을 통과시키지 않고 사람에게 넘긴다. 무엇을 자동화하지 않을지를 매번 먼저 정했다.'],
+        ['제3조', '자동화의 경계를 먼저 정한다', '면접 전날 리마인드 메일은 작성만 자동, 발송은 사람. 식대 검증은 판정할 수 없는 건을 통과시키지 않고 사람에게 넘긴다. 무엇을 자동화하지 않을지를 매번 먼저 정했다.'],
         ['제4조', '되돌릴 수 없는 변경에는 절차를 만든다', '안내서 이관에서 적용했다면 하위 페이지 46개가 삭제됐을 함정을 사전에 발견했다. 검증하려는 행위 자체가 위험원일 때는 원본을 건드리지 않는 리허설을 따로 설계한다.'],
         ['제5조', '자기 결과를 자기가 검증한다', 'AI가 만든 코드와 문서는 그럴듯하게 틀린다. 그래서 모든 배포는 구현과 분리된 세션의 독립 리뷰를 거치고 문서에 적힌 숫자도 다시 세어 확인한다.'],
       ],
@@ -59,19 +59,23 @@ export const t = {
       silent: [
         ['식대 검증에서 근태기록 누락', '차감 0원 = 문제 없음처럼 보임', '별도확인대상으로 승격'],
         ['충전 사유 형식 변경', '검증 대상에서 빠짐 = 조용히 통과', '미매칭 건 경보'],
-        ['안내메일 파싱 실패', '건너뛰기 = "3건 생성" 성공 메시지', '경고 카운트 동반 보고'],
+        ['리마인드 메일 파싱 실패', '건너뛰기 = "3건 생성" 성공 메시지', '경고 카운트 동반 보고'],
         ['알림 크론 사망', '실패 건수 0 = 정상처럼 보임', '마지막 커버 날짜 신선도 감시'],
       ],
     },
     log: {
       title: '이력 로그',
-      lede: '2024년 12월 입사 이후의 주요 기록. 시간순.',
+      lede: '첫 경력부터 지금까지의 주요 기록. 시간순.',
       entries: [
-        ['2024.12', '입사', 'DSRV 경영관리팀 매니저로 입사. 2주 차부터 팀 리드 부재로 근태·연차·건강검진·병역지정업체 업무를 인수인계 없이 이관받아 운영.'],
+        // 2022–2024 = DSRV 이전 경력, career-ops/cv.md 기준 (2026-11-19 추가). 학력은 인사기록 카드에 있다.
+        ['2022.10', '피처링 · 마케팅 인턴', '인플루언서 마케팅 회사에서 2022년 12월까지. 협업 인플루언서 발굴과 캠페인 제안서 작성, 영·한 문서 번역, 스타트업 박람회 부스에서 외국인 대상 통역.'],
+        ['2023.04', '수을관 · 카페 매니저', '노우즈 × 수을관 협업 매장을 2023년 12월까지 운영. 매장 운영 총괄과 현장 이슈 해결, 메뉴 개발 참여, 콜드브루 선물세트 상품 기획.'],
+        ['2024.07', '머신킹 · 해외영업 · 파트너십', 'Associate Founder로 2024년 8월까지. 파트너 3인이 함께한 중고 상업용 운동기구 수입·유통에서 미국 딜러와 가격 협상, Legend Fitness 총판 계약 성사, 컨테이너 출고·납기 조정, 국내 리퍼 업체 선정.'],
+        ['2024.12', 'DSRV 입사', 'HR 경력의 시작. DSRV 경영관리팀 매니저로 입사. 2주 차부터 팀 리드 부재로 근태·연차·건강검진·병역지정업체 업무를 인수인계 없이 이관받아 운영.'],
         ['2025.02', 'HR SaaS 전환', 'HR ERP(5240)에서 flex로 전환. 벤더 구축 지원 없이 어드민에서 직접 세팅하고 데이터 이관, 출입통제 연동, 전자결재 설계까지 약 5주 만에 전사 오픈.'],
         ['2025', '사옥 이전', '8개 이상 카테고리 업체 비교견적, 5일 이전 일정 설계·운영, 4단계 검수 절차. 이후 법인 변경등기와 임대인 귀속 비용 분리까지.'],
-        ['2025 –', '채용 오퍼레이션', '20개 이상 포지션 채용 전 구간 단독 운영. AI 이력서 스크리닝 도입, 4개 채널 단일 계정 통합, 채용 SLA 문서화, 면접관 교육.'],
-        ['2025 –', '온보딩 제도 신설', '없던 온보딩을 처음부터 설계해 CFO 승인. 6단계에서 8단계로 재설계, 입사자 약 50명 직접 진행.'],
+        ['2025 –', '채용 오퍼레이션', '20개 이상 포지션 채용 전 구간 운영. AI 이력서 스크리닝 도입, 4개 채널 단일 계정 통합, 채용 SLA 문서화, 면접관 교육.'],
+        ['2025 –', '온보딩 제도 신설', '없던 온보딩을 처음부터 설계해 CFO 승인. 입사자 약 50명 직접 진행.'], // "6단계→8단계 재설계"는 cv.md 본인 정정(2026-10-07)에 따라 뺐다
         ['2026.01', 'ERP 전환', '더존 아마란스10 도입 때 조직도·결재선·양식·인사정보 세팅과 교육 담당. 전자결재 전환 완료, 회계·인사 모듈 진행 중.'],
         ['2026.03', '자산관리규정 개정', '법률·세무 / 정보보안 / 구조·실무 세 관점 분석, 우선순위 15건 반영. 변상 시 임금·퇴직금 일방 공제 금지 원칙 명문화. 대표이사 승인.'],
         ['2026.03', 'HR/GA Hub 배포', '사내 인사총무 통합 플랫폼을 전 직원 대상으로 공개. 이후 중단 없이 운영 중.'],
@@ -95,11 +99,12 @@ export const t = {
       principles: [
         ['규정은 기억 대신 규칙으로 옮깁니다.', '사람마다 해석이 달라지던 지원 요건과 한도를 규칙으로 고정하면 판정이 일관되고 규정이 바뀔 때 고칠 곳이 한 곳이 됩니다.'],
         ['틀렸는데 정상처럼 보이는 것을 먼저 찾습니다.', '근태 기록이 빠지면 차감 0원으로, 읽기 실패는 성공 메시지로 위장합니다. 이런 건을 따로 모아 눈에 띄게 만듭니다.'],
-        ['무엇을 자동화하지 않을지 먼저 정합니다.', '안내메일은 작성까지만, 판정할 수 없는 식대 건은 사람에게. 되돌릴 수 없는 일은 사람이 마지막에 결정합니다.'],
+        ['무엇을 자동화하지 않을지 먼저 정합니다.', '면접 리마인드 메일은 작성까지만, 판정할 수 없는 식대 건은 사람에게. 되돌릴 수 없는 일은 사람이 마지막에 결정합니다.'],
       ],
       recordTitle: '인사기록 카드',
       photoAlt: '유주영 프로필 사진',
       logTitle: '이력 로그',
+      logOpen: '2024.12', // ← 처음 펼쳐 둘 줄의 날짜 (HR 경력이 시작되는 DSRV 입사). log.entries의 날짜와 글자까지 같아야 한다
       contactTitle: '연락은 이메일이 가장 빠릅니다.',
       copy: '이메일 복사', copied: '복사했습니다', copyFailed: '복사가 안 됐습니다. 주소를 직접 선택해 주세요.',
       // 2026-11 redesign: pinned laptop tour (src/components/Stage.astro) and the sections under it
@@ -141,7 +146,7 @@ export const t = {
       name: 'Juyoung You',
       role: 'HR Operations · People Systems',
       statement: 'An HR generalist who writes the policy when none exists, then builds the systems that make it hold.',
-      sub: 'Manager, HR & General Affairs at DSRV, a blockchain infrastructure company in Seoul. While the company grew from under 50 to about 90 employees, I ran two HR system transitions, owned recruiting alone for 20+ requisitions, and built an internal web service that encodes company regulation clause by clause.',
+      sub: 'Manager, HR & General Affairs at DSRV, a blockchain infrastructure company in Seoul. While the company grew from under 50 to about 90 employees, I ran two HR system transitions, handled recruiting for 20+ requisitions, and built an internal web service that encodes company regulation clause by clause.',
       fields: [
         ['Employer', 'DSRV · Manager, HR & General Affairs'],
         ['Tenure', 'Dec 2024 – present'],
@@ -166,7 +171,7 @@ export const t = {
       articles: [
         ['Art. 1', 'Move rules out of memory and into code', 'Meal-allowance eligibility, training budgets and asset lifetimes were all written down, yet interpreted by a person every time. Fix the interpretation in code and judgements become consistent, with one place to change when the rule changes.'],
         ['Art. 2', 'Find silent failures and make them loud', 'The risk was never an error message. It was a result that was wrong but looked normal. A missing attendance record shows up as a zero deduction; a parse failure hides behind a "3 drafts created" success message. Each was promoted to an explicit review item or an alert.'],
-        ['Art. 3', 'Decide the boundary of automation first', 'Interview emails: drafting is automated, sending is human. Meal-allowance cases the rules cannot decide are never waved through; they go to a person.'],
+        ['Art. 3', 'Decide the boundary of automation first', 'Interview reminder emails: drafting is automated, sending is human. Meal-allowance cases the rules cannot decide are never waved through; they go to a person.'],
         ['Art. 4', 'Irreversible changes get a procedure', 'A handbook migration would have deleted 46 child pages if applied as planned. Testing it on the real pages would itself have caused the damage, so I rehearsed on a copy and never touched the original.'],
         ['Art. 5', 'Audit your own results', 'AI-generated code and documents fail plausibly. So every deployment goes through an independent review in a session separate from the one that built it, and numbers written in documents get recounted.'],
       ],
@@ -181,17 +186,21 @@ export const t = {
     },
     log: {
       title: 'Log',
-      lede: 'Key entries since December 2024, in order.',
+      lede: 'Key entries from my first job to now, in order.',
       entries: [
-        ['Dec 2024', 'Joined', 'Joined DSRV. Two weeks in, the team lead became unavailable; took over attendance, leave, health screening and statutory administration with no handover.'],
+        // 2022–2024 = roles before DSRV, from career-ops/cv-en.md (added 2026-11-19); mirrors the KO entries
+        ['Oct 2022', 'Featuring · marketing intern', 'At an influencer-marketing company until December 2022. Sourced influencers, wrote campaign proposals, translated between English and Korean, and interpreted for international visitors at a startup expo.'],
+        ['Apr 2023', 'Suulgwan · café store manager', 'Ran a Knows × Suulgwan collaboration store until December 2023: store operations and on-site problems, menu development, and planning a cold-brew gift set.'],
+        ['Jul 2024', 'Machine King · overseas sales and partnerships', 'Associate Founder until August 2024, one of three partners importing and reselling used commercial gym equipment. Negotiated prices with US dealers, closed the Legend Fitness distributorship, coordinated container shipping, and chose refurbishment vendors in Korea.'],
+        ['Dec 2024', 'Joined DSRV', 'Start of my HR career. Joined DSRV. Two weeks in, the team lead became unavailable; took over attendance, leave, health screening and statutory administration with no handover.'],
         ['Feb 2025', 'HR SaaS migration', 'Moved from the old HR ERP to flex, an HR SaaS. Configured the admin console with effectively no vendor support, migrated data, integrated badge access, redesigned approvals. Company-wide launch in about five weeks.'],
         ['2025', 'Office relocation', 'Competitive bids across 8+ categories, a five-day execution schedule, a four-step inspection chain, followed by the corporate filings and splitting costs with the landlord.'],
-        ['2025 –', 'Recruiting operations', 'Sole owner end to end for 20+ requisitions. AI-assisted screening, four channels consolidated into one team account, documented SLAs, interviewer training.'],
-        ['2025 –', 'Onboarding from nothing', 'Designed the programme, cleared it with the CFO, redesigned it from six steps to eight, and ran it personally for about 50 new hires.'],
+        ['2025 –', 'Recruiting operations', 'Ran the process end to end for 20+ requisitions. AI-assisted screening, four channels consolidated into one team account, documented SLAs, interviewer training.'],
+        ['2025 –', 'Onboarding from nothing', 'Designed the programme, cleared it with the CFO, and ran it personally for about 50 new hires.'], // "six steps to eight" removed per the owner's correction in cv.md (2026-10-07)
         ['Jan 2026', 'ERP transition', 'Douzone Amaranth10: org structure, approval routing, forms and HR master data plus training. E-approval live; finance and HR modules in progress.'],
         ['Mar 2026', 'Asset regulation rewrite', 'Three-lens analysis, 15 priority findings implemented, wage-deduction protection codified. CEO approved.'],
         ['Mar 2026', 'HR/GA Hub shipped', 'Internal HR & workplace platform opened to all staff. No unplanned downtime since.'],
-        ['Apr 2026', 'New-hire feedback loop', 'Designed 1:1 coffee chats, analysed ~580 comments alone, briefed the executive team on a top-10 issue list and ~40 actions. Second round redesigned from first-round findings.'],
+        ['Apr 2026', 'New-hire feedback loop', 'Designed 1:1 coffee chats, analysed ~580 comments, briefed the executive team on a top-10 issue list and ~40 actions. Second round redesigned from first-round findings.'],
         ['2026', 'Zero-defect filings', '12 corporate registry filings and 10 partner KYB reviews as final reviewer of English submissions. No rejections.'],
         // Oct 2026 = HRIS period in src/content/projects/hris.md; mirrors the KO entry
         ['Oct 2026 –', 'In-house HRIS (PO)', 'Leading, as PO, an in-house HR system that brings employee records, org chart, leave, attendance, reviews and recruiting into one place. Took it from wireframes to development and asked the development, security and infrastructure teams to work with me on the decisions. Target: a company-wide test by end of 2026.'],
@@ -210,11 +219,12 @@ export const t = {
       principles: [
         ['Rules move out of memory and into checks.', 'Eligibility rules and limits that each person used to read differently become fixed rules: decisions stay consistent, and a rule change means editing one place.'],
         ['First, find what is wrong but looks normal.', 'A missing attendance record shows up as a zero deduction; a failed read shows up as a success message. These cases are collected and made visible.'],
-        ['Decide first what not to automate.', 'Interview emails stop at the draft; meal-allowance cases the rules cannot decide go to a person. A person makes the final call on anything that cannot be undone.'],
+        ['Decide first what not to automate.', 'Interview reminder emails stop at the draft; meal-allowance cases the rules cannot decide go to a person. A person makes the final call on anything that cannot be undone.'],
       ],
       recordTitle: 'Employee record',
       photoAlt: 'Portrait of Juyoung You',
       logTitle: 'Log',
+      logOpen: 'Dec 2024', // ← date of the entry shown open first (joining DSRV, where the HR career starts); must match log.entries exactly
       contactTitle: 'Email is the fastest way to reach me.',
       copy: 'Copy email', copied: 'Copied', copyFailed: 'Could not copy. Please select the address.',
       tour: {

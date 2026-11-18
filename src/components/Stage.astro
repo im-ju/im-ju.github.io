@@ -38,8 +38,9 @@ const record = s.hero.fields
 
 ---
 <section id="files" class="tour" data-steps={N} data-ids={['', ...files.map((f) => f.id)].join(',')} style={`--n:${N}`} aria-label={tr.rail}>
+  {/* 무대 바탕색은 .pin 밖에 따로 고정한다: 화면 전체에 깔린 점 무늬(Base.astro의 .field)가 바탕색 위, 내용 아래로 지나가야 해서 */}
+  <div class="shade" aria-hidden="true"></div>
   <div class="pin">
-    <div class="shade" aria-hidden="true"></div>
     <div class="col">
       <nav class="mode" aria-label={L('보기 방식', 'View')}>
         <a href="#files" aria-current="true">{tr.pill[0]}</a>
@@ -114,7 +115,7 @@ const record = s.hero.fields
                     <Row icon="file" title={L('회사 규정이 곧 설정값', 'Company rules are the settings')} sub={L('연차 발생 · 근무 유형 · 휴가 종류를 출처와 함께 한 파일에', 'Leave grants, work types and leave types in one file, with sources')} at={700}><span class="tg on" data-init="on"></span></Row>
                   </div>
                   <div class="chips">
-                    {[L('구성원 · 조직도', 'People & org chart'), L('근무', 'Attendance'), L('휴가', 'Leave'), L('평가 · 채용', 'Reviews & recruiting'), L('승인 정책 · 권한', 'Approval policy & permissions')].map((c, i) => (
+                    {[L('구성원 · 조직도', 'People & org chart'), L('근무', 'Attendance'), L('휴가', 'Leave'), L('평가 · 채용', 'Reviews & recruiting'), L('승인 정책 · 권한', 'Approval policy & permissions'), L('통계 · 감사 로그', 'Stats & audit log')].map((c, i) => (
                       <span class="chip rvl" data-at={900 + i * 130}>{c}</span>
                     ))}
                   </div>
@@ -156,14 +157,14 @@ const record = s.hero.fields
                   </div>
                 </div>
 
-                {/* 면접 안내메일 */}
+                {/* 면접 전날(D-1) 리마인드 메일 */}
                 <div class="pane" data-i={step('interview-reminder')}>
                   <header class="p-head"><span class="tile"><Icon name="mail" /></span><div><b>{file('interview-reminder').short}</b><span class="sub">{L('초안까지만 자동, 보내기는 사람이', 'Drafts are automatic; a person presses send')}</span></div></header>
                   <div class="p-list">
                     <Row icon="calendar" title={L('직무 면접 · 후보자 A', 'Role interview · Candidate A')} sub={L('공유 캘린더 · 내일 14:00', 'Shared calendar · tomorrow 14:00')} at={150}><span class="chip rvl" data-at="800">{L('유형: 직무', 'Type: role')}</span></Row>
                   </div>
-                  <p class="p-label">{L('안내메일 초안', 'Reminder draft')}</p>
-                  <div class="typebox tall"><span data-type={L('안녕하세요, 후보자 A님. 내일 14:00 직무 면접 안내드립니다. 장소와 준비물은 아래와 같습니다.', 'Hello Candidate A. This is a reminder of your role interview tomorrow at 14:00. The location and what to bring are below.')} data-delay="1100"></span><i class="caret"></i>
+                  <p class="p-label">{L('리마인드 메일 초안', 'Reminder draft')}</p>
+                  <div class="typebox tall"><span data-type={L('안녕하세요, 후보자 A님. 내일 14:00 직무 면접 일정을 다시 안내드립니다. 장소와 준비물은 아래와 같습니다.', 'Hello Candidate A. This is a reminder of your role interview tomorrow at 14:00. The location and what to bring are below.')} data-delay="1100"></span><i class="caret"></i>
                     <span class="chip dark rvl saved" data-at="4300">{L('임시보관함에 저장됨', 'Saved to Drafts')} ✓</span>
                   </div>
                   <p class="p-label m-hide">{L('설정', 'Settings')}</p>
@@ -209,6 +210,9 @@ const record = s.hero.fields
                 <span class="sample">{tr.sample}</span>
               </div>
             </div>
+            {/* 테마 전환용: .flip이 화면을 뒤집어 어두운 화면으로 만들고, .dust에 경계의 입자를 그린다 (아래 스크립트) */}
+            <div class="flip"></div>
+            <canvas class="dust"></canvas>
           </div>
         </div>
         <div class="base" aria-hidden="true"></div>
@@ -314,8 +318,34 @@ const record = s.hero.fields
       if (item) { hl.style.setProperty('--y', `${item.offsetTop}px`); hl.style.setProperty('--h', `${item.offsetHeight}px`); }
     }
 
+    // 왼쪽 메뉴에서 고른 항목의 아이콘이 화면 머리 자리로 날아와 앉는다 (휴대폰에는 왼쪽 메뉴가 없어 건너뛴다)
+    const scr = tour.querySelector<HTMLElement>('.screen')!;
+    let landGhost: (() => void) | null = null; // 날아가는 아이콘은 한 번에 하나만
+    function fly(i: number) {
+      landGhost?.();
+      const from = tour!.querySelector<HTMLElement>(`.side-item[data-i="${i}"] .tile`);
+      const to = tour!.querySelector<HTMLElement>(`.pane[data-i="${i}"] .p-head > .tile`);
+      if (reduce || !from || !to || !from.offsetParent) return;
+      const box = scr.getBoundingClientRect(), a = from.getBoundingClientRect();
+      // 도착 자리는 움직임(transform)을 뺀 원래 자리로 잰다: 화면이 올라오는 중이라 지금 보이는 좌표는 아직 어긋나 있다
+      let x = 0, y = 0;
+      for (let el: HTMLElement | null = to; el && el !== scr; el = el.offsetParent as HTMLElement | null) { x += el.offsetLeft; y += el.offsetTop; }
+      const ghost = to.cloneNode(true) as HTMLElement;
+      ghost.classList.add('fly');
+      Object.assign(ghost.style, { left: `${x}px`, top: `${y}px`, width: `${to.offsetWidth}px`, height: `${to.offsetHeight}px` });
+      scr.querySelector('.app')!.append(ghost);
+      to.style.visibility = 'hidden';
+      const done = () => { ghost.remove(); to.style.visibility = ''; if (landGhost === done) landGhost = null; };
+      landGhost = done;
+      ghost.animate(
+        [{ transform: `translate(${a.left - box.left - x}px, ${a.top - box.top - y}px) scale(${a.width / to.offsetWidth})` }, { transform: 'none' }],
+        { duration: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }, // ← 날아가는 시간(ms)
+      ).finished.then(done, done);
+    }
+
     function setStep(i: number) {
       if (i === cur) return;
+      const first = cur < 0;
       cur = i;
       tour!.dataset.step = String(i);
       tour!.style.setProperty('--dl-raw', `${SHADES[i % SHADES.length]}%`);
@@ -328,6 +358,7 @@ const record = s.hero.fields
       placeHighlight();
       const pane = tour!.querySelector<HTMLElement>(`.pane[data-i="${i}"]`);
       if (pane) run(pane);
+      if (!first) fly(i);
     }
 
     // 스크롤 위치 → 단계. 고정 구간 전체를 (N-1)등분한다.
@@ -335,24 +366,47 @@ const record = s.hero.fields
     const top = () => tour.getBoundingClientRect().top + scrollY - parseFloat(getComputedStyle(pin).top || '0'); // 고정이 시작되는 스크롤 위치
     const stepAt = () => Math.max(0, Math.min(N - 1, Math.round(((scrollY - top()) / range()) * (N - 1))));
     const inTour = () => scrollY < top() + range() + pin.offsetHeight * 0.5;
-    function goTo(i: number, smooth = true) {
-      const n = Math.max(0, Math.min(N - 1, i));
-      scrollTo({ top: top() + (range() * n) / (N - 1), behavior: smooth && !reduce ? 'smooth' : 'instant' });
-    }
+    const posOf = (n: number) => top() + (range() * n) / (N - 1);
 
+    // 버튼(왼쪽 메뉴·점 레일·다음·자동 넘기기)으로 갈 때: 누른 순간 도착 단계를 바로 켜고,
+    // 스크롤이 거기 닿을 때까지 지나가는 중간 단계는 켜지 않는다 → 화면·제목·아이콘이 한 번만 바뀐다
+    let held = -1;   // 도착할 단계 (-1 = 스크롤 위치를 그대로 따른다)
+    let heldGap = 0; // 도착 지점까지 가장 가까웠던 거리
     let ticking = false;
     let idle = 0;
-    addEventListener('scroll', () => {
-      if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; setStep(stepAt()); }); }
-      // 스크롤이 멈추면 주소 끝에 지금 프로젝트를 적어 둔다 → 그 주소를 보내면 같은 화면이 열린다
+    function goTo(i: number, smooth = true) {
+      const n = Math.max(0, Math.min(N - 1, i));
+      held = n; heldGap = Math.abs(scrollY - posOf(n));
+      setStep(n);
+      scrollTo({ top: posOf(n), behavior: smooth && !reduce ? 'smooth' : 'instant' });
+      settleSoon(); // 스크롤이 아예 일어나지 않아도(이미 그 자리, 시작하자마자 멈춤) 잠시 뒤 스크롤 위치와 맞춘다
+    }
+    function follow() {
+      if (held >= 0) {
+        const gap = Math.abs(scrollY - posOf(held));
+        // 아직 가는 중. 반 단계 넘게 멀어지면 사용자가 다른 쪽으로 끌고 간 것으로 본다
+        // (여유를 두는 이유: 가던 도중에 다른 항목을 누르면 앞선 스크롤이 한두 프레임 더 밀려간다)
+        if (stepAt() !== held && gap <= heldGap + range() / (N - 1) / 2) { heldGap = Math.min(heldGap, gap); return; }
+        held = -1;
+      }
+      setStep(stepAt());
+    }
+
+    // 스크롤이 멈추면: 단계를 스크롤 위치와 맞추고, 주소 끝에 지금 프로젝트를 적어 둔다 → 그 주소를 보내면 같은 화면이 열린다
+    function settleSoon() {
       clearTimeout(idle);
       idle = window.setTimeout(() => {
+        held = -1; setStep(stepAt());
         const isStepHash = ids.includes(location.hash.slice(1)) && location.hash.length > 1;
         if (inTour()) history.replaceState(null, '', cur > 0 ? `#${ids[cur]}` : location.pathname + location.search);
         else if (isStepHash) history.replaceState(null, '', location.pathname + location.search);
       }, 350);
+    }
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; follow(); }); }
+      settleSoon();
     }, { passive: true });
-    addEventListener('resize', () => { placeHighlight(); setStep(stepAt()); });
+    addEventListener('resize', () => { placeHighlight(); if (held < 0) setStep(stepAt()); });
 
     tour.addEventListener('click', (e) => {
       const go = (e.target as HTMLElement).closest<HTMLElement>('[data-go]');
@@ -363,6 +417,7 @@ const record = s.hero.fields
       const d = k === 'ArrowDown' || k === 'ArrowRight' ? 1 : k === 'ArrowUp' || k === 'ArrowLeft' ? -1 : 0;
       if (!d) return;
       e.preventDefault();
+      stopAuto();
       const n = Math.max(0, Math.min(N - 1, cur + d));
       goTo(n);
       tour.querySelector<HTMLElement>(`.rail button[data-i="${n}"]`)?.focus();
@@ -382,8 +437,71 @@ const record = s.hero.fields
       auto = window.setInterval(() => { if (cur >= N - 1) stopAuto(); else goTo(cur + 1); }, AUTO_MS);
     }
     play.addEventListener('click', (e) => { e.stopPropagation(); auto ? stopAuto() : startAuto(); });
-    ['wheel', 'touchstart'].forEach((ev) => addEventListener(ev, stopAuto, { passive: true }));
-    addEventListener('keydown', (e) => { if (e.target !== play && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'].includes(e.key)) stopAuto(); });
+    // 사용자가 직접 움직이면 자동 넘기기도, 건너뛰는 중이던 것도 놓아준다
+    ['wheel', 'touchstart'].forEach((ev) => addEventListener(ev, () => { stopAuto(); held = -1; }, { passive: true }));
+    addEventListener('keydown', (e) => {
+      if (e.defaultPrevented) return; // 점 레일의 화살표 키는 위에서 이미 처리했다
+      if (e.target !== play && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'].includes(e.key)) { stopAuto(); held = -1; }
+    });
+
+    // ── 테마 전환: 노트북 화면이 한쪽부터 입자로 흩어지며 바뀐다 ──
+    // 밝은 화면 ↔ 어두운 화면의 경계(front)가 화면을 가로지르고, 경계 양쪽에 반대편 색 입자를 뿌린다.
+    const flip = tour.querySelector<HTMLElement>('.flip')!;
+    const dust = tour.querySelector<HTMLCanvasElement>('.dust')!;
+    const dctx = dust.getContext('2d');
+    const photo = tour.querySelector<HTMLElement>('.p-photo');
+    let sweepRaf = 0;
+    const endSweep = () => {
+      cancelAnimationFrame(sweepRaf); sweepRaf = 0;
+      dctx?.clearRect(0, 0, dust.width, dust.height);
+      flip.style.clipPath = '';
+      scr.classList.remove('sweeping', 'photo-inv');
+    };
+    function sweep(toDark: boolean) { // toDark = 노트북 화면이 어두워지는 쪽 (사이트가 밝은 테마로 바뀔 때)
+      endSweep();
+      if (!dctx || reduce || document.hidden) return;
+      const w = scr.clientWidth, h = scr.clientHeight, dpr = Math.min(devicePixelRatio || 1, 2);
+      if (!w || !h) return;
+      dust.width = w * dpr; dust.height = h * dpr; dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const MS = 1000;           // ← 걸리는 시간(밀리초)
+      const BAND = w * 0.26;     // ← 입자가 뿌려지는 띠의 너비 (경계 양쪽으로 이만큼씩)
+      const LIGHT = '#ffffff', DARK = '#0d0d0d'; // 밝은 화면 바탕색, 뒤집힌 화면 바탕색 (.flip의 필터 결과와 같게)
+      // 경계 바로 옆에서는 입자가 화면의 절반쯤을 덮어야 곧은 경계선이 눈에 띄지 않는다 → 입자 수를 화면 넓이에 맞춘다
+      const specks = Array.from({ length: Math.round(w * h * 0.08) }, () => ({ x: Math.random() * w, y: Math.random() * h, s: 1.2 + Math.random() * 2.4, t: Math.random(), v: 0.4 + Math.random(), ph: Math.random() * 6.28 }));
+      const dir = toDark ? -1 : 1; // 경계가 가는 방향: 어두워질 때는 오른쪽 → 왼쪽
+      // 띠가 화면 밖에서 헛도는 시간을 줄이려고, 화면 가장자리 바로 바깥에서 출발해 바로 바깥에서 끝낸다
+      const EDGE = BAND * 0.45;
+      const fromF = toDark ? w + EDGE : -EDGE, toF = toDark ? -EDGE : w + EDGE;
+      const box = scr.getBoundingClientRect(), pr = photo?.getBoundingClientRect();
+      const px = pr ? pr.left + pr.width / 2 - box.left : 0;
+      scr.classList.add('sweeping');
+      const t0 = performance.now();
+      const frame = (now: number) => {
+        const u = Math.min(1, Math.max(0, (now - t0) / MS));
+        const p = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+        const f = fromF + (toF - fromF) * p; // 경계의 x 위치. 이보다 오른쪽이 어두운 화면
+        // 뒤집는 층은 경계 오른쪽만 남긴다. 곧은 선으로만 자른다: 비스듬한 모양(polygon)은 크롬이 뒤집기 효과에 그대로 적용하지 못한다
+        flip.style.clipPath = `inset(0 0 0 ${Math.min(w, Math.max(0, f)).toFixed(1)}px)`;
+        scr.classList.toggle('photo-inv', px > f);
+        dctx.clearRect(0, 0, w, h);
+        for (const tone of [DARK, LIGHT]) {
+          dctx.fillStyle = tone;
+          for (const q of specks) {
+            const d = q.x - f;                               // +면 어두운 쪽, -면 밝은 쪽
+            if ((d > 0) !== (tone === LIGHT)) continue;      // 어두운 쪽에는 밝은 입자, 밝은 쪽에는 어두운 입자
+            const a = Math.abs(d) / (BAND * (0.75 + 0.25 * Math.sin(q.y / 37 + q.ph * 0.15))); // 띠 너비를 높이에 따라 조금씩 다르게
+            if (a >= 1 || q.t > Math.pow(1 - a, 1.7)) continue;
+            const blow = a * (1 - a) * 4 * q.v;              // 경계에서 조금 떨어진 입자가 가장 많이 날린다 (경계 바로 옆은 제자리에서 선을 가린다)
+            dctx.fillRect(q.x + dir * 9 * blow * (d * dir > 0 ? 1 : 0.35), q.y + Math.sin(q.ph + u * 9) * 3 * blow, q.s, q.s);
+          }
+        }
+        if (u < 1) sweepRaf = requestAnimationFrame(frame); else endSweep();
+      };
+      frame(t0); // 첫 장을 바로 그려 둔다: 테마가 바뀐 그 순간에 화면이 한꺼번에 뒤집혀 보이지 않게
+      sweepRaf = requestAnimationFrame(frame);
+    }
+    new MutationObserver(() => sweep(document.documentElement.dataset.theme === 'light'))
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     // 주소가 #프로젝트id로 끝나면 그 단계에서 시작
     const want = ids.indexOf(location.hash.slice(1));
@@ -400,28 +518,36 @@ const record = s.hero.fields
     position: relative;
     --step: 72vh; --step: 72svh;       /* ← 한 단계를 넘기는 데 필요한 스크롤 길이 */
     --pin-h: calc(100vh - var(--bar-h));
-    --dev-w: clamp(340px, min(760px, 100vw - 240px, (100vh - var(--bar-h) - 360px) * 1.5), 760px);
+    --dev-w: clamp(340px, min(1040px, 100vw - 240px, (100vh - var(--bar-h) - 336px) * 1.5), 1040px);
     --title: clamp(2.3rem, min(5.4vw, 8.2vh), 4.25rem);
     --dl-raw: 0%;
     height: calc(var(--pin-h) + (var(--n) - 1) * var(--step));
     transition: --dl-raw 0.9s ease;
   }
   @supports (height: 100svh) {
-    .tour { --pin-h: calc(100svh - var(--bar-h)); --dev-w: clamp(340px, min(760px, 100vw - 240px, (100svh - var(--bar-h) - 360px) * 1.5), 760px); --title: clamp(2.3rem, min(5.4vw, 8.2svh), 4.25rem); }
+    .tour { --pin-h: calc(100svh - var(--bar-h)); --dev-w: clamp(340px, min(1040px, 100vw - 240px, (100svh - var(--bar-h) - 336px) * 1.5), 1040px); --title: clamp(2.3rem, min(5.4vw, 8.2svh), 4.25rem); }
   }
   /* JS가 없으면 단계를 넘길 수 없으니 고정하지 않고 첫 화면만 보여준다. 프로젝트는 아래 "한눈에 보기"에 전부 있다 */
   :global(.no-js) .tour { height: auto; }
   :global(.no-js) .tour .controls, :global(.no-js) .tour .act [data-go] { display: none; }
 
-  .pin { position: sticky; top: var(--bar-h); height: var(--pin-h); overflow: hidden; display: grid; }
-  :global(.no-js) .pin { position: relative; top: 0; }
+  /* 바탕색(.shade)과 내용(.pin)을 같은 자리에 겹쳐 고정한다. 그 사이(z-index -1)로 화면 전체의 점 무늬가 지나간다 */
+  .pin { position: sticky; top: var(--bar-h); height: var(--pin-h); margin-top: calc(-1 * var(--pin-h)); overflow: hidden; display: grid; }
+  :global(.no-js) .pin, :global(.no-js) .shade { position: relative; top: 0; }
   .shade {
     --l: calc(var(--stage-l) + var(--dl-raw) * var(--stage-swing));
-    grid-area: 1 / 1;
+    position: sticky; top: var(--bar-h); z-index: -2; height: var(--pin-h);
     background:
       linear-gradient(to bottom, transparent 82%, var(--color-paper)),
       radial-gradient(120% 70% at 50% 0%, hsl(0 0% calc(var(--l) + 5%)), hsl(0 0% var(--l)) 70%);
   }
+  /* 밝은 테마에서는 노트북 화면을 뒤집어 어두운 화면으로 보여 준다. 바뀌는 순간에는 경계가 입자로 흩어지며 지나간다(스크립트) */
+  .flip { position: absolute; inset: 0; z-index: 2; pointer-events: none; -webkit-backdrop-filter: invert(1) contrast(0.9); backdrop-filter: invert(1) contrast(0.9); clip-path: inset(0 0 0 100%); }
+  :global([data-theme="light"]) .flip { clip-path: inset(0); }
+  .dust { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; pointer-events: none; }
+  /* 사진은 뒤집힌 화면에서도 제 색이어야 하니 미리 한 번 뒤집어 둔다. 전환 중에는 경계가 사진을 지날 때 스크립트가 바꾼다 */
+  :global([data-theme="light"]) .screen:not(.sweeping) :global(.p-photo), .screen.sweeping.photo-inv :global(.p-photo) { filter: invert(1); }
+
   .col { grid-area: 1 / 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 0; padding: 12px 16px 16px; text-align: center; }
 
   .mode { display: inline-flex; flex: none; padding: 3px; border-radius: 999px; background: var(--btn2-bg); border: 1px solid var(--color-rule-strong); box-shadow: var(--shadow-card); }
@@ -431,7 +557,7 @@ const record = s.hero.fields
 
   /* 제목·버튼 묶음은 전부 같은 칸에 겹쳐 두고 하나만 보여준다 → 단계가 바뀌어도 아래 요소가 출렁이지 않는다 */
   .titles, .acts { display: grid; width: 100%; flex: none; }
-  .titles { margin-top: clamp(0.7rem, 2.2vh, 1.2rem); }
+  .titles { margin-top: clamp(0.5rem, 1.6vh, 1rem); }
   .t-item, .act { grid-area: 1 / 1; align-self: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, transform 0.5s var(--ease-spring), filter 0.3s, visibility 0s 0.3s; }
   .t-item { transform: translateY(0.5rem) scale(0.985); filter: blur(6px); }
   .t-item.on, .act.on { opacity: 1; visibility: visible; transform: none; filter: none; transition-delay: 0.1s, 0.1s, 0.1s, 0s; }
@@ -440,7 +566,7 @@ const record = s.hero.fields
   .t-item .short { display: none; }
 
   /* ── 노트북 ── 안쪽 치수는 전부 em이라 노트북 폭에 비례해 같이 줄어든다 */
-  .device { position: relative; flex: none; width: var(--dev-w); margin-top: clamp(0.8rem, 2.4vh, 1.35rem); font-size: calc(var(--dev-w) / 76); }
+  .device { position: relative; flex: none; width: var(--dev-w); margin-top: clamp(0.7rem, 2vh, 1.2rem); font-size: calc(var(--dev-w) / 76); }
   .lid { padding: 1.1em 1.1em 1.5em; border-radius: 1.9em 1.9em 0.3em 0.3em; background: #0a0a0b; box-shadow: inset 0 0 0 0.12em #3a3a3e, 0 0 0 0.1em rgba(255, 255, 255, 0.08), 0 3.5em 6em -2.5em rgba(0, 0, 0, 0.65); }
   .screen { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 0.9em 0.9em 0.2em 0.2em; background: #fff; container-type: inline-size; }
   .base { position: relative; height: 1.7em; margin: 0 -6.5%; border-radius: 0.3em 0.3em 1.6em 1.6em / 0.3em 0.3em 1.2em 1.2em; background: linear-gradient(#e6e7ea, #c9cbcf 45%, #9a9ca2); box-shadow: 0 1.6em 2.4em -1em rgba(0, 0, 0, 0.5); }
@@ -462,7 +588,7 @@ const record = s.hero.fields
   .play :global(svg) { fill: currentColor; }
   .play[aria-pressed="false"] .i-pause, .play[aria-pressed="true"] .i-play { opacity: 0; transform: scale(0.4); }
 
-  .acts { margin-top: clamp(0.9rem, 2.4vh, 1.35rem); }
+  .acts { margin-top: clamp(0.7rem, 2vh, 1.2rem); }
   .act { display: flex; flex-direction: column; align-items: center; gap: 8px; }
   .act-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
   .cap { font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); }
@@ -528,6 +654,14 @@ const record = s.hero.fields
   .app .pane { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 1.1em; padding: 2.4em 2.6em 0; opacity: 0; visibility: hidden; transform: translateY(1.4em); transition: opacity 0.3s, transform 0.55s var(--ease-spring), visibility 0s 0.3s; }
   .app .pane.on { opacity: 1; visibility: visible; transform: none; transition-delay: 0.12s, 0.12s, 0s; }
   .app .p-head { display: flex; align-items: center; gap: 1.3em; }
+  /* 왼쪽 메뉴를 누르면 그 아이콘이 화면 머리로 날아와 앉고(.fly, 스크립트), 제목은 옆에서 밀려 들어온다 */
+  .app .tile.fly { position: absolute; z-index: 1; border-radius: 1.2em; transform-origin: 0 0; pointer-events: none; }
+  .app .tile.fly svg { width: 2.4em; height: 2.4em; }
+  .app .pane.on .p-head > div { animation: head-in 0.6s var(--ease-spring) 0.1s both; }
+  @keyframes head-in { from { opacity: 0; transform: translateX(-1em); } }
+  .app .side-item .tile svg { transition: transform 0.35s var(--ease-spring); }
+  .app .side-item:active .tile svg { transform: scale(0.8); }
+  @media (prefers-reduced-motion: reduce) { .app .pane.on .p-head > div { animation: none; } }
   .app .p-head .tile { width: 4.4em; height: 4.4em; border-radius: 1.2em; }
   .app .p-head .tile svg { width: 2.4em; height: 2.4em; }
   .app .p-head b { display: block; font-size: 2.2em; font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; }

@@ -14,7 +14,7 @@ const cards = {
   // role은 사이트 머리글과 같게 "HR" (2026-11-17 결정: 개인 포트폴리오라 회사명은 넣지 않는다. "HR Operations"도 쓰지 않는다)
   // rows ← EDIT: src/data/cases.ts의 앞 세 프로젝트 short 이름과 같게
   ko: { lang: 'ko', name: '유주영', role: 'HR', h1: '사람은 사람의 일에 집중하도록.', size: 74, sub: 'Systems for people.', rows: ['사내 HRIS', 'HR/GA Hub', '식대 검증'] },
-  en: { lang: 'en', name: 'Juyoung You', role: 'HR', h1: 'Systems for people.', size: 100, sub: 'HR Operations · People Systems portfolio', rows: ['In-house HRIS', 'HR/GA Hub', 'Meal checks'] },
+  en: { lang: 'en', name: 'Juyoung You', role: 'HR', h1: 'Systems for people.', size: 100, sub: 'HR · People Systems portfolio', rows: ['In-house HRIS', 'HR/GA Hub', 'Meal checks'] },
 };
 const html = (c) => `<!doctype html><html lang="${c.lang}"><head><meta charset="utf-8"><style>
   @font-face { font-family: P; src: url(data:font/woff2;base64,${font}) format("woff2-variations"); font-weight: 45 920; }

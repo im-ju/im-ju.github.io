@@ -101,7 +101,8 @@ const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); // K
 
     <!-- 4 · 이력 로그 -->
     <section class="page">
-      <p class="label">LOG · 2024-12-05 이후</p>
+      {/* 시작 시점은 로그 첫 줄에서 가져온다: 로그에 앞선 경력을 더해도 꼬리표가 어긋나지 않게 */}
+      <p class="label">LOG · {s.log.entries[0][0]} 이후</p>
       <h2>{s.log.title}</h2>
       <p class="lede">{s.log.lede}</p>
       <ol class="log">

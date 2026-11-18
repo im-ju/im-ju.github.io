@@ -55,6 +55,8 @@ const navItems = Object.entries(s.nav); // [section id, label]
     <meta name="twitter:image" content={ogImage} />
   </head>
   <body>
+    {/* 화면 전체 바탕의 점 무늬. 화면에 고정돼 있고 본문은 그 위로 지나간다 (아래 스크립트가 그린다) */}
+    <canvas class="field" aria-hidden="true"></canvas>
     <a class="skip" href="#main">{en ? 'Skip to content' : '본문으로 건너뛰기'}</a>
     <header class="topbar">
       <div class="topbar-in">
@@ -110,9 +112,73 @@ const navItems = Object.entries(s.nav); // [section id, label]
     addEventListener('scroll', mark, { passive: true });
     mark();
   }
+
+  // ── 화면 바탕의 점 무늬: 마우스 근처 점이 밝아지며 살짝 밀려난다 ──
+  // 마우스가 있는 기기에서만 그린다(휴대폰·"움직임 줄이기"에서는 빈 바탕). 마우스가 움직일 때만 다시 그리므로 스크롤에는 비용이 없다.
+  const field = document.querySelector<HTMLCanvasElement>('.field');
+  const fctx = field?.getContext('2d');
+  if (field && fctx && !matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const GAP = 26;      // ← 점 사이 간격(px)
+    const REACH = 180;   // ← 마우스가 영향을 주는 반경(px)
+    const MID = 0.3;     // ← 본문이 지나가는 가운데 기둥의 점 세기 (1 = 양옆 여백과 같게, 0 = 가운데는 비움)
+    let fw = 0, fh = 0, offX = 0, offY = 0, half = 0, ink = '#fff', clear = 'rgba(255,255,255,0)';
+    let mx = -999, my = -999, tx = -999, ty = -999, lit = 0, litTo = 0, fraf = 0;
+    // 가운데 기둥(본문 폭)에서는 MID, 양옆 여백으로 나가면서 1까지 올라간다
+    const weight = (x: number) => {
+      const u = Math.min(1, Math.max(0, (Math.abs(x - fw / 2) - (half - 40)) / 120));
+      return MID + (1 - MID) * u * u * (3 - 2 * u);
+    };
+    const paint = () => {
+      fctx.clearRect(0, 0, fw, fh);
+      if (lit > 0.01) { // 마우스 자리의 옅은 빛
+        const g = fctx.createRadialGradient(mx, my, 0, mx, my, REACH * 1.5);
+        g.addColorStop(0, ink); g.addColorStop(1, clear);
+        fctx.globalAlpha = 0.07 * lit * weight(mx); fctx.fillStyle = g; fctx.fillRect(mx - REACH * 1.5, my - REACH * 1.5, REACH * 3, REACH * 3);
+      }
+      fctx.fillStyle = ink;
+      for (let x = (fw % GAP) / 2 + GAP / 2; x < fw; x += GAP) {
+        const w = weight(x);
+        for (let y = (fh % GAP) / 2 + GAP / 2; y < fh; y += GAP) {
+          const dx = x - mx, dy = y - my, d = Math.hypot(dx, dy) || 1;
+          const k = d < REACH ? Math.pow(1 - d / REACH, 2) * lit : 0;
+          fctx.globalAlpha = (0.1 + 0.6 * k) * w;
+          fctx.beginPath(); fctx.arc(x + (dx / d) * 7 * k, y + (dy / d) * 7 * k, 1 + 1.1 * k * w, 0, 6.2832); fctx.fill(); // 본문 뒤에서는 점이 덜 밝고 덜 커진다(w)
+        }
+      }
+    };
+    const size = () => {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const r = field.getBoundingClientRect();
+      fw = r.width; fh = r.height; offX = r.left; offY = r.top;
+      field.width = Math.round(fw * dpr); field.height = Math.round(fh * dpr); fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const cs = getComputedStyle(root);
+      half = (parseFloat(cs.getPropertyValue('--page-max')) * parseFloat(cs.fontSize)) / 2; // 본문 최대 폭(rem)의 절반을 px로
+      if (!(half > 0)) throw new Error('Base.astro dot field: --page-max is missing or not a rem length, so the content column cannot be located.');
+      ink = getComputedStyle(field).color; clear = ink.replace('rgb(', 'rgba(').replace(')', ', 0)');
+      paint();
+    };
+    const tick = () => {
+      mx += (tx - mx) * 0.2; my += (ty - my) * 0.2; lit += (litTo - lit) * 0.12;
+      paint();
+      fraf = Math.abs(tx - mx) + Math.abs(ty - my) > 0.4 || Math.abs(litTo - lit) > 0.01 ? requestAnimationFrame(tick) : 0;
+    };
+    const wake = () => { if (!fraf) fraf = requestAnimationFrame(tick); };
+    addEventListener('pointermove', (e) => {
+      tx = e.clientX - offX; ty = e.clientY - offY;
+      if (lit < 0.02) { mx = tx; my = ty; } // 처음 들어올 때는 멀리서 끌려오지 않고 그 자리에서 켜진다
+      litTo = 1; wake();
+    }, { passive: true });
+    root.addEventListener('pointerleave', () => { litTo = 0; wake(); });
+    addEventListener('resize', size);
+    new MutationObserver(size).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    size();
+  }
 </script>
 
 <style>
+  /* 바탕색(body) 바로 위, 모든 내용 아래. 메뉴 막대 밑에서 시작한다 */
+  .field { position: fixed; inset: var(--bar-h) 0 0 0; z-index: -1; width: 100%; height: calc(100% - var(--bar-h)); pointer-events: none; color: var(--color-ink); }
+
   .skip { position: absolute; left: -999px; top: 0.5rem; z-index: 100; background: var(--color-ink); color: var(--color-paper); padding: 0.5rem 0.8rem; border-radius: var(--radius-sm); font-size: var(--text-sm); }
   .skip:focus { left: 0.5rem; }
 

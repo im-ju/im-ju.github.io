@@ -46,7 +46,7 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
     },
     shots: [
       { file: 'ir-01-calendar', ko: ['내일 일정에서 면접만 골라내기', '매일 아침 공유 캘린더의 내일 일정을 읽어, 제목으로 면접 유형을 가리고 설명란에서 후보자 이름과 이메일을 찾습니다. 이메일이 없는 건은 초안을 만들지 않습니다.'], en: ["Picking interviews out of tomorrow's calendar", "Every morning it reads tomorrow's shared calendar, tells the interview type from the title and finds the candidate's name and email in the description. If there is no email, it makes no draft."] },
-      { file: 'ir-02-drafts', ko: ['유형별 안내메일 초안', '폰 스크리닝·직무·컬쳐핏 템플릿에 이름·날짜·시간을 채워 임시보관함에 둡니다. 보내기는 사람이 직접 누릅니다.'], en: ['Drafts by interview type', 'Phone-screen, role and culture-fit templates filled with name, date and time, left in Drafts. A person presses Send.'] },
+      { file: 'ir-02-drafts', ko: ['유형별 리마인드 메일 초안', '폰 스크리닝·직무·컬쳐핏 템플릿에 이름·날짜·시간을 채워 임시보관함에 둡니다. 보내기는 사람이 직접 누릅니다.'], en: ['Reminder drafts by interview type', 'Phone-screen, role and culture-fit templates filled with name, date and time, left in Drafts. A person presses Send.'] },
       { file: 'ir-03-notice', ko: ['담당자 요약 알림', '만든 초안 목록과, 처리하지 못한 일정과 그 사유를 실행한 담당자에게 보냅니다.'], en: ['Summary to the operator', 'A list of the drafts it made, plus any interviews it could not handle and why.'] },
     ],
   },
@@ -57,13 +57,37 @@ export const PROJECT_SHOTS: Record<string, ShotSet> = {
     },
     shots: [
       { file: 'hris-01-home', ko: ['홈', '오늘 근무 시간, 이번 주 근무, 승인할 일과 내 요청을 한 화면에 모았습니다.'], en: ['Home', "Today's hours, this week's work, things to approve and my own requests on one screen."] },
+      { file: 'hris-10-request-comments', ko: ['요청 상세 · 댓글과 멘션', '알림을 누르면 요청이 그 자리에서 열립니다. 승인 순서와 참조가 옆에 보이고, 댓글에서 @로 사람을 불러 확인을 받습니다.'], en: ['Request detail · comments and mentions', 'A notification opens the request in place, with the approval steps and people copied in beside it. An @mention in the comments asks someone to confirm.'] },
+      // 근무
       { file: 'hris-02-my-work', ko: ['근무 · 내 근무', '출퇴근, 외근·원격 근무·출장 등록, 이번 주 근무시간과 확인할 기록.'], en: ['Attendance · my work', 'Clock in and out, register field work, remote work or trips, and see weekly hours and records to check.'] },
+      { file: 'hris-11-team-work', ko: ['근무 · 팀 근무', '같은 조직 사람들의 이번 주 출퇴근 시각과 원격 근무·출장·휴가를 표로 봅니다. 휴가 종류와 사유는 보이지 않습니다.'], en: ['Attendance · team view', "Teammates' clock-in and clock-out times this week, with remote days, trips and leave. Leave type and reason stay hidden."] },
+      { file: 'hris-12-work-requests', ko: ['근무 · 신청 관리', '팀원이 보낸 근무 기록 수정, 외근, 출장 신청을 승인하거나 반려합니다. 수정 요청에는 출입 기록이 증빙으로 자동 첨부됩니다.'], en: ['Attendance · requests to approve', 'Approve or return record corrections, field work and trips from the team. Door-access records are attached to a correction as evidence automatically.'] },
+      // 휴가
       { file: 'hris-03-leave', ko: ['휴가 신청', '휴가 종류마다 남은 일수와 증빙 조건을 보고 고릅니다.'], en: ['Requesting leave', 'Pick a leave type with its remaining days and evidence rules in view.'] },
+      { file: 'hris-13-annual-leave', ko: ['휴가 · 연차 상세', '올해 연차가 언제 생기고 쓰였는지 월별로 보여 줍니다. 숫자에 마우스를 올리면 어디서 온 숫자인지 나옵니다.'], en: ['Leave · annual leave detail', "How this year's annual leave was granted and used, month by month. Hover a number to see where it came from."] },
       { file: 'hris-04-leave-requests', ko: ['휴가 신청 관리', '승인할 신청을 오래된 것부터 보여 주고, 같은 기간에 겹치는 팀원 휴가를 함께 알려 줍니다.'], en: ['Leave requests', 'Requests to approve, oldest first, with a warning when teammates are off at the same time.'] },
+      // 근태 관리 (인사총무팀)
       { file: 'hris-05-attendance-status', ko: ['근태 관리 · 근무 현황', '오늘 근무 중·외근·휴가 인원과 구성원별 이번 주 근무시간, 확인할 기록.'], en: ['Attendance management', "Who is working, out or on leave today, each person's weekly hours, and records to check."] },
+      { file: 'hris-14-comp-leave', ko: ['근태 관리 · 보상 휴가', '연장·야간·휴일 근무를 돈 대신 휴가로 쌓습니다. 사람마다 계산식을 그대로 보여 주고 고른 사람만 적립합니다.'], en: ['Attendance management · comp leave', 'Overtime, night and holiday work banked as leave instead of pay. The calculation is shown per person, and only the people you select are credited.'] },
+      { file: 'hris-15-attendance-closing', ko: ['근태 관리 · 근태 마감', '한 달을 마감하기 전에 확인할 기록, 승인 대기 중인 수정 요청, 부족 시간, 보상 휴가 적립을 차례로 점검합니다. 마감하면 그 달 기록이 잠깁니다.'], en: ['Attendance management · monthly closing', "A checklist before closing a month: records to check, pending corrections, short hours and comp-leave credits. Closing locks that month's records."] },
+      { file: 'hris-16-leave-promotion', ko: ['휴가 관리 · 연차 촉진', '사람마다 1차·2차 촉진이 어느 단계인지, 알림을 읽었는지, 사용 계획을 냈는지 한 표에서 챙깁니다.'], en: ['Leave management · annual-leave promotion', 'One table for who is at the first or second notice to use their remaining days, whether they have read it, and whether they have sent a plan.'] },
+      // 구성원 관리 (인사총무팀)
       { file: 'hris-06-people', ko: ['구성원 관리', '재직 상태, 입사일, 조직, 근속 기간으로 거르고 정렬합니다.'], en: ['People management', 'Filter and sort by status, join date, team and tenure.'] },
+      { file: 'hris-17-member-profile', ko: ['구성원 관리 · 구성원 정보', '목록에서 한 사람을 누르면 옆에 인사 정보, 기본 정보, 근무 정보가 열립니다. 언제부터 적용됐는지와 변경 내역이 함께 남습니다.'], en: ['People management · member profile', 'Pick someone from the list and their HR, basic and work details open beside it, with effective dates and a change history.'] },
+      { file: 'hris-18-onboarding', ko: ['구성원 관리 · 입사', '입사를 등록하면 체크리스트 템플릿의 할 일이 자동으로 붙습니다. 사람마다 진행률과 다음 할 일, 담당을 보여 줍니다.'], en: ['People management · onboarding', "Registering a new hire attaches the checklist template's tasks automatically. Each person shows progress, the next task and who owns it."] },
+      { file: 'hris-19-personnel-orders', ko: ['인사 정보 관리 · 인사 발령', '전속, 승진, 겸직 발령을 날짜와 함께 기록합니다. 예정된 발령을 미리 등록하고, 잘못된 발령은 취소하거나 다시 발령합니다.'], en: ['HR records · personnel orders', 'Transfers, promotions and concurrent posts recorded with their dates. Future orders can be registered ahead, and a wrong one cancelled or reissued.'] },
+      { file: 'hris-20-certificates', ko: ['구성원 관리 · 증명서', '구성원이 신청한 재직·경력증명서를 미리 보고 발급합니다. 발급한 증명서는 번호와 함께 대장에 남습니다.'], en: ['People management · certificates', 'Preview and issue the employment and career certificates people request. Every issued one is kept in a numbered register.'] },
       { file: 'hris-07-org', ko: ['조직도 관리', '조직을 만들고 옮기고, 언제 어떻게 바뀌었는지 남깁니다.'], en: ['Org chart management', 'Create and move teams, with a record of when and how each change happened.'] },
+      // 평가 · 채용
+      { file: 'hris-21-review-progress', ko: ['평가 운영 · 진행 현황', '자기평가와 조직장 평가가 얼마나 제출됐는지 조직별로 보고, 미제출자에게 알림을 보내거나 기한을 늘립니다.'], en: ['Review operations · progress', 'How many self-reviews and manager reviews are in, by team, with buttons to remind people or extend the deadline.'] },
+      { file: 'hris-22-recruit-board', ko: ['채용 · 지원자 보드', '공고 하나의 지원자를 전형 단계 칸으로 봅니다. 카드를 끌어 단계를 옮기고, 여러 명을 골라 메일을 쓰거나 결과를 처리합니다.'], en: ['Recruiting · candidate board', "One posting's candidates laid out by stage. Drag a card to move it, or select several to write mail or record a result."] },
+      { file: 'hris-23-interview-evaluation', ko: ['채용 · 면접 평가 작성', '면접관이 항목별로 점수와 의견을 남깁니다. 다른 면접관의 평가는 내 평가를 낸 뒤에야 보입니다.'], en: ['Recruiting · interview evaluation', "An interviewer scores each item and writes a comment. Other interviewers' evaluations stay hidden until you submit your own."] },
+      // 통계 · 감사 로그 · 설정
+      { file: 'hris-24-stats', ko: ['통계', '인원 현황, 월별 입사·퇴사, 조직별 주 평균 근무시간을 기간과 조직으로 걸러 봅니다.'], en: ['Statistics', 'Headcount, monthly joiners and leavers, and average weekly hours by team, filtered by period and team.'] },
+      { file: 'hris-25-audit-log', ko: ['감사 로그', '누가 언제 무엇을 조회하고 바꾸고 내려받았는지 자동으로 남습니다. 종류, 메뉴, 사람, 접속 위치로 거릅니다.'], en: ['Audit log', 'Who viewed, changed or downloaded what, and when, recorded automatically. Filter by type, menu, person or access location.'] },
       { file: 'hris-08-approval-policy', ko: ['승인 정책', '휴가·근무 요청 종류마다 누가 승인하고 합의하는지 정합니다.'], en: ['Approval policy', 'Who approves and who signs off, for each kind of leave or attendance request.'] },
+      { file: 'hris-26-permissions', ko: ['설정 · 권한', '권한 그룹마다 볼 수 있는 화면과 할 수 있는 일을 영역별로 고릅니다. 관리 권한을 고르면 같은 영역의 조회 권한이 함께 켜집니다.'], en: ['Settings · permissions', 'For each permission group, choose what it can see and do, area by area. Picking a manage permission turns on the matching view permission.'] },
+      // 휴대폰
       { file: 'hris-09-phone', ko: ['휴대폰 웹앱', '출퇴근, 휴가 확인, 요청 승인처럼 자주 하는 일만 휴대폰으로 합니다.'], en: ['Phone web app', 'The frequent tasks on a phone: clocking in and out, checking leave, approving requests.'] },
     ],
   },

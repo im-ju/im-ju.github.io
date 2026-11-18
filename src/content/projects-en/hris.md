@@ -12,15 +12,16 @@ What we decide after hearing each team is written down, so the reason behind eac
 
 ## Goal
 
-A company-wide test by the end of 2026. For now, every flow can be demoed on fake data, with no real employee data.
+A company-wide test by the end of 2026. The screens for every feature below are designed, and for now every flow can be demoed on fake data, with no real employee data.
 
 ## What it covers
 
-- **People and org chart**: member records, joining, leaving and leave of absence, personnel orders, reorganisations
-- **Attendance**: clocking in and out, registering field work, remote work and business trips, weekly hours, correction requests
+- **People and org chart**: member records with change history, joining and leaving checklists, leave of absence, personnel orders, certificates, reorganisations
+- **Attendance**: clocking in and out, registering field work, remote work and business trips, weekly hours, team view, correction requests and approvals, monthly closing
 - **Leave**: requests and approvals, annual-leave balances, leave promotion, compensatory leave
-- **Reviews and recruiting**: review cycles, job postings and interview evaluations
-- **Approval policy and permissions**: approval lines per request type, permission groups
+- **Reviews and recruiting**: review cycles and their progress, job postings, candidate stages, interview evaluations
+- **Approval policy and permissions**: approval lines per request type, requests opened straight from a notification with comments and mentions, permission groups
+- **Statistics and audit log**: headcount and attendance statistics, Excel export, and an audit log of who viewed or changed what, and when
 
 On PC everything runs in the browser; on phones an installable web app covers the frequent tasks: clocking in and out, requests and approvals.
 
