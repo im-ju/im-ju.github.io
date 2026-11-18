@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#1b1d24"/><circle cx="10" cy="16" r="4" fill="#3f9a78"/><rect x="17" y="12" width="9" height="2.5" rx="1.25" fill="#f3f1ec"/><rect x="17" y="17.5" width="9" height="2.5" rx="1.25" fill="#f3f1ec"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- 유주영의 J. 사이트의 아이콘 타일과 같은 규칙: 밝은 화면에서는 검은 타일에 흰 글자, 어두운 화면에서는 뒤집힌다.
+       글자는 글꼴 파일 없이 선 하나로 그렸다(파비콘은 웹폰트를 못 읽는다). 고친 뒤에는 npm run favicon 으로 favicon.ico도 다시 만든다. -->
+  <style>
+    .tile { fill: #131314; }
+    .edge { stroke: #fff; stroke-opacity: 0.16; }
+    .j { stroke: #fff; }
+    @media (prefers-color-scheme: dark) {
+      .tile { fill: #f6f6f7; }
+      .edge { stroke: #000; stroke-opacity: 0.1; }
+      .j { stroke: #131314; }
+    }
+  </style>
+  <rect class="tile" width="32" height="32" rx="8"/>
+  <rect class="edge" x="0.375" y="0.375" width="31.25" height="31.25" rx="7.625" fill="none" stroke-width="0.75"/>
+  <path class="j" d="M20.77 7.5V17.35A5.25 5.25 0 0 1 10.97 19.98" fill="none" stroke-width="3.8"/>
+</svg>

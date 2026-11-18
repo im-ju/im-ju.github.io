@@ -25,6 +25,8 @@ const navItems = Object.entries(s.nav); // [section id, label]
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
     <link rel="canonical" href={canonical} />
+    {/* 탭 아이콘: SVG를 읽는 브라우저는 svg(화면 밝기에 따라 뒤집힘), 못 읽으면 ico */}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="color-scheme" content="dark light" />
     <link rel="preload" href="/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin />
