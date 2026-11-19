@@ -12,7 +12,7 @@
   --color-ink-3: rgba(255, 255, 255, 0.6);   /* 바탕 위 6.6:1 */
   --color-rule: rgba(255, 255, 255, 0.12);
   --color-rule-strong: rgba(255, 255, 255, 0.26);
-  --color-bar: rgba(33, 33, 33, 0.78);
+  --color-bar: rgba(33, 33, 33, 0.9); /* 흐림을 지원하지 않는 옛 사파리(17 이하)에서도 본문이 덜 비치도록 */
   --color-accent: #ffffff;
   --color-accent-ink: #ffffff;
   --color-accent-soft: rgba(255, 255, 255, 0.1);
@@ -49,7 +49,7 @@
   --color-ink-3: rgba(0, 0, 0, 0.62);        /* 바탕 위 6.3:1 */
   --color-rule: rgba(0, 0, 0, 0.1);
   --color-rule-strong: rgba(0, 0, 0, 0.24);
-  --color-bar: rgba(245, 245, 247, 0.8);
+  --color-bar: rgba(245, 245, 247, 0.9);
   --color-accent: #111111;
   --color-accent-ink: #111111;
   --color-accent-soft: rgba(0, 0, 0, 0.06);

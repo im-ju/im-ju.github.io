@@ -182,7 +182,8 @@ const navItems = Object.entries(s.nav); // [section id, label]
   .skip { position: absolute; left: -999px; top: 0.5rem; z-index: 100; background: var(--color-ink); color: var(--color-paper); padding: 0.5rem 0.8rem; border-radius: var(--radius-sm); font-size: var(--text-sm); }
   .skip:focus { left: 0.5rem; }
 
-  .topbar { position: sticky; top: 0; z-index: 40; height: var(--bar-h); background: var(--color-bar); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); border-bottom: 1px solid var(--color-rule); }
+  /* -webkit- 먼저, 표준 속성을 마지막에: 빌드 압축기가 둘을 같은 속성으로 보고 앞엣것을 지워서, 순서가 반대면 크롬에서 흐림이 사라진다(2026-11-19 확인) */
+  .topbar { position: sticky; top: 0; z-index: 40; height: var(--bar-h); background: var(--color-bar); -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); border-bottom: 1px solid var(--color-rule); }
   .topbar-in { display: flex; align-items: stretch; gap: 0.25rem; height: 100%; max-width: 82rem; margin-inline: auto; padding-inline: clamp(0.75rem, 3vw, 2rem); }
   .brand { display: inline-flex; flex: none; align-items: center; gap: 0.6rem; padding-right: 0.75rem; font-weight: 700; font-size: 1.0625rem; letter-spacing: -0.02em; text-decoration: none; white-space: nowrap; }
   .brand span { font-weight: 500; font-size: var(--text-sm); letter-spacing: 0; color: var(--color-ink-3); }
@@ -205,11 +206,14 @@ const navItems = Object.entries(s.nav); // [section id, label]
   .footer-note { flex: 1 1 320px; font-size: var(--text-xs); }
 
   @media (max-width: 640px) {
-    .brand { font-size: 1rem; padding-right: 0.25rem; }
+    .brand { font-size: 1rem; padding-right: 0.5rem; }
     .brand span { display: none; }
     .topnav { min-width: 0; overflow-x: auto; scrollbar-width: none; } /* 아주 좁은 화면에서는 줄바꿈 대신 옆으로 밀린다 */
-    .topnav a { padding: 0 0.45rem; font-size: 0.8125rem; }
-    .lang { padding: 0 0.4rem; font-size: 0.8125rem; }
+    .topnav a { padding: 0 0.6rem; font-size: 0.8125rem; }
+    .lang { margin-left: 0.5rem; padding: 0 0.5rem; font-size: 0.8125rem; }
+    /* 영어는 이름(Juyoung You)과 메뉴 글자가 길어 360px 폰에서 Contact가 잘리므로 간격을 조금 줄인다 */
+    :global(html[lang="en"]) .topnav a { padding: 0 0.4rem; }
+    :global(html[lang="en"]) .lang { margin-left: 0; }
     .lang :global(svg) { display: none; }
     .theme { width: 40px; }
   }

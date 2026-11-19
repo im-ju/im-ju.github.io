@@ -88,7 +88,8 @@ export const t = {
     // Home page (2026-11 redesign: pinned laptop tour). hero/modules/policy/log above stay because /print/ still uses them.
     home: {
       h1: ['사람은 사람의 일에', '집중하도록.'],
-      en: 'Systems for people.',
+      // 휴대폰 첫 화면에서 desc 대신 보이는 한 줄 (desc가 세 줄을 넘어 잘리므로)
+      short: '제도와 HR 시스템을 만들고, 손으로 하던 확인 업무를 도구로 바꿉니다.',
       desc: '조직이 90명으로 크는 동안 제도와 HR 시스템을 만들고 손으로 하던 확인 업무를 직접 만든 도구로 바꿉니다.',
       ctaContact: '연락하기',
       filesTitle: (n: number) => `작업 파일 ${n}건`,
@@ -208,7 +209,7 @@ export const t = {
     },
     home: {
       h1: ['Systems for people.'],
-      en: '',
+      short: '',
       desc: 'An HR generalist who writes the policy when none exists, then builds the systems that make it hold.',
       ctaContact: 'Contact',
       filesTitle: (n: number) => `${n} case files`,
