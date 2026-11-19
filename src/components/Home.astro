@@ -1,11 +1,12 @@
 ---
 // 홈 본문. / (ko)와 /en/이 같이 쓴다.
-// 맨 위는 고정된 노트북 무대(Stage.astro), 그 아래로 소개 · 업무 원칙 · 프로젝트 한눈에 보기 · 인사기록 · 연락.
-// 쉬운 말 설명은 src/data/cases.ts, 기간·상태는 콘텐츠 컬렉션, 화면 문구는 i18n.ts에서 온다.
+// 맨 위는 노트북 무대(Stage.astro), 그 아래로 소개 · 업무 원칙 · 프로젝트 목록 · 인사기록 · 경력 · 연락.
+// 프로젝트 이름은 src/data/cases.ts, 상태는 콘텐츠 컬렉션, 화면 문구는 i18n.ts에서 온다.
+// 2026-11-19 "복잡하다, 글이 많다"는 피드백으로 홈에는 한 줄짜리만 둔다. 긴 설명은 각 프로젝트 상세 페이지에 있다.
 import type { ComponentProps } from 'astro/types';
 import { getCollection } from 'astro:content';
 import { t, EMAIL, LINKEDIN, STATUS_LABEL, type Locale } from '../i18n';
-import { CASES, fileNo } from '../data/cases';
+import { CASES } from '../data/cases';
 import Icon from './Icon.astro';
 import Stage from './Stage.astro';
 
@@ -17,9 +18,11 @@ const h = s.home;
 const en = locale === 'en';
 const prefix = en ? '/en/' : '/';
 
-// 이력 로그에서 처음 펼쳐 둘 줄 (i18n.ts의 home.logOpen). 그 날짜의 줄이 없으면 빌드를 멈춘다.
-const logOpen = s.log.entries.findIndex(([when]) => when === h.logOpen);
-if (logOpen < 0) throw new Error(`Home.astro: no log entry dated "${h.logOpen}". Fix home.logOpen or log.entries in src/i18n.ts.`);
+// 경력: 회사별 묶음을 최신 회사부터, 묶음 안에서도 최신 일부터 보여 준다 (i18n.ts에는 오래된 순으로 적혀 있다)
+const jobs = [...s.log.jobs].reverse().map((j) => {
+  if (!j.items?.length && !j.body) throw new Error(`Home.astro: log job "${j.org}" in src/i18n.ts has neither body nor items.`);
+  return { ...j, items: j.items?.length ? [...j.items].reverse() : null };
+});
 
 // 프로젝트별 아이콘 ← 프로젝트를 추가하면 여기에도 한 줄
 const ICONS: Record<string, IconName> = {
@@ -63,63 +66,45 @@ const files = CASES.map((c) => {
   const e = entries.find((p) => p.id === c.id);
   if (!e) throw new Error(`src/data/cases.ts lists "${c.id}" but src/content/projects/${c.id}.md does not exist.`);
   if (!ICONS[c.id]) throw new Error(`Home.astro has no icon for project "${c.id}". Add it to ICONS.`);
-  const d = e.data;
   const copy = en ? c.en : c;
-  // 기간이 "2026.03 – 운영 중", "2026.10 – 개발 중"처럼 상태로 끝나면 상태를 두 번 말하지 않는다
-  const status = STATUS_LABEL[locale][d.status];
-  const span = en ? d.periodEn : d.period;
-  const open = span.endsWith(status);
   return {
     id: c.id,
-    no: fileNo(c.id),
     short: copy.short,
     title: copy.title,
-    line: copy.line,
-    cat: en ? c.catEn : c.cat,
-    period: open ? span.slice(0, -status.length).trimEnd() : span, // 카드: 상태 꼬리표가 옆에 따로 있다 → "2026.03 –"
-    status,
-    statusKey: d.status,
-    caption: [en ? c.catEn : c.cat, span, ...(open ? [] : [status])].join(' · '), // 무대 아래 한 줄
+    status: STATUS_LABEL[locale][e.data.status],
+    statusKey: e.data.status,
     href: `${prefix}work/${c.id}/`,
     icon: ICONS[c.id],
   };
 });
 const record = s.hero.fields.filter(([k]) => k !== '근무지' && k !== 'Location'); // 정해 둔 항목: 소속·기간·언어·학위
-const principleIcons: IconName[] = ['file', 'search', 'lock'];
 ---
 <Stage locale={locale} files={files} />
 
 <section id="about" class="about wrap" aria-labelledby="about-title">
   <p class="eyebrow rv">{h.aboutEyebrow}</p>
   <h2 id="about-title" class="big rv">{s.hero.statement}</h2>
-  <p class="lede rv">{s.hero.sub}</p>
+  <dl class="stats">
+    {h.stats.map(([n, label], i) => <div class="rv" style={`--rv:${i}`}><dt>{label}</dt><dd>{n}</dd></div>)}
+  </dl>
 
   <h3 class="sec-label rv">{h.principlesTitle}</h3>
   <ol class="steps">
-    {h.principles.map(([head, body], i) => (
-      <li class="rv" style={`--rv:${i}`}>
-        <div class="step-top"><span class="tile"><Icon name={principleIcons[i]} size={20} /></span><span class="num">{i + 1}</span></div>
-        <b>{head}</b>
-        <p>{body}</p>
-      </li>
-    ))}
+    {h.principles.map((head, i) => <li class="rv" style={`--rv:${i}`}><span class="num">{i + 1}</span><b>{head}</b></li>)}
   </ol>
 </section>
 
-<section id="index" class="index wrap" aria-labelledby="index-title">
+{/* 메뉴의 "작업 파일"이 여기로 온다 */}
+<section id="files" class="index wrap" aria-labelledby="index-title">
   <h2 id="index-title" class="sec-label rv">{h.filesTitle(files.length)}</h2>
-  <ul class="cards">
-    {files.map((f, i) => (
-      <li class="rv" style={`--rv:${i % 2}`}>
-        <a class="card" href={f.href}>
-          <span class="card-top">
-            <span class="tile"><Icon name={f.icon} size={18} /></span>
-            <span class="no">{f.no}</span>
-            <span class="status" data-status={f.statusKey}>{f.status}</span>
-          </span>
-          <b class="card-title">{f.title}</b>
-          <span class="card-line">{f.line}</span>
-          <span class="card-foot">{f.cat} · {f.period}<Icon name="arrow-right" size={16} /></span>
+  <ul class="rows">
+    {files.map((f) => (
+      <li class="rv">
+        <a class="row" href={f.href}>
+          <span class="tile"><Icon name={f.icon} size={18} /></span>
+          <span class="row-txt"><b>{f.short}</b><span>{f.title}</span></span>
+          <span class="status" data-status={f.statusKey}>{f.status}</span>
+          <Icon name="arrow-right" size={16} />
         </a>
       </li>
     ))}
@@ -138,12 +123,23 @@ const principleIcons: IconName[] = ['file', 'search', 'lock'];
     </div>
   </div>
 
+  {/* 경력: 회사마다 한 묶음. 줄을 누르면 설명이 펼쳐진다. 줄끼리 서로 닫지 않는다: 위쪽 줄이 닫히면 누른 줄이 손가락 밑에서 달아난다 */}
   <h2 class="sec-label rv">{h.logTitle}</h2>
-  <div class="acc-list">
-    {s.log.entries.map(([when, head, body], i) => (
-      <details class="acc rv" name="log" open={i === logOpen}>
-        <summary><span class="when">{when}</span><b>{head}</b><Icon name="chevron-down" size={18} /></summary>
-        <p>{body}</p>
+  <div class="jobs">
+    {jobs.map((j) => j.items ? (
+      <article class="job rv">
+        <header class="job-head"><h3>{j.org}<span>{j.role}</span></h3><span class="period">{j.period}</span></header>
+        {j.items.map(([when, head, body]) => (
+          <details class="acc">
+            <summary><span class="when">{when}</span><b>{head}</b><Icon name="chevron-down" size={18} /></summary>
+            <p>{body}</p>
+          </details>
+        ))}
+      </article>
+    ) : (
+      <details class="job acc rv">
+        <summary class="job-head"><h3>{j.org}<span>{j.role}</span></h3><span class="period">{j.period}</span><Icon name="chevron-down" size={18} /></summary>
+        <p>{j.body}</p>
       </details>
     ))}
   </div>
@@ -155,7 +151,6 @@ const principleIcons: IconName[] = ['file', 'search', 'lock'];
   <p class="contact-lede rv">{s.contact.lede}</p>
   <div class="contact-actions rv">
     <button type="button" class="btn" data-copy={EMAIL} data-label={h.copy} data-done={h.copied} data-fail={h.copyFailed}>{h.copy}</button>
-    <a class="btn ghost" href={`mailto:${EMAIL}`}>{h.mail}</a>
     <a class="btn ghost" href={LINKEDIN} target="_blank" rel="noopener">LinkedIn<Icon name="arrow-right" size={16} /></a>
   </div>
   <p class="contact-mail rv"><a href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
@@ -234,32 +229,32 @@ const principleIcons: IconName[] = ['file', 'search', 'lock'];
   .about { padding-block: clamp(4rem, 12vh, 8rem) clamp(2rem, 6vh, 4rem); }
   .about .big { max-width: 20ch; margin-top: 0.9rem; }
   :global(html[lang="en"]) .about .big { max-width: 26ch; }
-  .lede { max-width: 44rem; margin-top: 1.5rem; font-size: clamp(1.05rem, 1.6vw, 1.3rem); line-height: 1.6; color: var(--color-ink-2); }
 
-  /* 업무 원칙: 번호가 선으로 이어진 세 단계 */
-  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem 1.5rem; }
-  .steps li { position: relative; }
-  .step-top { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.1rem; }
-  .step-top::after { content: ""; flex: 1; height: 1px; margin-right: -1.5rem; background: var(--color-rule-strong); }
-  .steps li:last-child .step-top::after { margin-right: 0; background: linear-gradient(to right, var(--color-rule-strong), transparent); }
-  .num { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--color-rule-strong); font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
-  .steps b { display: block; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.4; text-wrap: balance; }
-  .steps p { margin-top: 0.5rem; color: var(--color-ink-3); line-height: 1.65; }
+  /* 숫자 세 개: 큰 숫자 위, 설명 아래 */
+  .stats { margin: clamp(2rem, 5vh, 3rem) 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; max-width: 46rem; }
+  .stats div { display: flex; flex-direction: column-reverse; gap: 0.2rem; padding-top: 1rem; border-top: 1px solid var(--color-rule-strong); }
+  .stats dd { margin: 0; font-size: clamp(1.7rem, 3.6vw, 2.6rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stats dt { font-size: 0.9375rem; color: var(--color-ink-3); line-height: 1.4; }
 
-  /* 프로젝트 한눈에 보기 */
+  /* 업무 원칙: 번호 + 한 줄 */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem 1.5rem; }
+  .steps li { display: flex; align-items: flex-start; gap: 0.75rem; }
+  .num { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--color-rule-strong); font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
+  .steps b { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.45; text-wrap: balance; }
+
+  /* 프로젝트 목록: 한 줄에 하나 */
   .index { padding-block: clamp(2rem, 6vh, 4rem); }
-  .cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .card { display: flex; flex-direction: column; gap: 0.6rem; height: 100%; padding: 1.4rem 1.5rem 1.2rem; border-radius: var(--radius-lg); background: var(--color-panel); border: 1px solid var(--color-rule); box-shadow: var(--shadow-card); text-decoration: none; transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), transform 0.4s var(--ease-spring); }
-  .card:hover { background: var(--color-accent-soft); border-color: var(--color-rule-strong); transform: translateY(-3px); }
-  .card-top { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.3rem; }
-  .card-top .tile { width: 34px; height: 34px; border-radius: 10px; background: var(--color-accent-soft); color: var(--color-ink); transition: background-color var(--dur-base), color var(--dur-base); }
-  .card:hover .tile { background: var(--color-ink); color: var(--color-paper); }
-  .no { font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); font-variant-numeric: tabular-nums; margin-right: auto; }
-  .card-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1.35; text-wrap: balance; }
-  .card-line { color: var(--color-ink-3); line-height: 1.6; }
-  .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: auto; padding-top: 0.6rem; font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); }
-  .card-foot :global(svg) { transition: transform 0.4s var(--ease-spring); }
-  .card:hover .card-foot :global(svg) { transform: translateX(4px); color: var(--color-ink); }
+  .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .row { display: flex; align-items: center; gap: 0.9rem; min-height: 64px; padding: 0.7rem 1.2rem; border-radius: var(--radius-md); background: var(--color-panel); border: 1px solid var(--color-rule); box-shadow: var(--shadow-card); text-decoration: none; transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out); }
+  .row:hover { background: var(--color-accent-soft); border-color: var(--color-rule-strong); }
+  .row .tile { width: 34px; height: 34px; border-radius: 10px; background: var(--color-accent-soft); color: var(--color-ink); transition: background-color var(--dur-base), color var(--dur-base); }
+  .row:hover .tile { background: var(--color-ink); color: var(--color-paper); }
+  .row-txt { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.8rem; }
+  .row-txt b { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; }
+  .row-txt span { color: var(--color-ink-3); line-height: 1.45; }
+  .row .status { flex: none; }
+  .row > :global(svg) { flex: none; color: var(--color-ink-3); transition: transform 0.4s var(--ease-spring); }
+  .row:hover > :global(svg) { transform: translateX(4px); color: var(--color-ink); }
 
   /* 인사기록 */
   .record-sec { padding-block: clamp(2rem, 6vh, 4rem); }
@@ -271,19 +266,30 @@ const principleIcons: IconName[] = ['file', 'search', 'lock'];
   .fields dt { font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); }
   .fields dd { margin: 0.1rem 0 0; line-height: 1.5; }
 
-  /* 이력 로그: 하나씩 펼쳐지는 줄 */
-  .acc-list { display: grid; gap: 10px; max-width: 54rem; }
-  .acc { border-radius: var(--radius-md); background: var(--color-panel); border: 1px solid var(--color-rule); box-shadow: var(--shadow-card); interpolate-size: allow-keywords; transition: background-color var(--dur-base); }
-  .acc:hover, .acc[open] { background: var(--color-accent-soft); }
-  .acc summary { display: flex; align-items: center; gap: 1rem; min-height: 56px; padding: 0.6rem 1.2rem; cursor: pointer; list-style: none; }
+  /* 경력: 회사마다 카드 하나. 카드 머리 = 회사 · 직무 · 기간, 그 아래 한 일이 줄로 들어간다 */
+  .jobs { display: grid; gap: 10px; max-width: 54rem; }
+  .job { border-radius: var(--radius-md); background: var(--color-panel); border: 1px solid var(--color-rule); box-shadow: var(--shadow-card); }
+  .job-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 1rem; padding: 1.1rem 1.2rem; }
+  .job-head h3 { flex: 1; min-width: 0; font-size: 1.1875rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35; }
+  .job-head h3 span { margin-left: 0.6rem; font-size: 0.9375rem; font-weight: 500; letter-spacing: 0; color: var(--color-ink-3); }
+  .period { flex: none; font-size: 0.875rem; font-weight: 600; color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
+  /* 펼쳐지는 줄 */
+  .acc { interpolate-size: allow-keywords; transition: background-color var(--dur-base); }
+  .acc summary { display: flex; align-items: center; gap: 1rem; min-height: 48px; padding: 0.5rem 1.2rem; cursor: pointer; list-style: none; }
   .acc summary::-webkit-details-marker { display: none; }
-  .acc summary b { flex: 1; font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.015em; }
-  .acc summary :global(svg) { flex: none; color: var(--color-ink-3); transition: transform 0.4s var(--ease-spring); }
-  .acc[open] summary :global(svg) { transform: rotate(180deg); }
-  .when { flex: none; width: 4.6rem; font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); font-variant-numeric: tabular-nums; }
-  .acc p { padding: 0 1.2rem 1.1rem calc(1.2rem + 4.6rem + 1rem); color: var(--color-ink-2); line-height: 1.7; }
+  .job > .acc { border-top: 1px solid var(--color-rule); }
+  .job > .acc:last-child { border-radius: 0 0 var(--radius-md) var(--radius-md); }
+  .acc:hover, .acc[open] { background: var(--color-accent-soft); }
+  .acc summary b { flex: 1; font-weight: 600; letter-spacing: -0.015em; }
+  .acc summary :global(svg) { flex: none; align-self: center; color: var(--color-ink-3); transition: transform 0.4s var(--ease-spring); }
+  .acc[open] > summary :global(svg) { transform: rotate(180deg); }
+  .when { flex: none; width: 4.6rem; white-space: nowrap; font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); font-variant-numeric: tabular-nums; }
+  .acc p { padding: 0 1.2rem 1rem calc(1.2rem + 4.6rem + 1rem); color: var(--color-ink-2); line-height: 1.7; }
   .acc::details-content { block-size: 0; overflow: clip; transition: block-size 0.45s var(--ease-spring), content-visibility 0.45s allow-discrete; }
   .acc[open]::details-content { block-size: auto; }
+  /* 한 일이 하나뿐인 회사: 카드 머리 자체가 펼치는 줄 */
+  details.job > summary.job-head { align-items: baseline; padding: 1.1rem 1.2rem; }
+  details.job p { padding: 0 1.2rem 1.1rem; }
 
   /* 연락 */
   .contact { display: flex; flex-direction: column; align-items: center; text-align: center; padding-block: clamp(3rem, 10vh, 6rem) clamp(4rem, 12vh, 7rem); }
@@ -296,14 +302,19 @@ const principleIcons: IconName[] = ['file', 'search', 'lock'];
   .copy-status { min-height: 1.5rem; margin-top: 0.4rem; font-size: 0.875rem; color: var(--color-ink-2); }
 
   @media (max-width: 760px) {
-    .steps { grid-template-columns: 1fr; gap: 1.75rem; }
-    .step-top::after { margin-right: 0; }
-    .cards { grid-template-columns: 1fr; }
+    .stats { gap: 1rem; }
+    .stats dt { font-size: 0.8125rem; }
+    .steps { grid-template-columns: 1fr; }
+    .row { gap: 0.7rem; padding-inline: 1rem; }
+    .row > :global(svg) { display: none; }
     .who { grid-template-columns: 1fr; gap: 1.1rem; }
     .photo { width: 112px; height: 112px; }
     .fields { grid-template-columns: 1fr; }
-    .when { width: 3.9rem; }
+    .job-head, details.job > summary.job-head { padding-inline: 1rem; }
+    .job-head h3 { flex-basis: 100%; }
+    .job-head h3 span { display: block; margin: 0.1rem 0 0; }
+    .when { width: 4.3rem; }
     .acc summary { gap: 0.6rem; padding-inline: 1rem; }
-    .acc p { padding: 0 1rem 1rem; }
+    .acc p, details.job p { padding: 0 1rem 1rem; }
   }
 </style>

@@ -1,6 +1,7 @@
 ---
 // 프로젝트 상세 본문. /work/[id]/ 와 /en/work/[id]/ 가 같이 쓴다.
-// 순서: 머리(제목·요약·기간) → 한눈에 보기(흐름 + 문제·해결·결과, src/data/cases.ts) → 데모 화면 → 긴 글.
+// 순서: 머리(제목·요약·기간) → 한눈에 보기(흐름 + 문제·해결·결과, src/data/cases.ts) → 데모 화면 → 긴 글(접혀 있음).
+// 2026-11-20 "글이 많다"는 피드백으로 긴 글은 지우지 않고 접어 두었다. "전체 기록 보기"를 누르면 펴진다.
 // EN pages render src/content/projects-en/<id>.md when it exists, else fall back to the Korean body.
 import { render, getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { t, STATUS_LABEL, type Locale } from '../i18n';
@@ -27,6 +28,10 @@ if (idx < 0 || !next) throw new Error(`Work page for "${entry.id}": missing from
 const title = en ? d.titleEn : d.title;
 const copy = en ? CASES[idx].en : CASES[idx];
 const psr = [copy.problem, copy.solution, copy.result];
+// 기간이 "2026.03 – 운영 중"처럼 상태로 끝나면 옆의 상태 꼬리표와 겹치므로 "2026.03 –"까지만 보여 준다
+const status = STATUS_LABEL[locale][d.status];
+const span = en ? d.periodEn : d.period;
+const period = span.endsWith(status) ? span.slice(0, -status.length).trimEnd() : span;
 ---
 <article class="wrap work">
   {/* 홈으로 돌아가면 보던 프로젝트 단계가 다시 열린다 (#id는 Stage.astro가 읽는다) */}
@@ -35,15 +40,11 @@ const psr = [copy.problem, copy.solution, copy.result];
     <div class="work-top">
       <span class="work-id">{fileNo(entry.id)}</span>
       <span class="label">{en ? CASES[idx].catEn : CASES[idx].cat}</span>
-      <span class="status" data-status={d.status}>{STATUS_LABEL[locale][d.status]}</span>
+      <span class="label">{period}</span>
+      <span class="status" data-status={d.status}>{status}</span>
     </div>
     <h1 class="work-title">{title}</h1>
     <p class="work-summary">{en ? d.summaryEn : d.summary}</p>
-    <dl class="work-meta">
-      <div><dt>{s.period}</dt><dd>{en ? d.periodEn : d.period}</dd></div>
-      <div><dt>{s.stack}</dt><dd>{d.stack.join(' · ')}</dd></div>
-      <div><dt>{s.replaced}</dt><dd>{en ? d.replacedEn : d.replaced}</dd></div>
-    </dl>
   </header>
 
   <section class="glance" aria-labelledby="glance-title">
@@ -62,9 +63,13 @@ const psr = [copy.problem, copy.solution, copy.result];
     </p>
   )}
 
-  {PROJECT_SHOTS[entry.id] && <ProjectShots id={entry.id} locale={locale} variant="gallery" />}
+  {PROJECT_SHOTS[entry.id] && <ProjectShots id={entry.id} locale={locale} />}
 
-  <div class="prose" lang={bodyLang}><Content /></div>
+  {/* 긴 글은 접어 둔다. JS 없이도 펴지고, 브라우저의 페이지 내 검색은 접힌 글까지 찾아 펴 준다 */}
+  <details class="more">
+    <summary class="btn ghost"><span class="when-closed">{h.full}</span><span class="when-open">{h.fullClose}</span><Icon name="chevron-down" size={18} /></summary>
+    <div class="prose" lang={bodyLang}><Content /></div>
+  </details>
 
   <nav class="work-next" aria-label={s.next}>
     <span class="label">{s.next}</span>
@@ -82,10 +87,6 @@ const psr = [copy.problem, copy.solution, copy.result];
   .work-title { max-width: 18ch; font-size: clamp(2.2rem, 5.4vw, 4rem); line-height: 1.08; letter-spacing: -0.04em; }
   :global(html[lang="en"]) .work-title { max-width: 22ch; }
   .work-summary { max-width: 46rem; font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--color-ink-2); line-height: 1.6; }
-  .work-meta { margin: var(--space-sm) 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 54rem; }
-  .work-meta div { padding: 0.9rem 1.1rem; border-radius: var(--radius-md); background: var(--color-panel); border: 1px solid var(--color-rule); }
-  .work-meta dt { font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-3); }
-  .work-meta dd { margin: 0.15rem 0 0; font-weight: 600; line-height: 1.45; }
 
   .glance { padding-bottom: var(--space-2xl); margin-bottom: var(--space-2xl); border-bottom: 1px solid var(--color-rule); }
   .glance .sec-label { margin-top: 0; }
@@ -100,13 +101,21 @@ const psr = [copy.problem, copy.solution, copy.result];
   .psr dt { font-size: 0.8125rem; font-weight: 700; color: var(--color-ink-3); }
   .psr dd { margin: 0.4rem 0 0; color: var(--color-ink-2); line-height: 1.7; }
 
+  /* 접어 둔 긴 글 */
+  .more > summary { display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; list-style: none; }
+  .more > summary::-webkit-details-marker { display: none; }
+  .more > summary :global(svg) { transition: transform 0.4s var(--ease-spring); }
+  .more[open] > summary :global(svg) { transform: rotate(180deg); }
+  .more:not([open]) .when-open, .more[open] .when-closed { display: none; }
+  .more .prose { margin-top: var(--space-xl); }
+
   .notice { max-width: var(--measure); font-size: var(--text-sm); color: var(--color-ink-2); background: var(--color-panel); border: 1px solid var(--color-rule); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); margin-bottom: var(--space-xl); }
   .work-next { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--color-rule); display: grid; gap: var(--space-2xs); }
   .work-next a { display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; font-weight: 700; font-size: 1.125rem; }
   .work-next a:hover { text-decoration: underline; }
 
   @media (max-width: 760px) {
-    .work-meta, .flow, .psr { grid-template-columns: 1fr; }
+    .flow, .psr { grid-template-columns: 1fr; }
     .flow li + li::before { content: "↓"; left: 50%; top: -6px; }
   }
 </style>

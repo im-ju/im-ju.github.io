@@ -12,6 +12,64 @@ export const STATUS_LABEL: Record<Locale, Record<string, string>> = {
   en: { live: 'live', wip: 'in development', poc: 'PoC complete', approved: 'approved', pending: 'awaiting rollout', done: 'complete' },
 };
 
+// 이력 로그: 회사(경력)별 묶음. 오래된 회사부터, 묶음 안에서도 오래된 일부터 적는다.
+// 홈은 이 묶음을 최신 순으로 뒤집어 보여 주고, /print/는 flatLog()가 편 한 줄짜리 목록을 그대로 쓴다.
+// 한 회사에서 한 일이 하나면 body, 여러 개면 items([시기, 제목, 내용])를 쓴다.
+export interface Job { org: string; role: string; period: string; body?: string; items?: [string, string, string][]; }
+export function flatLog(jobs: Job[]): [string, string, string][] {
+  return jobs.flatMap((j): [string, string, string][] => {
+    if (j.items?.length) return j.items;
+    if (j.body) return [[j.period.split(' – ')[0], `${j.org} · ${j.role}`, j.body]];
+    throw new Error(`src/i18n.ts: log job "${j.org}" has neither body nor items, so it would vanish from the career log.`);
+  });
+}
+// 2022–2024 = DSRV 이전 경력, career-ops/cv.md 기준 (2026-11-19 추가). 학력은 인사기록 카드에 있다.
+const LOG_KO: Job[] = [
+  { org: '피처링', role: '마케팅 인턴', period: '2022.10 – 2022.12', body: '인플루언서 마케팅 회사에서 2022년 12월까지. 협업 인플루언서 발굴과 캠페인 제안서 작성, 영·한 문서 번역, 스타트업 박람회 부스에서 외국인 대상 통역.' },
+  { org: '수을관', role: '카페 매니저', period: '2023.04 – 2023.12', body: '노우즈 × 수을관 협업 매장을 2023년 12월까지 운영. 매장 운영 총괄과 현장 이슈 해결, 메뉴 개발 참여, 콜드브루 선물세트 상품 기획.' },
+  { org: '머신킹', role: '해외영업 · 파트너십', period: '2024.07 – 2024.08', body: 'Associate Founder로 2024년 8월까지. 파트너 3인이 함께한 중고 상업용 운동기구 수입·유통에서 미국 딜러와 가격 협상, Legend Fitness 총판 계약 성사, 컨테이너 출고·납기 조정, 국내 리퍼 업체 선정.' },
+  {
+    org: 'DSRV', role: '인사총무팀 매니저', period: '2024.12 – 재직 중', // ← 회사를 옮기면 이 묶음 아래에 새 묶음을 추가
+    items: [
+      ['2024.12', 'DSRV 입사', 'HR 경력의 시작. DSRV 경영관리팀 매니저로 입사. 2주 차부터 팀 리드 부재로 근태·연차·건강검진·병역지정업체 업무를 인수인계 없이 이관받아 운영.'],
+      ['2025.02', 'HR SaaS 전환', 'HR ERP(5240)에서 flex로 전환. 벤더 구축 지원 없이 어드민에서 직접 세팅하고 데이터 이관, 출입통제 연동, 전자결재 설계까지 약 5주 만에 전사 오픈.'],
+      ['2025', '사옥 이전', '8개 이상 카테고리 업체 비교견적, 5일 이전 일정 설계·운영, 4단계 검수 절차. 이후 법인 변경등기와 임대인 귀속 비용 분리까지.'],
+      ['2025 –', '채용 오퍼레이션', '20개 이상 포지션 채용 전 구간 운영. AI 이력서 스크리닝 도입, 4개 채널 단일 계정 통합, 채용 SLA 문서화, 면접관 교육.'],
+      ['2025 –', '온보딩 제도 신설', '없던 온보딩을 처음부터 설계해 CFO 승인. 입사자 약 50명 직접 진행.'], // "6단계→8단계 재설계"는 cv.md 본인 정정(2026-10-07)에 따라 뺐다
+      ['2026.01', 'ERP 전환', '더존 아마란스10 도입 때 조직도·결재선·양식·인사정보 세팅과 교육 담당. 전자결재 전환 완료, 회계·인사 모듈 진행 중.'],
+      ['2026.03', '자산관리규정 개정', '법률·세무 / 정보보안 / 구조·실무 세 관점 분석, 우선순위 15건 반영. 변상 시 임금·퇴직금 일방 공제 금지 원칙 명문화. 대표이사 승인.'],
+      ['2026.03', 'HR/GA Hub 배포', '사내 인사총무 통합 플랫폼을 전 직원 대상으로 공개. 이후 중단 없이 운영 중.'],
+      ['2026.04', '신규 입사자 피드백 프로그램', '1:1 커피챗 설계, 약 580개 의견 취합·분석, TOP 10 이슈와 약 40건 액션 아이템으로 경영진 보고. 2차 질문 가이드를 1차 결과로 재설계.'],
+      ['2026', '외부 제출 무반려', '법인 변경등기 12건, 해외 파트너 KYB 실사 10건 영문 서류 최종 검토. 반려 0건.'],
+      // 2026.10 = HRIS period in src/content/projects/hris.md; facts match the HRIS page (user-confirmed 2026-11-17)
+      ['2026.10 –', '사내 HRIS 구축 (PO)', '구성원·조직도·휴가·근태·평가·채용을 한곳에서 다루는 사내 인사 시스템을 PO로 진행 중. 와이어프레임부터 개발까지 이끌고, 개발·보안·인프라팀에 협업을 요청해 결정. 2026년 말 전사 테스트 목표.'],
+    ],
+  },
+];
+// Mirrors LOG_KO; roles before DSRV follow career-ops/cv-en.md (added 2026-11-19).
+const LOG_EN: Job[] = [
+  { org: 'Featuring', role: 'marketing intern', period: 'Oct 2022 – Dec 2022', body: 'At an influencer-marketing company until December 2022. Sourced influencers, wrote campaign proposals, translated between English and Korean, and interpreted for international visitors at a startup expo.' },
+  { org: 'Suulgwan', role: 'café store manager', period: 'Apr 2023 – Dec 2023', body: 'Ran a Knows × Suulgwan collaboration store until December 2023: store operations and on-site problems, menu development, and planning a cold-brew gift set.' },
+  { org: 'Machine King', role: 'overseas sales and partnerships', period: 'Jul 2024 – Aug 2024', body: 'Associate Founder until August 2024, one of three partners importing and reselling used commercial gym equipment. Negotiated prices with US dealers, closed the Legend Fitness distributorship, coordinated container shipping, and chose refurbishment vendors in Korea.' },
+  {
+    org: 'DSRV', role: 'Manager, HR & General Affairs', period: 'Dec 2024 – present',
+    items: [
+      ['Dec 2024', 'Joined DSRV', 'Start of my HR career. Joined DSRV. Two weeks in, the team lead became unavailable; took over attendance, leave, health screening and statutory administration with no handover.'],
+      ['Feb 2025', 'HR SaaS migration', 'Moved from the old HR ERP to flex, an HR SaaS. Configured the admin console with effectively no vendor support, migrated data, integrated badge access, redesigned approvals. Company-wide launch in about five weeks.'],
+      ['2025', 'Office relocation', 'Competitive bids across 8+ categories, a five-day execution schedule, a four-step inspection chain, followed by the corporate filings and splitting costs with the landlord.'],
+      ['2025 –', 'Recruiting operations', 'Ran the process end to end for 20+ requisitions. AI-assisted screening, four channels consolidated into one team account, documented SLAs, interviewer training.'],
+      ['2025 –', 'Onboarding from nothing', 'Designed the programme, cleared it with the CFO, and ran it personally for about 50 new hires.'], // "six steps to eight" removed per the owner's correction in cv.md (2026-10-07)
+      ['Jan 2026', 'ERP transition', 'Douzone Amaranth10: org structure, approval routing, forms and HR master data plus training. E-approval live; finance and HR modules in progress.'],
+      ['Mar 2026', 'Asset regulation rewrite', 'Three-lens analysis, 15 priority findings implemented, wage-deduction protection codified. CEO approved.'],
+      ['Mar 2026', 'HR/GA Hub shipped', 'Internal HR & workplace platform opened to all staff. No unplanned downtime since.'],
+      ['Apr 2026', 'New-hire feedback loop', 'Designed 1:1 coffee chats, analysed ~580 comments, briefed the executive team on a top-10 issue list and ~40 actions. Second round redesigned from first-round findings.'],
+      ['2026', 'Zero-defect filings', '12 corporate registry filings and 10 partner KYB reviews as final reviewer of English submissions. No rejections.'],
+      // Oct 2026 = HRIS period in src/content/projects/hris.md; mirrors the KO entry
+      ['Oct 2026 –', 'In-house HRIS (PO)', 'Leading, as PO, an in-house HR system that brings employee records, org chart, leave, attendance, reviews and recruiting into one place. Took it from wireframes to development and asked the development, security and infrastructure teams to work with me on the decisions. Target: a company-wide test by end of 2026.'],
+    ],
+  },
+];
+
 export const t = {
   ko: {
     htmlLang: 'ko',
@@ -66,62 +124,40 @@ export const t = {
     log: {
       title: '이력 로그',
       lede: '첫 경력부터 지금까지의 주요 기록. 시간순.',
-      entries: [
-        // 2022–2024 = DSRV 이전 경력, career-ops/cv.md 기준 (2026-11-19 추가). 학력은 인사기록 카드에 있다.
-        ['2022.10', '피처링 · 마케팅 인턴', '인플루언서 마케팅 회사에서 2022년 12월까지. 협업 인플루언서 발굴과 캠페인 제안서 작성, 영·한 문서 번역, 스타트업 박람회 부스에서 외국인 대상 통역.'],
-        ['2023.04', '수을관 · 카페 매니저', '노우즈 × 수을관 협업 매장을 2023년 12월까지 운영. 매장 운영 총괄과 현장 이슈 해결, 메뉴 개발 참여, 콜드브루 선물세트 상품 기획.'],
-        ['2024.07', '머신킹 · 해외영업 · 파트너십', 'Associate Founder로 2024년 8월까지. 파트너 3인이 함께한 중고 상업용 운동기구 수입·유통에서 미국 딜러와 가격 협상, Legend Fitness 총판 계약 성사, 컨테이너 출고·납기 조정, 국내 리퍼 업체 선정.'],
-        ['2024.12', 'DSRV 입사', 'HR 경력의 시작. DSRV 경영관리팀 매니저로 입사. 2주 차부터 팀 리드 부재로 근태·연차·건강검진·병역지정업체 업무를 인수인계 없이 이관받아 운영.'],
-        ['2025.02', 'HR SaaS 전환', 'HR ERP(5240)에서 flex로 전환. 벤더 구축 지원 없이 어드민에서 직접 세팅하고 데이터 이관, 출입통제 연동, 전자결재 설계까지 약 5주 만에 전사 오픈.'],
-        ['2025', '사옥 이전', '8개 이상 카테고리 업체 비교견적, 5일 이전 일정 설계·운영, 4단계 검수 절차. 이후 법인 변경등기와 임대인 귀속 비용 분리까지.'],
-        ['2025 –', '채용 오퍼레이션', '20개 이상 포지션 채용 전 구간 운영. AI 이력서 스크리닝 도입, 4개 채널 단일 계정 통합, 채용 SLA 문서화, 면접관 교육.'],
-        ['2025 –', '온보딩 제도 신설', '없던 온보딩을 처음부터 설계해 CFO 승인. 입사자 약 50명 직접 진행.'], // "6단계→8단계 재설계"는 cv.md 본인 정정(2026-10-07)에 따라 뺐다
-        ['2026.01', 'ERP 전환', '더존 아마란스10 도입 때 조직도·결재선·양식·인사정보 세팅과 교육 담당. 전자결재 전환 완료, 회계·인사 모듈 진행 중.'],
-        ['2026.03', '자산관리규정 개정', '법률·세무 / 정보보안 / 구조·실무 세 관점 분석, 우선순위 15건 반영. 변상 시 임금·퇴직금 일방 공제 금지 원칙 명문화. 대표이사 승인.'],
-        ['2026.03', 'HR/GA Hub 배포', '사내 인사총무 통합 플랫폼을 전 직원 대상으로 공개. 이후 중단 없이 운영 중.'],
-        ['2026.04', '신규 입사자 피드백 프로그램', '1:1 커피챗 설계, 약 580개 의견 취합·분석, TOP 10 이슈와 약 40건 액션 아이템으로 경영진 보고. 2차 질문 가이드를 1차 결과로 재설계.'],
-        ['2026', '외부 제출 무반려', '법인 변경등기 12건, 해외 파트너 KYB 실사 10건 영문 서류 최종 검토. 반려 0건.'],
-        // 2026.10 = HRIS period in src/content/projects/hris.md; facts match the HRIS page (user-confirmed 2026-11-17)
-        ['2026.10 –', '사내 HRIS 구축 (PO)', '구성원·조직도·휴가·근태·평가·채용을 한곳에서 다루는 사내 인사 시스템을 PO로 진행 중. 와이어프레임부터 개발까지 이끌고, 개발·보안·인프라팀에 협업을 요청해 결정. 2026년 말 전사 테스트 목표.'],
-      ],
+      jobs: LOG_KO,
+      entries: flatLog(LOG_KO),
     },
     // Home page (2026-11 redesign: pinned laptop tour). hero/modules/policy/log above stay because /print/ still uses them.
     home: {
       h1: ['사람은 사람의 일에', '집중하도록.'],
-      // 휴대폰 첫 화면에서 desc 대신 보이는 한 줄 (desc가 세 줄을 넘어 잘리므로)
-      short: '제도와 HR 시스템을 만들고, 손으로 하던 확인 업무를 도구로 바꿉니다.',
-      desc: '조직이 90명으로 크는 동안 제도와 HR 시스템을 만들고 손으로 하던 확인 업무를 직접 만든 도구로 바꿉니다.',
+      desc: '제도와 HR 시스템을 만들고, 손으로 하던 확인 업무를 도구로 바꿉니다.', // 첫 화면 제목 아래 한 줄. 휴대폰에서 세 줄을 넘으면 잘린다
+      // 소개 구역의 숫자 세 개: [숫자, 설명]. hero.sub(/print/ 표지 문장)와 같은 사실이어야 한다
+      stats: [['90명', '50명 미만에서 커진 조직'], ['2회', 'HR 시스템 전환'], ['20+', '채용 포지션']],
       ctaContact: '연락하기',
       filesTitle: (n: number) => `작업 파일 ${n}건`,
       flow: '흐름',
       psr: ['문제', '해결', '결과'],
-      full: '전체 기록 보기',
+      open: '자세히 보기',      // 첫 화면 노트북 아래 버튼 → 프로젝트 상세 페이지
+      full: '전체 기록 보기',   // 상세 페이지에서 접어 둔 긴 글을 펴는 버튼
+      fullClose: '전체 기록 접기',
       principlesTitle: '업무 원칙',
-      principles: [
-        ['규정은 기억 대신 규칙으로 옮깁니다.', '사람마다 해석이 달라지던 지원 요건과 한도를 규칙으로 고정하면 판정이 일관되고 규정이 바뀔 때 고칠 곳이 한 곳이 됩니다.'],
-        ['틀렸는데 정상처럼 보이는 것을 먼저 찾습니다.', '근태 기록이 빠지면 차감 0원으로, 읽기 실패는 성공 메시지로 위장합니다. 이런 건을 따로 모아 눈에 띄게 만듭니다.'],
-        ['무엇을 자동화하지 않을지 먼저 정합니다.', '면접 리마인드 메일은 작성까지만, 판정할 수 없는 식대 건은 사람에게. 되돌릴 수 없는 일은 사람이 마지막에 결정합니다.'],
-      ],
+      // 한 줄씩만 보여 준다 (2026-11-19 "글이 많다"는 피드백으로 설명 문단을 뺐다. 풀이는 /print/의 policy.articles에 있다)
+      principles: ['규정은 기억 대신 규칙으로 옮깁니다.', '틀렸는데 정상처럼 보이는 것을 먼저 찾습니다.', '무엇을 자동화하지 않을지 먼저 정합니다.'],
       recordTitle: '인사기록 카드',
       photoAlt: '유주영 프로필 사진',
-      logTitle: '이력 로그',
-      logOpen: '2024.12', // ← 처음 펼쳐 둘 줄의 날짜 (HR 경력이 시작되는 DSRV 입사). log.entries의 날짜와 글자까지 같아야 한다
+      logTitle: '경력',
       contactTitle: '연락은 이메일이 가장 빠릅니다.',
       copy: '이메일 복사', copied: '복사했습니다', copyFailed: '복사가 안 됐습니다. 주소를 직접 선택해 주세요.',
       // 2026-11 redesign: pinned laptop tour (src/components/Stage.astro) and the sections under it
       tour: {
-        pill: ['둘러보기', '한눈에 보기'],
         rail: '프로젝트 둘러보기', intro: '소개',
         play: '자동으로 넘기기', pause: '자동 넘기기 멈춤',
         start: '작업 파일 보기', next: '다음',
-        caption: 'HR · 서울', // 머리글과 같은 이유로 회사명은 넣지 않는다 (2026-11-19)
         sample: '예시 화면 · 가상 데이터',
         search: '검색', employed: '재직 중',
       },
       aboutEyebrow: '소개',
-      indexLede: '카드를 누르면 전체 기록이 열립니다.',
       glance: '한눈에 보기',
-      mail: '이메일 보내기',
       themeToggle: '밝은 테마 / 어두운 테마 전환',
     },
     contact: {
@@ -133,7 +169,7 @@ export const t = {
       note: '이 사이트의 모든 수치는 저장소 소스·커밋 이력·산출 리포트 실측 기준입니다. 임직원 실명과 사내 식별자는 제외했습니다.',
       built: '직접 만들었습니다 · Astro · GitHub Pages',
     },
-    detail: { back: '작업 파일', period: '기간', status: '상태', stack: '스택', replaced: '대체한 것', next: '다음 파일' },
+    detail: { back: '작업 파일', next: '다음 파일' },
   },
   en: {
     htmlLang: 'en',
@@ -188,59 +224,36 @@ export const t = {
     log: {
       title: 'Log',
       lede: 'Key entries from my first job to now, in order.',
-      entries: [
-        // 2022–2024 = roles before DSRV, from career-ops/cv-en.md (added 2026-11-19); mirrors the KO entries
-        ['Oct 2022', 'Featuring · marketing intern', 'At an influencer-marketing company until December 2022. Sourced influencers, wrote campaign proposals, translated between English and Korean, and interpreted for international visitors at a startup expo.'],
-        ['Apr 2023', 'Suulgwan · café store manager', 'Ran a Knows × Suulgwan collaboration store until December 2023: store operations and on-site problems, menu development, and planning a cold-brew gift set.'],
-        ['Jul 2024', 'Machine King · overseas sales and partnerships', 'Associate Founder until August 2024, one of three partners importing and reselling used commercial gym equipment. Negotiated prices with US dealers, closed the Legend Fitness distributorship, coordinated container shipping, and chose refurbishment vendors in Korea.'],
-        ['Dec 2024', 'Joined DSRV', 'Start of my HR career. Joined DSRV. Two weeks in, the team lead became unavailable; took over attendance, leave, health screening and statutory administration with no handover.'],
-        ['Feb 2025', 'HR SaaS migration', 'Moved from the old HR ERP to flex, an HR SaaS. Configured the admin console with effectively no vendor support, migrated data, integrated badge access, redesigned approvals. Company-wide launch in about five weeks.'],
-        ['2025', 'Office relocation', 'Competitive bids across 8+ categories, a five-day execution schedule, a four-step inspection chain, followed by the corporate filings and splitting costs with the landlord.'],
-        ['2025 –', 'Recruiting operations', 'Ran the process end to end for 20+ requisitions. AI-assisted screening, four channels consolidated into one team account, documented SLAs, interviewer training.'],
-        ['2025 –', 'Onboarding from nothing', 'Designed the programme, cleared it with the CFO, and ran it personally for about 50 new hires.'], // "six steps to eight" removed per the owner's correction in cv.md (2026-10-07)
-        ['Jan 2026', 'ERP transition', 'Douzone Amaranth10: org structure, approval routing, forms and HR master data plus training. E-approval live; finance and HR modules in progress.'],
-        ['Mar 2026', 'Asset regulation rewrite', 'Three-lens analysis, 15 priority findings implemented, wage-deduction protection codified. CEO approved.'],
-        ['Mar 2026', 'HR/GA Hub shipped', 'Internal HR & workplace platform opened to all staff. No unplanned downtime since.'],
-        ['Apr 2026', 'New-hire feedback loop', 'Designed 1:1 coffee chats, analysed ~580 comments, briefed the executive team on a top-10 issue list and ~40 actions. Second round redesigned from first-round findings.'],
-        ['2026', 'Zero-defect filings', '12 corporate registry filings and 10 partner KYB reviews as final reviewer of English submissions. No rejections.'],
-        // Oct 2026 = HRIS period in src/content/projects/hris.md; mirrors the KO entry
-        ['Oct 2026 –', 'In-house HRIS (PO)', 'Leading, as PO, an in-house HR system that brings employee records, org chart, leave, attendance, reviews and recruiting into one place. Took it from wireframes to development and asked the development, security and infrastructure teams to work with me on the decisions. Target: a company-wide test by end of 2026.'],
-      ],
+      jobs: LOG_EN,
+      entries: flatLog(LOG_EN),
     },
     home: {
       h1: ['Systems for people.'],
-      short: '',
-      desc: 'An HR generalist who writes the policy when none exists, then builds the systems that make it hold.',
+      desc: 'I build policies and HR systems, and turn manual checks into tools.', // mirrors the KO line (the longer sentence is the About headline right below)
+      stats: [['~90', 'employees, up from under 50'], ['2', 'HR system transitions'], ['20+', 'requisitions recruited']],
       ctaContact: 'Contact',
       filesTitle: (n: number) => `${n} case files`,
       flow: 'Flow',
       psr: ['Problem', 'Solution', 'Result'],
+      open: 'View project',
       full: 'Read the full write-up',
+      fullClose: 'Hide the full write-up',
       principlesTitle: 'Working principles',
-      principles: [
-        ['Rules move out of memory and into checks.', 'Eligibility rules and limits that each person used to read differently become fixed rules: decisions stay consistent, and a rule change means editing one place.'],
-        ['First, find what is wrong but looks normal.', 'A missing attendance record shows up as a zero deduction; a failed read shows up as a success message. These cases are collected and made visible.'],
-        ['Decide first what not to automate.', 'Interview reminder emails stop at the draft; meal-allowance cases the rules cannot decide go to a person. A person makes the final call on anything that cannot be undone.'],
-      ],
+      principles: ['Rules move out of memory and into checks.', 'First, find what is wrong but looks normal.', 'Decide first what not to automate.'],
       recordTitle: 'Employee record',
       photoAlt: 'Portrait of Juyoung You',
-      logTitle: 'Log',
-      logOpen: 'Dec 2024', // ← date of the entry shown open first (joining DSRV, where the HR career starts); must match log.entries exactly
+      logTitle: 'Experience',
       contactTitle: 'Email is the fastest way to reach me.',
       copy: 'Copy email', copied: 'Copied', copyFailed: 'Could not copy. Please select the address.',
       tour: {
-        pill: ['Tour', 'At a glance'],
         rail: 'Project tour', intro: 'Intro',
         play: 'Play the tour', pause: 'Pause the tour',
         start: 'See the work', next: 'Next',
-        caption: 'HR · Seoul',
         sample: 'Sample screen · made-up data',
         search: 'Search', employed: 'Employed',
       },
       aboutEyebrow: 'About',
-      indexLede: 'Open a card to read the full write-up.',
       glance: 'At a glance',
-      mail: 'Email me',
       themeToggle: 'Switch between light and dark theme',
     },
     contact: {
@@ -252,6 +265,6 @@ export const t = {
       note: 'Every figure on this site is measured from repository sources, commit history and produced reports. Employee names and internal identifiers are excluded.',
       built: 'Built by hand · Astro · GitHub Pages',
     },
-    detail: { back: 'All files', period: 'Period', status: 'Status', stack: 'Stack', replaced: 'Replaced', next: 'Next file' },
+    detail: { back: 'All files', next: 'Next file' },
   },
 } as const;
