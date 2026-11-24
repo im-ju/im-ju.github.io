@@ -16,8 +16,6 @@ It was not hard, but it could never be missed. A missed email hurts the candidat
 
 **I had it prepare drafts every morning.** I wrote a small program that runs inside Google's work tools (Google Apps Script). Every morning it reads the next day's events in the shared calendar, uses each title to tell whether it is an interview and of what type, finds the candidate's name and email in the event description, and creates a Gmail draft from the right template. When it is done, it sends a summary email saying how many drafts it made.
 
-**It shows the events it could not read.** If it cannot find the candidate's name or email in the description, it lists the event as a warning, with the reason, in the morning summary. If it simply skipped, the summary would say "3 drafts created" and nobody would know there were actually 4 interviews. On days with warnings, the summary's subject line gets "needs checking", so a normal morning and a problem morning look different in the inbox.
-
 **The same draft is never created twice.** Sometimes the program runs twice, or the same event appears twice in the calendar. Before creating a draft, it checks whether a draft with the same subject and recipient already exists, and if so, it does not create another.
 
 **It can preview without touching the real mailbox.** When changing a template or adding words for spotting interview types, there is a separate way to run it that shows what would be created without actually creating any drafts.
@@ -28,6 +26,10 @@ It was not hard, but it could never be missed. A missed email hurts the candidat
 - The summary email goes not to a fixed address but to whoever is running the program, because the drafts are created in that person's mailbox too.
 - The list of words used to spot interview types is kept in one place. When the spelling varies, for example with spacing or English words, you add a line to the list instead of changing the code.
 
+## Where I got stuck
+
+The calendar is filled in by hand, so some days an event is missing the candidate's name or email. If those events were simply skipped, the summary email would say "3 drafts created" and nobody would know there had been 4 interviews. So events it cannot read go into the summary email as warnings with the reason, and the subject line gets "Needs checking".
+
 ## What I chose not to do
 
 **I did not have it send emails automatically.** This is the most important decision in the project. Technically, sending is easier, and stopping at drafts looks less automated, because a person still has to open the mailbox every day. I stopped at drafts for three reasons:
@@ -37,3 +39,7 @@ It was not hard, but it could never be missed. A missed email hurts the candidat
 - When the input is not 100% reliable and the result cannot be undone, the final human check must not be removed.
 
 Almost all of the repetitive work was in the writing, so automating only that captured most of the benefit without the risk of a wrong send.
+
+## What I learned
+
+I was already sending interview details without missing any. Even so, one more reminder the day before helped not only the candidates but our own team keep track of the schedule. What is enough by my standard may not be enough by theirs. It taught me to think from the other person's side, not mine.

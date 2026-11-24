@@ -26,11 +26,13 @@ Making these calls meant matching meal-card usage against attendance records by 
 
 **It absorbs data whose format changes every month.** Employee numbers in the attendance records switched from month to month between `1.0`, `1` and `001`. When the format differs, the same person is treated as two different people, and no error appears; you just get believable results. So the very first step puts every employee number into one format before any matching.
 
-**It warns when the results look odd.** In June 2026, the wording of the top-up reason changed, so people who had received a full month's points were classed as not having received them and dropped out of the check. Since then, if the share of people who received a full month's points falls below half, it warns that "the format may have changed again".
-
 **When the regulation changes, you choose instead of editing the program.** In July 2026, dinner and weekend meals switched to paying with a personal card and claiming the cost afterwards. Instead of changing the program every time the regulation changes, you choose which version of the regulation to apply when you run it. Re-checking a past month runs on that month's regulation.
 
 **I bundled the monthly routine too.** Remembering and entering the exceptions that change every month (remote-work exceptions, shift workers, cases the coordinator already cleared) was itself where mistakes happened. I made a single command in an AI tool (Claude Code) that asks for the exceptions first, finds the files, runs the check and summarises the results; if anything needs a person's review, it asks again and re-runs.
+
+## Where I got stuck
+
+In June 2026, the wording of the top-up records changed, and people who had received a full month's points quietly dropped out of the check. There was no error, and the results looked plausible. Since then, if the share of people with a full month's top-up falls below half, it warns that the format may have changed again.
 
 ## What I chose not to do
 
@@ -41,3 +43,7 @@ Making these calls meant matching meal-card usage against attendance records by 
 **I did not drop upcoming leavers early.** The attendance records already show the leaving date of people who leave next month. Dropping them on sight would wave through a whole month of normal work without any check. If the leaving date falls after the month being checked, the person stays in.
 
 **I did not decide borderline cases against the employee.** On days with a morning half-day off, the actual arrival time is also checked. But the attendance system does not record arrivals that overlap with leave hours, so arriving at 11:59 is recorded as 12:00, when the leave ends. A 12:00 record alone cannot show whether the person arrived on time, so I decided that exactly 12:00 is paid and deductions start from 12:01.
+
+## What I learned
+
+Once the rules were written down properly from the start and the right data could be pulled, checking became easy. For the first month I matched the data, did the sums and checked everything by hand. A month later I wrapped that process into a single Claude Code command, and a check that used to take a day or two took under 20 minutes. That was a real sense of achievement.

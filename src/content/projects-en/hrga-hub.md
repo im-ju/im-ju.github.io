@@ -8,6 +8,10 @@ As the HR and general-affairs person, I built my team's repetitive work into a w
 
 The data moved over includes a member list of about 90 people, 337 partner restaurants and 66 training-allowance spending records. I have not measured how many people actually use it or how often, though. About 90 is the size of the list the Hub manages, not the number of people who use it every day.
 
+## How it started
+
+It began with an idea from my lead, looking at the company Google Calendar: a dashboard showing which meeting rooms were in use. After that I built small tools the HR and general-affairs team might find useful, one at a time, and deployed each one separately on Vercel. The more tools there were, the more scattered and harder to manage they became, so I rebuilt them as one web app where everything is managed in one place.
+
 ## The problem
 
 HR and general-affairs work was spread across four places:

@@ -6,6 +6,10 @@ I rewrote an asset management regulation that had gone unchanged for more than t
 - **3 new clauses and 1 new form.** Clauses on loss and theft, data security, and what happens when the regulation is breached, plus a table of asset categories and how many years each is expected to last.
 - **17 people recommended for replacement.** I applied the new obsolescence standard to the asset register and sorted them by priority.
 
+## How it started
+
+The regulation had been left untouched for a long time, and some clauses looked odd even to me. It felt as if nobody was looking after it. So I asked first whether I could revise it, and then started.
+
 ## The problem
 
 The asset management regulation was still the November 2023 version. Since then the company and its assets had grown, and situations the regulation did not cover kept coming up in day-to-day work.

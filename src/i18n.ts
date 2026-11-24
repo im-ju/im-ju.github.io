@@ -39,7 +39,7 @@ const LOG_KO: Job[] = [
       ['2026.01', 'ERP 전환', '더존 아마란스10 도입 때 조직도·결재선·양식·인사정보 세팅과 교육 담당. 전자결재 전환 완료, 회계·인사 모듈 진행 중.'],
       ['2026.03', '자산관리규정 개정', '법률·세무 / 정보보안 / 구조·실무 세 관점 분석, 우선순위 15건 반영. 변상 시 임금·퇴직금 일방 공제 금지 원칙 명문화. 대표이사 승인.'],
       ['2026.03', 'HR/GA Hub 배포', '사내 인사총무 통합 플랫폼을 전 직원 대상으로 공개. 이후 중단 없이 운영 중.'],
-      ['2026.04', '신규 입사자 피드백 프로그램', '1:1 커피챗 설계, 약 580개 의견 취합·분석, TOP 10 이슈와 약 40건 액션 아이템으로 경영진 보고. 2차 질문 가이드를 1차 결과로 재설계.'],
+      ['2026.04', '신규 입사자 피드백 프로그램', '1:1 커피챗 설계, 약 580개 의견 취합·분석, TOP 10 이슈와 약 40건 액션 아이템으로 경영진 보고.'],
       ['2026', '외부 제출 무반려', '법인 변경등기 12건, 해외 파트너 KYB 실사 10건 영문 서류 최종 검토. 반려 0건.'],
       // 2026.10 = HRIS period in src/content/projects/hris.md; facts match the HRIS page (user-confirmed 2026-11-17)
       ['2026.10 –', '사내 HRIS 구축 (PO)', '구성원·조직도·휴가·근태·평가·채용을 한곳에서 다루는 사내 인사 시스템을 PO로 진행 중. 와이어프레임부터 개발까지 이끌고, 개발·보안·인프라팀에 협업을 요청해 결정. 2026년 말 전사 테스트 목표.'],
@@ -62,7 +62,7 @@ const LOG_EN: Job[] = [
       ['Jan 2026', 'ERP transition', 'Douzone Amaranth10: org structure, approval routing, forms and HR master data plus training. E-approval live; finance and HR modules in progress.'],
       ['Mar 2026', 'Asset regulation rewrite', 'Three-lens analysis, 15 priority findings implemented, wage-deduction protection codified. CEO approved.'],
       ['Mar 2026', 'HR/GA Hub shipped', 'Internal HR & workplace platform opened to all staff. No unplanned downtime since.'],
-      ['Apr 2026', 'New-hire feedback loop', 'Designed 1:1 coffee chats, analysed ~580 comments, briefed the executive team on a top-10 issue list and ~40 actions. Second round redesigned from first-round findings.'],
+      ['Apr 2026', 'New-hire feedback loop', 'Designed 1:1 coffee chats, analysed ~580 comments, briefed the executive team on a top-10 issue list and ~40 actions.'],
       ['2026', 'Zero-defect filings', '12 corporate registry filings and 10 partner KYB reviews as final reviewer of English submissions. No rejections.'],
       // Oct 2026 = HRIS period in src/content/projects/hris.md; mirrors the KO entry
       ['Oct 2026 –', 'In-house HRIS (PO)', 'Leading, as PO, an in-house HR system that brings employee records, org chart, leave, attendance, reviews and recruiting into one place. Took it from wireframes to development and asked the development, security and infrastructure teams to work with me on the decisions. Target: a company-wide test by end of 2026.'],
@@ -104,7 +104,7 @@ export const t = {
     },
     policy: {
       title: '이 사이트의 운영 규정',
-      lede: '여섯 개 프로젝트는 도메인도 규모도 다르지만 같은 문제의식에서 나왔습니다. 그 문제의식을 조문으로 적었습니다.',
+      lede: '이 프로젝트들은 도메인도 규모도 다르지만 같은 문제의식에서 나왔습니다. 그 문제의식을 조문으로 적었습니다.',
       articles: [
         ['제1조', '규정은 사람의 기억이 아니라 코드로 옮긴다', '식대 지원 요건, 자기계발비 한도, 자산 내용연수는 전부 문서에 적혀 있었지만 매번 사람이 해석했다. 해석을 코드로 고정하면 판정이 일관되고 규정이 바뀌었을 때 고칠 자리가 한 곳이 된다.'],
         ['제2조', '조용한 실패를 찾아 시끄럽게 만든다', '이 일들의 진짜 위험은 에러가 아니었다. 틀렸는데 정상처럼 보이는 것이었다. 근태 누락은 차감 0원으로, 파싱 실패는 "3건 생성" 성공 메시지로 위장한다. 전부 별도 확인 대상으로 승격하거나 경보를 붙였다.'],
@@ -158,6 +158,7 @@ export const t = {
       },
       aboutEyebrow: '소개',
       glance: '한눈에 보기',
+      role: '내 역할',
       themeToggle: '밝은 테마 / 어두운 테마 전환',
     },
     contact: {
@@ -204,7 +205,7 @@ export const t = {
     },
     policy: {
       title: 'Operating rules of this site',
-      lede: 'The six projects differ in domain and size but share the same concerns. I wrote them up as articles, the way I write policy.',
+      lede: 'These projects differ in domain and size but share the same concerns. I wrote them up as articles, the way I write policy.',
       articles: [
         ['Art. 1', 'Move rules out of memory and into code', 'Meal-allowance eligibility, training budgets and asset lifetimes were all written down, yet interpreted by a person every time. Fix the interpretation in code and judgements become consistent, with one place to change when the rule changes.'],
         ['Art. 2', 'Find silent failures and make them loud', 'The risk was never an error message. It was a result that was wrong but looked normal. A missing attendance record shows up as a zero deduction; a parse failure hides behind a "3 drafts created" success message. Each was promoted to an explicit review item or an alert.'],
@@ -254,6 +255,7 @@ export const t = {
       },
       aboutEyebrow: 'About',
       glance: 'At a glance',
+      role: 'My role',
       themeToggle: 'Switch between light and dark theme',
     },
     contact: {

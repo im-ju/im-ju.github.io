@@ -18,8 +18,6 @@ Rebuilding it had its own constraint: the document was already in daily use. Eac
 
 **I narrowed the requirements first, then chose from four mock-ups side by side.** Before building any structure, I ran five interviews with a fixed set of questions to pin down the requirements. Then I made four mock-ups of different kinds: a left-menu layout, a three-column layout with widgets on top, a three-column layout with toggles, and a shortcuts-first layout. A document structure is hard to compare from a description; you have to see the real thing. So instead of building one and revising it, I put four side by side and chose. The one confirmed was the three-column layout: rule cards on the left, eight expandable lists in the middle, widgets on the right. Improvements that came up after the choice (swapping a widget, showing whether a rule is up to date, a path for new hires) were applied equally to all four mock-ups to keep the comparison fair.
 
-**Matching the original against the mock-up item by item, I found a trap.** Before moving anything, I compared the original and the mock-up section by section. The count matched exactly at 47 items, but one kind of item was different. The 46 entries in the original's body were not links pointing at pages elsewhere; they were the places where those pages actually lived. Taking them out of the body would not break a link; it would delete the page. The mock-up, by contrast, used links throughout. Had I pasted the mock-up onto the original as it was, 46 pages would have vanished at once. Had I only counted the items, I would have missed the difference.
-
 **I took only the new layout and kept the original's pages.** From the mock-up I took only the arrangement (the three columns, the expandable lists, the widgets), and inside the lists I put the original's real pages back as they were. That way the handbook's address, the addresses of its 46 child pages and their place in the left sidebar all stay the same. Moving the child pages somewhere else first was another option, but it would push the sidebar one level deeper and would be hard to undo if the move failed, so I kept it as the fallback.
 
 **I set up deletions to fail outright.** Notion's editing feature has an option that forbids deleting content. With it switched on, any edit that would delete even one child page is rejected with an error. I used this option as a safety check: if an edit succeeded, none of the 47 items had been deleted.
@@ -31,6 +29,10 @@ Rebuilding it had its own constraint: the document was already in daily use. Eac
 **I avoided losses that look like success by getting the order right.** Three problems would not fail with an error; they would look successful while leaving the result empty. Editing in a certain way silently drops images, attachments not yet placed on a page disappear after a while, and the source address of an attachment expires after 5 minutes. So images go in all at once with no partial edits afterwards, attachments are created just before applying, and the procedure says nothing else may happen between fetching and uploading.
 
 **I split the checks into two kinds.** Anything a program can count (46 pages in the right sections, 1 database, 2 links, page icons) is compared automatically. Anything that needs eyes (the three-column layout, the widgets, opening and closing the eight lists) is checked separately.
+
+## Where I got stuck
+
+Just before moving the mock-up into the original, the item count matched exactly at 47, but one kind of item did not. The 46 entries in the original were not links; they were where the pages actually lived. Every entry in the mock-up was a link. Pasting it in as drafted would have deleted all 46 pages at once. So I switched to taking only the layout from the mock-up and putting the original pages back in place, which also kept every address and the sidebar position unchanged.
 
 ## What I chose not to do
 

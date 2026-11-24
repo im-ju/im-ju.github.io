@@ -8,7 +8,8 @@ import { t, EMAIL, LINKEDIN, STATUS_LABEL, SITE_URL } from '../i18n';
 import Wordmark from '../components/Wordmark.astro';
 
 const s = t.ko;
-const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+// 이 PDF의 "모듈"은 직접 만들어 운영한 도구만. 사람을 만나 운영한 프로그램(module "PROGRAM", 예: 커피챗)은 이력 로그에만 나온다.
+const projects = (await getCollection('projects')).filter((p) => p.data.module !== 'PROGRAM').sort((a, b) => a.data.order - b.data.order);
 const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); // KST
 ---
 <!doctype html>

@@ -21,7 +21,7 @@ const L = (ko: string, enText: string) => (en ? enText : ko);
 const N = files.length + 1;
 
 // 데모 화면 순서는 프로젝트 id로 찾는다. 프로젝트를 추가했는데 화면을 안 그렸으면 빌드에서 멈춘다.
-const PANES = ['hris', 'hrga-hub', 'meal-allowance', 'interview-reminder', 'guide-redesign', 'asset-regulation'];
+const PANES = ['hris', 'hrga-hub', 'meal-allowance', 'interview-reminder', 'coffee-chat', 'guide-redesign', 'asset-regulation'];
 const missing = files.filter((f) => !PANES.includes(f.id)).map((f) => f.id);
 if (missing.length) throw new Error(`Stage.astro has no demo screen for: ${missing.join(', ')}. Add a <div class="pane"> for it.`);
 const step = (id: string) => {
@@ -167,6 +167,27 @@ const record = s.hero.fields
                   <div class="p-list m-hide">
                     <Row icon="pen" title={L('초안 자동 작성', 'Write drafts automatically')} sub={L('매일 아침 내일 면접을 찾습니다', "Every morning it finds tomorrow's interviews")}><span class="tg on" data-init="on"></span></Row>
                     <Row icon="lock" title={L('자동 발송', 'Send automatically')} sub={L('보낸 메일은 되돌릴 수 없어 사람이 누릅니다', 'A sent email cannot be taken back, so a person sends it')}><span class="tg" data-init="off"></span></Row>
+                  </div>
+                </div>
+
+                {/* 신규 입사자 커피챗 — 이슈 이름은 일부러 "이슈 A/B": 실제 리포트 내용은 쓰지 않는다 */}
+                <div class="pane" data-i={step('coffee-chat')}>
+                  <header class="p-head"><span class="tile"><Icon name="chat" /></span><div><b>{file('coffee-chat').short}</b><span class="sub">{L('1:1로 듣고, 언급 빈도로 묶기', 'Listen one-to-one, group by how often it comes up')}</span></div></header>
+                  <div class="sg cycle m-hide"><span>{L('채용', 'Recruiting')}</span><span>{L('온보딩', 'Onboarding')}</span><span>{L('회사 생활', 'Working life')}</span></div>
+                  <div class="p-list">
+                    <Row icon="users" title={L('1:1 커피챗', 'One-to-one chats')} sub={L('한 사람당 30~45분 · 2주', '30–45 min each · two weeks')} at={150}><span class="p-val"><span data-count="23" data-delay="400">23</span>{L('명', '')}</span></Row>
+                    <Row icon="chat" title={L('모인 의견', 'Comments collected')} at={300}><span class="p-val">{L('약 ', '~')}<span data-count="580" data-delay="600">580</span>{L('개', '')}</span></Row>
+                  </div>
+                  <p class="p-label">{L('공통 이슈 · 언급 빈도순', 'Common issues · by mentions')}</p>
+                  <div class="p-list">
+                    <Row icon="chart" title={L('이슈 A', 'Issue A')} at={900}><span class="bar" data-at="1100" style="--to:100%"><i></i></span></Row>
+                    <Row icon="chart" title={L('이슈 B', 'Issue B')} at={1000}><span class="bar" data-at="1300" style="--to:78%"><i></i></span></Row>
+                  </div>
+                  <p class="p-label m-hide">{L('액션 아이템 약 40건', 'About 40 action items')}</p>
+                  <div class="chips m-hide">
+                    {[L('바로 할 것', 'Quick wins'), L('중기', 'Medium term'), L('장기', 'Long term')].map((c, i) => (
+                      <span class="chip rvl" data-at={2000 + i * 150}>{c}</span>
+                    ))}
                   </div>
                 </div>
 

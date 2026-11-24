@@ -49,6 +49,8 @@ const period = span.endsWith(status) ? span.slice(0, -status.length).trimEnd() :
 
   <section class="glance" aria-labelledby="glance-title">
     <h2 id="glance-title" class="sec-label">{h.glance}</h2>
+    {/* 누구와, 어떤 역할로 했는지 (7단계 구조의 "내 역할") */}
+    <p class="role"><b>{h.role}</b>{copy.role}</p>
     <ol class="flow" aria-label={h.flow}>
       {copy.flow.map((x, i) => <li class="rv" style={`--rv:${i}`}><b>{['IN', 'DO', 'OUT'][i]}</b><span>{x}</span></li>)}
     </ol>
@@ -90,6 +92,8 @@ const period = span.endsWith(status) ? span.slice(0, -status.length).trimEnd() :
 
   .glance { padding-bottom: var(--space-2xl); margin-bottom: var(--space-2xl); border-bottom: 1px solid var(--color-rule); }
   .glance .sec-label { margin-top: 0; }
+  .role { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; align-items: baseline; margin: 0 0 var(--space-md); color: var(--color-ink-2); font-weight: 600; line-height: 1.6; }
+  .role b { font-size: 0.8125rem; font-weight: 700; color: var(--color-ink-3); }
   /* 흐름: 들어온 것 → 한 일 → 나온 것. 칸 사이를 화살표로 잇는다 */
   .flow { list-style: none; margin: 0 0 12px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   .flow li { position: relative; display: grid; gap: 0.4rem; align-content: start; padding: 1.1rem 1.25rem; border-radius: var(--radius-md); background: var(--color-ink); color: var(--color-paper); }

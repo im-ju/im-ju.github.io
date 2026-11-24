@@ -30,3 +30,7 @@ On PC everything runs in the browser; on phones an installable web app covers th
 - **Company rules are settings.** Leave grants, work types and leave types live in one file with their sources, so the app behaves the company's way rather than a vendor's default.
 - **Permissions are decided in one place on the server.** Hiding a button on screen is a convenience; the server decides what is allowed.
 - **Everything is fake until real data comes in.** Every name, email and number is made up for the demo.
+
+## What I learned
+
+With AI getting better, I can now build a fair amount of what I picture myself, by describing it to an AI that writes the code ("vibe coding"). But taking it to a level the whole company can rely on needed help from several departments. Being able to build something is not the same as being able to run it, and I reminded myself not to get overconfident.
