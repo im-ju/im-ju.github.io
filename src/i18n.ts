@@ -82,7 +82,7 @@ export const t = {
       eyebrow: '인사기록 카드 · HR × AX',
       name: '유주영',
       role: 'HR Operations · People Systems',
-      statement: '제도가 없으면 만들고 만든 제도가 지켜지는지 코드로 확인하는 HR 담당자입니다.',
+      statement: '제도가 없으면 만들고, 만든 제도가 지켜지는지 직접 만든 도구로 확인하는 HR 담당자입니다.',
       sub: '블록체인 인프라 기업 DSRV 인사총무팀. 조직이 50명 미만에서 90명으로 커지는 동안 HR 시스템 전환 2회, 20개 이상 포지션 채용 운영, 사내 규정을 조문 단위로 코드화한 웹 서비스 운영.',
       fields: [
         ['소속', 'DSRV · 인사총무팀 매니저'],
@@ -130,7 +130,7 @@ export const t = {
     // Home page (2026-11 redesign: pinned laptop tour). hero/modules/policy/log above stay because /print/ still uses them.
     home: {
       h1: ['사람은 사람의 일에', '집중하도록.'],
-      desc: '제도와 HR 시스템을 만들고, 손으로 하던 확인 업무를 도구로 바꿉니다.', // 첫 화면 제목 아래 한 줄. 휴대폰에서 세 줄을 넘으면 잘린다
+      desc: '구성원과 조직의 이야기를 듣고, 제도와 HR 시스템으로 풀어냅니다.', // 첫 화면 제목 아래 한 줄. 휴대폰에서 세 줄을 넘으면 잘린다
       // 소개 구역의 숫자 세 개: [숫자, 설명]. hero.sub(/print/ 표지 문장)와 같은 사실이어야 한다
       stats: [['90명', '50명 미만에서 커진 조직'], ['2회', 'HR 시스템 전환'], ['20+', '채용 포지션']],
       ctaContact: '연락하기',
@@ -163,7 +163,7 @@ export const t = {
     },
     contact: {
       title: '연락',
-      lede: 'HR Ops · People Systems · 외국계 한국법인 HR 포지션에 관심이 있습니다.',
+      lede: 'HRBP · HR Ops · People Systems 등 외국계 한국법인 HR 포지션에 관심이 있습니다.', // ← 지원 직무
     },
     footer: {
       line: 'Juyoung You · HR × AX',
@@ -230,7 +230,7 @@ export const t = {
     },
     home: {
       h1: ['Systems for people.'],
-      desc: 'I build policies and HR systems, and turn manual checks into tools.', // mirrors the KO line (the longer sentence is the About headline right below)
+      desc: 'I listen to people and the organisation, then solve what I hear with policies and HR systems.', // mirrors the KO line (the longer sentence is the About headline right below)
       stats: [['~90', 'employees, up from under 50'], ['2', 'HR system transitions'], ['20+', 'requisitions recruited']],
       ctaContact: 'Contact',
       filesTitle: (n: number) => `${n} case files`,
@@ -260,7 +260,7 @@ export const t = {
     },
     contact: {
       title: 'Contact',
-      lede: 'Open to HR Operations, People Systems and HR Generalist roles at foreign-owned companies in Korea.',
+      lede: 'Open to HRBP, HR Operations, People Systems and HR Generalist roles at foreign-owned companies in Korea.', // ← target roles
     },
     footer: {
       line: 'Juyoung You · HR × AX',
