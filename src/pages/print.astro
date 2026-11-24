@@ -31,7 +31,7 @@ const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); // K
       <div class="cover-body">
         <div>
           <p class="label">{s.hero.eyebrow}</p>
-          <h1 class="cover-name">{s.hero.name}<span class="cover-role"> · {s.hero.role}</span></h1>
+          <h1 class="cover-name">{s.hero.name}<span class="cover-role"> {s.hero.role}</span>{/* 직함은 이름 아래 줄로 떨어지므로(display:block) 앞에 "·"를 두지 않는다 */}</h1>
           <p class="cover-statement">{s.hero.statement}</p>
           <p class="cover-sub">{s.hero.sub}</p>
         </div>

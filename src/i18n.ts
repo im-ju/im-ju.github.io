@@ -74,14 +74,14 @@ export const t = {
   ko: {
     htmlLang: 'ko',
     siteTitle: 'Juyoung You — HR × AX',
-    description: 'HR 담당자 유주영의 포트폴리오. 제도를 만들고 그 제도가 지켜지는지 코드로 확인합니다.',
+    description: 'HR 담당자 유주영의 포트폴리오. 구성원과 조직의 이야기를 듣고, 제도와 HR 시스템으로 풀어냅니다.', // 검색·링크 미리보기 문구. 첫 화면 home.desc와 같은 말
     nav: { files: '작업 파일', record: '인사기록', contact: '연락' },
     langSwitch: 'EN',
     langSwitchHref: '/en/',
     hero: {
       eyebrow: '인사기록 카드 · HR × AX',
       name: '유주영',
-      role: 'HR Operations · People Systems',
+      role: 'HRBP · HR Operations · People Systems', // ← 지원 분야. /print/ 표지, 홈 인사기록 카드, 미리보기 이미지 설명에 쓰인다
       statement: '제도가 없으면 만들고, 만든 제도가 지켜지는지 직접 만든 도구로 확인하는 HR 담당자입니다.',
       sub: '블록체인 인프라 기업 DSRV 인사총무팀. 조직이 50명 미만에서 90명으로 커지는 동안 HR 시스템 전환 2회, 20개 이상 포지션 채용 운영, 사내 규정을 조문 단위로 코드화한 웹 서비스 운영.',
       fields: [
@@ -175,14 +175,14 @@ export const t = {
   en: {
     htmlLang: 'en',
     siteTitle: 'Juyoung You — HR × AX',
-    description: 'Portfolio of Juyoung You, HR generalist who writes the policy when none exists, then builds the systems that make it hold.',
+    description: 'Portfolio of Juyoung You, an HR generalist who listens to people and the organisation and turns that into policies and HR systems.', // search/link-preview text; same idea as home.desc
     nav: { files: 'Files', record: 'Record', contact: 'Contact' },
     langSwitch: 'KO',
     langSwitchHref: '/',
     hero: {
       eyebrow: 'Employee record · HR × AX',
       name: 'Juyoung You',
-      role: 'HR Operations · People Systems',
+      role: 'HRBP · HR Operations · People Systems', // ← 지원 분야. /print/ 표지, 홈 인사기록 카드, 미리보기 이미지 설명에 쓰인다
       statement: 'An HR generalist who writes the policy when none exists, then builds the systems that make it hold.',
       sub: 'Manager, HR & General Affairs at DSRV, a blockchain infrastructure company in Seoul. While the company grew from under 50 to about 90 employees, I ran two HR system transitions, handled recruiting for 20+ requisitions, and built an internal web service that encodes company regulation clause by clause.',
       fields: [
